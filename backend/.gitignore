@@ -1,0 +1,37 @@
+# Node modules
+node_modules/
+package-lock.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# OS-specific
+.DS_Store
+
+# Editor folders
+.vscode/
+.idea/
+
+# Build output (if any)
+dist/
+build/
+
+# Database (if you dump or cache anything locally)
+*.sqlite
+*.sqlite3
+*.db
+
+# Coverage reports
+coverage/
+
+# Temp files
+*.tmp
+*.swp
+
+# Passport or session cache (optional, if you persist sessions)
+sessions/
