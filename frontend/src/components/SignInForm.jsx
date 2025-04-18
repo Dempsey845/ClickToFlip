@@ -1,58 +1,22 @@
-import React, { useState } from "react";
+import CustomForm from "../components/CustomForm";
 import { attemptLoginWithFormData } from "../handlers/apiHandler";
 
-function SignInForm({ onSignIn }) {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleInputChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setFormData((prevFormData) => {
-      return { ...prevFormData, [name]: value };
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+function SignIn({ onSignIn }) {
+  const handleLogin = async (formData) => {
     await attemptLoginWithFormData(formData);
     onSignIn();
   };
 
   return (
-    <div>
-      <h3>Sign Ip</h3>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            onChange={handleInputChange}
-            type="text"
-            id="email"
-            name="email"
-            value={formData.email}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            onChange={handleInputChange}
-            type="text"
-            id="password"
-            name="password"
-            value={formData.password}
-            required
-          />
-        </div>
-        <div>
-          <input type="submit" />
-        </div>
-      </form>
-    </div>
+    <CustomForm
+      title="Sign In"
+      onSubmit={handleLogin}
+      fields={[
+        { name: "email", label: "Email", type: "text" },
+        { name: "password", label: "Password", type: "password" },
+      ]}
+    />
   );
 }
 
-export default SignInForm;
+export default SignIn;

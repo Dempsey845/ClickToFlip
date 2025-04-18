@@ -1,56 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
+import CustomForm from "../components/CustomForm";
 import { registerUserWithFormData } from "../handlers/apiHandler";
 
-function SignUpForm() {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-
-  const handleInputChange = (e) => {
-    const name = e.target.name;
-    const value = e.target.value;
-    setFormData((prevFormData) => {
-      return { ...prevFormData, [name]: value };
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+function SignUpForm({ onSignUp }) {
+  const handleRegister = async (formData) => {
     await registerUserWithFormData(formData);
+    if (onSignUp) onSignUp();
   };
 
   return (
-    <div>
-      <h3>Sign Up</h3>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="email">Email</label>
-          <input
-            onChange={handleInputChange}
-            type="text"
-            id="email"
-            name="email"
-            value={formData.email}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="password">Password</label>
-          <input
-            onChange={handleInputChange}
-            type="text"
-            id="password"
-            name="password"
-            value={formData.password}
-            required
-          />
-        </div>
-        <div>
-          <input type="submit" />
-        </div>
-      </form>
-    </div>
+    <CustomForm
+      title="Sign Up"
+      onSubmit={handleRegister}
+      fields={[
+        { name: "email", label: "Email", type: "email" },
+        { name: "password", label: "Password", type: "password" },
+      ]}
+    />
   );
 }
 
