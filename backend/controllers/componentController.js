@@ -4,7 +4,7 @@ import db from "../config/db.js";
 const getComponentsByType = (type) => {
   return new Promise((resolve, reject) => {
     db.query(
-      "SELECT (name, type) FROM components WHERE type = $1",
+      "SELECT id, name, type FROM components WHERE type = $1",
       [type],
       (err, result) => {
         if (err) return reject(err);
@@ -15,7 +15,7 @@ const getComponentsByType = (type) => {
 };
 
 export const getComponents = (req, res) => {
-  db.query("SELECT (name, type) FROM components", (err, result) => {
+  db.query("SELECT id, name, type FROM components", (err, result) => {
     if (err) {
       console.error("Error fetching components:", err);
       return res.status(500).json({ error: "Internal server error" });

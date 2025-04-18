@@ -7,6 +7,7 @@ import sessionMiddleware from "./middleware/session.js";
 import corsOptions from "./middleware/corsOptions.js";
 import authRoutes from "./routes/authRoutes.js";
 import componentRoutes from "./routes/componentRoutes.js";
+import buildRoutes from "./routes/buildRoutes.js";
 
 config();
 
@@ -23,6 +24,7 @@ app.use(passport.session());
 
 app.use("/api", authRoutes);
 app.use("/api/components", componentRoutes);
+app.use("/api/builds", buildRoutes);
 
 app.get("/", (req, res) => res.send("API running"));
 

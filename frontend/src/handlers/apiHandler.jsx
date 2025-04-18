@@ -119,6 +119,22 @@ const getMotherboardComponents = async () => {
   return res.data;
 };
 
+// Add build
+const addBuildWithBuildPayLoad = async (buildPayload) => {
+  try {
+    const response = await axios.post(
+      `${BACKEND_URL}/api/builds`,
+      buildPayload,
+      { withCredentials: true }
+    );
+    console.log("Build created:", response.data);
+    toast.success("Build created successfully!");
+  } catch (err) {
+    console.error("Error submitting build", err);
+    toast.error("Failed to create build.");
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -127,4 +143,5 @@ export {
   getCPUComponents,
   getGPUComponents,
   getMotherboardComponents,
+  addBuildWithBuildPayLoad,
 };

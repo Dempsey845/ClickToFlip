@@ -5,22 +5,7 @@ import {
   getMotherboardComponents,
 } from "../handlers/apiHandler";
 
-// Parses PostgreSQL row string like '("AMD Ryzen 5 3600",CPU)' into { name, type }
-const parseComponentRow = (rowString) => {
-  const match = rowString.match(/^\((.*?),(.*?)\)$/);
-  if (!match) return null;
-
-  let name = match[1];
-  let type = match[2];
-
-  // Remove surrounding quotes if present
-  name = name.replace(/^"|"$/g, "");
-  type = type.replace(/^"|"$/g, "");
-
-  return { name, type };
-};
-
-const AutocompleteInput = ({ type }) => {
+const AutocompleteInput = ({ type, onSelect }) => {
   const [components, setComponents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredComponents, setFilteredComponents] = useState([]);
@@ -28,8 +13,9 @@ const AutocompleteInput = ({ type }) => {
 
   useEffect(() => {
     const fetchComponents = async () => {
-      let data = [];
       try {
+        let data = [];
+
         if (type === "CPU") {
           data = await getCPUComponents();
         } else if (type === "GPU") {
@@ -41,11 +27,7 @@ const AutocompleteInput = ({ type }) => {
           return;
         }
 
-        const parsed = data
-          .map((entry) => parseComponentRow(entry.row))
-          .filter((item) => item && item.name && item.type === type);
-
-        setComponents(parsed);
+        setComponents(data); // No need to parse, already structured
       } catch (err) {
         console.error("Error fetching components:", err);
       }
@@ -74,6 +56,7 @@ const AutocompleteInput = ({ type }) => {
     setSearchTerm(component.name);
     setSelectedComponent(component);
     setFilteredComponents([]);
+    onSelect(component); // Returns full { id, name, type } object
   };
 
   return (
@@ -86,9 +69,9 @@ const AutocompleteInput = ({ type }) => {
       />
       {filteredComponents.length > 0 && (
         <ul style={{ listStyle: "none", padding: 0 }}>
-          {filteredComponents.map((component, index) => (
+          {filteredComponents.map((component) => (
             <li
-              key={index}
+              key={component.id}
               onClick={() => handleSelect(component)}
               style={{
                 cursor: "pointer",
