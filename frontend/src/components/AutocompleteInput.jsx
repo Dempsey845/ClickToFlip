@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { getComponents } from "../handlers/apiHandler";
+import {
+  getCPUComponents,
+  getGPUComponents,
+  getMotherboardComponents,
+} from "../handlers/apiHandler";
 
 // Parses PostgreSQL row string like '("AMD Ryzen 5 3600",CPU)' into { name, type }
 const parseComponentRow = (rowString) => {
@@ -16,19 +20,31 @@ const parseComponentRow = (rowString) => {
   return { name, type };
 };
 
-const AutocompleteInput = () => {
+const AutocompleteInput = ({ type }) => {
   const [components, setComponents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredComponents, setFilteredComponents] = useState([]);
-  const [selectedComponent, setSelectedComponent] = useState("");
+  const [selectedComponent, setSelectedComponent] = useState(null);
 
   useEffect(() => {
     const fetchComponents = async () => {
+      let data = [];
       try {
-        const data = await getComponents();
+        if (type === "CPU") {
+          data = await getCPUComponents();
+        } else if (type === "GPU") {
+          data = await getGPUComponents();
+        } else if (type === "Motherboard") {
+          data = await getMotherboardComponents();
+        } else {
+          console.warn(`Unsupported component type: ${type}`);
+          return;
+        }
+
         const parsed = data
           .map((entry) => parseComponentRow(entry.row))
-          .filter((item) => item && item.name); // filter out nulls
+          .filter((item) => item && item.name && item.type === type);
+
         setComponents(parsed);
       } catch (err) {
         console.error("Error fetching components:", err);
@@ -36,7 +52,7 @@ const AutocompleteInput = () => {
     };
 
     fetchComponents();
-  }, []);
+  }, [type]);
 
   const handleSearch = (e) => {
     const query = e.target.value;
@@ -45,7 +61,7 @@ const AutocompleteInput = () => {
     if (query) {
       const matches = components.filter(
         (component) =>
-          component?.name &&
+          component.name &&
           component.name.toLowerCase().includes(query.toLowerCase())
       );
       setFilteredComponents(matches);
@@ -66,10 +82,10 @@ const AutocompleteInput = () => {
         type="text"
         value={searchTerm}
         onChange={handleSearch}
-        placeholder="Search for a PC component..."
+        placeholder={`Search for a ${type}...`}
       />
       {filteredComponents.length > 0 && (
-        <ul>
+        <ul style={{ listStyle: "none", padding: 0 }}>
           {filteredComponents.map((component, index) => (
             <li
               key={index}
@@ -77,7 +93,7 @@ const AutocompleteInput = () => {
               style={{
                 cursor: "pointer",
                 padding: "5px",
-                border: "1px solid #ccc",
+                borderBottom: "1px solid #ccc",
               }}
             >
               {component.name} ({component.type})

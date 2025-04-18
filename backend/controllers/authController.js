@@ -55,13 +55,3 @@ export const logout = (req, res) => {
 export const checkAuth = (req, res) => {
   res.json({ isAuthenticated: req.isAuthenticated() });
 };
-
-export const getComponents = (req, res) => {
-  db.query("SELECT (name, type) FROM components", (err, result) => {
-    if (err) {
-      console.error("Error fetching components:", err);
-      return res.status(500).json({ error: "Internal server error" });
-    }
-    res.status(200).json(result.rows);
-  });
-};

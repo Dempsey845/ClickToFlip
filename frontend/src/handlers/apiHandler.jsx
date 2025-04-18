@@ -95,22 +95,36 @@ async function logout() {
   }
 }
 
-async function getComponents() {
-  try {
-    const response = await axios.get(`${BACKEND_URL}/api/getcomponents`, {
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (err) {
-    console.error("Failed to fetch components:", err);
-    throw new Error("Could not retrieve components.");
-  }
-}
+// GPU
+const getGPUComponents = async () => {
+  const res = await axios.get(`${BACKEND_URL}/api/components/gpu`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
+
+// CPU
+const getCPUComponents = async () => {
+  const res = await axios.get(`${BACKEND_URL}/api/components/cpu`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
+
+// Motherboard
+const getMotherboardComponents = async () => {
+  const res = await axios.get(`${BACKEND_URL}/api/components/motherboard`, {
+    withCredentials: true,
+  });
+  return res.data;
+};
 
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
   isAuthenticated,
   logout,
-  getComponents,
+  getCPUComponents,
+  getGPUComponents,
+  getMotherboardComponents,
 };
