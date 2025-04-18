@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { registerUserWithFormData } from "../handlers/apiHandler";
+import { attemptLoginWithFormData } from "../handlers/apiHandler";
 
-function SignUpForm() {
+function SignInForm({ onSignIn }) {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -17,12 +17,13 @@ function SignUpForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await registerUserWithFormData(formData);
+    await attemptLoginWithFormData(formData);
+    onSignIn();
   };
 
   return (
     <div>
-      <h3>Sign Up</h3>
+      <h3>Sign Ip</h3>
       <form onSubmit={handleSubmit}>
         <div>
           <label htmlFor="email">Email</label>
@@ -54,4 +55,4 @@ function SignUpForm() {
   );
 }
 
-export default SignUpForm;
+export default SignInForm;
