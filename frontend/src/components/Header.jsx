@@ -1,15 +1,20 @@
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function Header({ isAuthenticated, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = () => navigate("/signin");
   const handleSignup = () => navigate("/signup");
   const handleLogout = () => {
-    onLogout(); // Log out the user
+    onLogout();
     navigate("/signin");
   };
+
+  // A helper function to determine if the current link is active
+  const isActive = (path) =>
+    location.pathname === path ? "link-secondary" : "";
 
   return (
     <div className="container header">
@@ -33,22 +38,28 @@ function Header({ isAuthenticated, onLogout }) {
 
         <ul className="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
           <li>
-            <a href="/" className="nav-link px-2 link-secondary">
+            <a href="/" className={`nav-link px-2 ${isActive("/")}`}>
               Home
             </a>
           </li>
           <li>
-            <a href="/dashboard" className="nav-link px-2">
+            <a
+              href="/dashboard"
+              className={`nav-link px-2 ${isActive("/dashboard")}`}
+            >
               Dashboard
             </a>
           </li>
           <li>
-            <a href="/contact" className="nav-link px-2">
+            <a
+              href="/contact"
+              className={`nav-link px-2 ${isActive("/contact")}`}
+            >
               Contact
             </a>
           </li>
           <li>
-            <a href="/about" className="nav-link px-2">
+            <a href="/about" className={`nav-link px-2 ${isActive("/about")}`}>
               About
             </a>
           </li>
