@@ -86,7 +86,7 @@ async function isAuthenticated() {
 // Log the user out
 async function logout() {
   try {
-    const response = await axios.get(`${BACKEND_URL}/api/logout`, {
+    await axios.get(`${BACKEND_URL}/api/logout`, {
       withCredentials: true,
     });
     toast.success("Logout successful.");
@@ -95,9 +95,22 @@ async function logout() {
   }
 }
 
+async function getComponents() {
+  try {
+    const response = await axios.get(`${BACKEND_URL}/api/getcomponents`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (err) {
+    console.error("Failed to fetch components:", err);
+    throw new Error("Could not retrieve components.");
+  }
+}
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
   isAuthenticated,
   logout,
+  getComponents,
 };

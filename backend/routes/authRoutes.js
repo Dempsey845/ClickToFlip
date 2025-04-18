@@ -5,6 +5,7 @@ import {
   login,
   logout,
   checkAuth,
+  getComponents,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -14,5 +15,7 @@ router.post("/login", login);
 
 router.get("/logout", logout);
 router.get("/check-auth", checkAuth);
+
+router.get("/getcomponents", getComponents);
 
 export default router;
