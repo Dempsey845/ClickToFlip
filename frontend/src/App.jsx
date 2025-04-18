@@ -1,10 +1,13 @@
-import { useEffect, useState } from "react";
+// App.js or main component
+import React, { useState, useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
 } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { isAuthenticated, logout } from "./handlers/apiHandler";
 import HomePage from "./pages/HomePage";
 import SignInPage from "./pages/SignInPage";
@@ -35,8 +38,13 @@ function App() {
   const attemptLogout = async () => {
     await logout();
     setAuthenticated(false);
-    console.log("Logged out!");
   };
+
+  const handleSignIn = () => {
+    setAuthenticated(true);
+  };
+
+  const handleSignUp = () => {};
 
   if (loading) {
     return <div>Loading...</div>;
@@ -59,10 +67,14 @@ function App() {
         />
         <Route
           path="/signin"
-          element={<SignInPage onSignIn={() => setAuthenticated(true)} />}
+          element={<SignInPage onSignIn={handleSignIn} />}
         />
-        <Route path="/signup" element={<SignUpPage />} />
+        <Route
+          path="/signup"
+          element={<SignUpPage onSignUp={handleSignUp} />}
+        />
       </Routes>
+      <ToastContainer />
     </Router>
   );
 }

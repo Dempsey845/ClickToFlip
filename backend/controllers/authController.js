@@ -1,5 +1,6 @@
 import db from "../config/db.js";
 import bcrypt from "bcrypt";
+import passport from "passport";
 
 export const register = async (req, res) => {
   const { email, password } = req.body;
@@ -25,8 +26,22 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = (req, res) => {
-  res.json({ message: "Login successful", user: req.user });
+export const login = (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({ message: info?.message || "Login failed" });
+    }
+
+    req.login(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+      return res.json({ message: "Login successful", user: req.user });
+    });
+  })(req, res, next);
 };
 
 export const logout = (req, res) => {
