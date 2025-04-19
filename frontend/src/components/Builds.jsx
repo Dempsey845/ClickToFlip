@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getUserBuilds } from "../handlers/apiHandler";
+import EditBuildForm from "./EditBuildForm";
 
 const styles = {
   card: {
@@ -15,6 +16,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function Builds() {
   const [builds, setBuilds] = useState([]);
+  const [editingBuildId, setEditingBuildId] = useState(null); // Track which build is being edited
 
   useEffect(() => {
     const getBuilds = async () => {
@@ -25,10 +27,25 @@ function Builds() {
   }, []);
 
   const displayBuild = (build) => {
-    console.log("Build: ", build);
+    const handleEditClick = () => {
+      // Toggle visibility of the form for this specific build
+      setEditingBuildId(editingBuildId === build.id ? null : build.id);
+    };
+
     return (
       <div key={build.id} className="build-card" style={styles.card}>
         <h2>{build.name}</h2>
+
+        {/* Edit Button to toggle form visibility */}
+        <button onClick={handleEditClick} className="btn btn-primary">
+          {editingBuildId === build.id ? "Close Edit Form" : "Edit Build"}
+        </button>
+
+        {/* Conditionally render the EditBuildForm */}
+        {editingBuildId === build.id && (
+          <EditBuildForm buildId={build.id} onClose={handleEditClick} />
+        )}
+
         <p>
           <strong>Description:</strong> {build.description || "N/A"}
         </p>
@@ -51,7 +68,8 @@ function Builds() {
         <img
           style={{ width: "200px", height: "200px" }}
           src={`${BACKEND_URL}${build.image_url}`}
-        ></img>
+          alt="Build image"
+        />
       </div>
     );
   };

@@ -172,6 +172,42 @@ const uploadImageWithFormData = async (formData) => {
   }
 };
 
+const updateBuild = async (buildId, updateData) => {
+  try {
+    const response = await axios.patch(
+      `${BACKEND_URL}/api/builds/${buildId}`,
+      updateData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      }
+    );
+
+    toast.success("Build updated successfully!");
+    console.log("Updated build:", response.data);
+    return response.data;
+  } catch (err) {
+    const errorMsg =
+      err.response?.data?.error || "An unexpected error occurred.";
+    toast.error(`Failed to update build: ${errorMsg}`);
+    console.error("Error while updating build:", err);
+  }
+};
+
+const getBuildById = async (buildId) => {
+  try {
+    const response = await axios.get(`${BACKEND_URL}/api/builds/${buildId}`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (err) {
+    console.error("Error in getBuildById:", err);
+    throw err;
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -183,4 +219,6 @@ export {
   addBuildWithBuildPayLoad,
   getUserBuilds,
   uploadImageWithFormData,
+  updateBuild,
+  getBuildById,
 };
