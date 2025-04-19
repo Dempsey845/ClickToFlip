@@ -127,11 +127,48 @@ const addBuildWithBuildPayLoad = async (buildPayload) => {
       buildPayload,
       { withCredentials: true }
     );
-    console.log("Build created:", response.data);
+    //console.log("Build created:", response.data);
     toast.success("Build created successfully!");
+    return response.data;
   } catch (err) {
     console.error("Error submitting build", err);
     toast.error("Failed to create build.");
+  }
+};
+
+// GET builds
+const getUserBuilds = async () => {
+  try {
+    const result = await axios.get(`${BACKEND_URL}/api/builds`, {
+      withCredentials: true,
+    });
+    return result.data;
+  } catch (err) {
+    console.error("Error fetching user builds: ", err);
+    toast.error("Failed to fetch user builds.");
+    return null;
+  }
+};
+
+// Upload Image
+const uploadImageWithFormData = async (formData) => {
+  try {
+    const response = await axios.post(
+      `${BACKEND_URL}/api/upload/image`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      }
+    );
+
+    toast.success("Upload successful!");
+    return response.data.imageUrl;
+  } catch (error) {
+    console.error("Error uploading image:", error);
+    toast.error("Upload failed!");
   }
 };
 
@@ -144,4 +181,6 @@ export {
   getGPUComponents,
   getMotherboardComponents,
   addBuildWithBuildPayLoad,
+  getUserBuilds,
+  uploadImageWithFormData,
 };

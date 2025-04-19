@@ -1,10 +1,10 @@
-import AddBuildForm from "../components/AddBuildForm";
+import ImageUploader from "../components/ImageUploader";
 
 function HomePage() {
   return (
     <div>
       <h1>Welcome to the Home Page</h1>
-      <AddBuildForm />
+      <ImageUploader buildId={8} />
     </div>
   );
 }

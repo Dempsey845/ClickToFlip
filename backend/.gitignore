@@ -35,3 +35,6 @@ coverage/
 
 # Passport or session cache (optional, if you persist sessions)
 sessions/
+
+# Images
+uploads/

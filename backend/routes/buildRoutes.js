@@ -9,6 +9,8 @@ router.post("/", async (req, res) => {
     return res.status(401).json({ error: "Unauthorized. Please log in." });
   }
 
+  const userId = req.user.id;
+
   const {
     name,
     description,
@@ -44,8 +46,8 @@ router.post("/", async (req, res) => {
 
     const buildResult = await client.query(
       `
-      INSERT INTO builds (name, description, status, total_cost, sale_price, sold_date, profit)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO builds (name, description, status, total_cost, sale_price, sold_date, profit, user_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING id;
     `,
       [
@@ -56,6 +58,7 @@ router.post("/", async (req, res) => {
         sale_price || null,
         sold_date || null,
         profit || null,
+        userId,
       ]
     );
 
@@ -77,6 +80,31 @@ router.post("/", async (req, res) => {
     res.status(500).json({ error: err.message || "Internal server error" });
   } finally {
     client.release(); // ✅ release client back to pool
+  }
+});
+
+router.get("/", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    console.error("Unauthorized: User not authenticated.");
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  const userId = req.user.id;
+
+  try {
+    const result = await db.query("SELECT * FROM builds WHERE user_id = $1", [
+      userId,
+    ]);
+
+    if (result.rows.length === 0) {
+      return res.status(204).send(); // 204 No Content
+    }
+
+    return res.status(200).json(result.rows);
+  } catch (err) {
+    return res
+      .status(500)
+      .json({ error: "Failed to query db for user builds" });
   }
 });
 

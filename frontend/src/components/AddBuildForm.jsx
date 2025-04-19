@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AutocompleteInput from "../components/AutocompleteInput";
 import { addBuildWithBuildPayLoad } from "../handlers/apiHandler";
+import ImageUploader from "./ImageUploader";
 
 function AddBuildForm() {
   const [formData, setFormData] = useState({
@@ -18,6 +19,8 @@ function AddBuildForm() {
   const [selectedMotherboard, setSelectedMotherboard] = useState(null);
   const [formErrors, setFormErrors] = useState({});
   const [selectedGPUs, setSelectedGPUs] = useState([null]);
+  const [added, setAdded] = useState(false);
+  const [buildId, setBuildId] = useState(null);
 
   const handleGPUChange = (index, value) => {
     const updated = [...selectedGPUs];
@@ -81,7 +84,9 @@ function AddBuildForm() {
         componentIds,
       };
 
-      await addBuildWithBuildPayLoad(buildPayload);
+      const data = await addBuildWithBuildPayLoad(buildPayload);
+      setBuildId(data.buildId);
+      setAdded(true);
 
       // Reset form
       setFormData({
@@ -256,9 +261,15 @@ function AddBuildForm() {
             </div>
           )}
 
+          <ImageUploader
+            buildId={buildId}
+            customButton={true}
+            trigger={added}
+          />
+
           <div className="d-grid mt-4">
             <button type="submit" className="btn btn-primary btn-lg">
-              Save Build
+              Add Build
             </button>
           </div>
         </form>
