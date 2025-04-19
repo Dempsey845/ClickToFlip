@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getUserBuilds } from "../handlers/apiHandler";
+import { getUserBuilds, deleteBuildById } from "../handlers/apiHandler";
 import EditBuildForm from "./EditBuildForm";
 
 const styles = {
@@ -45,6 +45,15 @@ function Builds() {
         {editingBuildId === build.id && (
           <EditBuildForm buildId={build.id} onClose={handleEditClick} />
         )}
+
+        <button
+          onClick={() => {
+            deleteBuildById(build.id);
+          }}
+          className="btn btn-danger"
+        >
+          Delete Build
+        </button>
 
         <p>
           <strong>Description:</strong> {build.description || "N/A"}

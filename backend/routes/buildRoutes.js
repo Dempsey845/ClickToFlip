@@ -255,4 +255,34 @@ router.patch("/:buildId", async (req, res) => {
   }
 });
 
+router.delete("/:buildId", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    console.error("Unauthorized: User not authenticated.");
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  const userId = req.user.id;
+  const { buildId } = req.params;
+
+  try {
+    // Check if the build belongs to the user
+    const check = await db.query(
+      "SELECT * FROM builds WHERE id = $1 AND user_id = $2",
+      [buildId, userId]
+    );
+
+    if (check.rows.length === 0) {
+      return res.status(403).json({ error: "Forbidden. Not your build." });
+    }
+
+    // Delete the build
+    await db.query("DELETE FROM builds WHERE id = $1", [buildId]);
+
+    return res.status(200).json({ message: "Build deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting build:", err);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+});
+
 export default router;

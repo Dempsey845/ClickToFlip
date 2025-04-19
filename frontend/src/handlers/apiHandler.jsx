@@ -208,6 +208,20 @@ const getBuildById = async (buildId) => {
   }
 };
 
+const deleteBuildById = async (buildId) => {
+  try {
+    const response = await axios.delete(
+      `${BACKEND_URL}/api/builds/${buildId}`,
+      { withCredentials: true }
+    );
+    toast.success(`Successfully deleted build: ${response.data.message}`);
+  } catch (err) {
+    toast.error(
+      `Error deleting build: ${err.response?.data?.error || err.message}`
+    );
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -221,4 +235,5 @@ export {
   uploadImageWithFormData,
   updateBuild,
   getBuildById,
+  deleteBuildById,
 };
