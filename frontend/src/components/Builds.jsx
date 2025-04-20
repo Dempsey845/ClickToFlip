@@ -25,67 +25,83 @@ function Builds({ builds, onUpdate }) {
     };
 
     return (
-      <div key={build.id} className="build-card" style={styles.card}>
-        <h2>{build.name}</h2>
+      <div key={build.id} className="card mb-4 shadow-sm">
+        <div className="card-body">
+          <h2 className="card-title">{build.name}</h2>
 
-        {/* Edit Button to toggle form visibility */}
-        <button onClick={handleEditClick} className="btn btn-primary">
-          {editingBuildId === build.id ? "Close Edit Form" : "Edit Build"}
-        </button>
+          {/* Edit Button to toggle form visibility */}
+          <button onClick={handleEditClick} className="btn btn-primary mb-3">
+            {editingBuildId === build.id ? "Close Edit Form" : "Edit Build"}
+          </button>
 
-        {/* Conditionally render the EditBuildForm */}
-        {editingBuildId === build.id && (
-          <EditBuildForm
-            buildId={build.id}
-            onClose={handleEditClick}
-            onSuccess={onUpdate}
-          />
-        )}
+          {/* Conditionally render the EditBuildForm */}
+          {editingBuildId === build.id && (
+            <EditBuildForm
+              buildId={build.id}
+              onClose={handleEditClick}
+              onSuccess={onUpdate}
+            />
+          )}
 
-        <DisplayComponents
-          build={build}
-          cpuName={build.cpu_name}
-          cpuSpecs={build.cpu_specs}
-          gpus={build.gpus}
-          motherboardName={build.motherboard_name}
-          motherboardSpecs={build.motherboard_specs}
-          onUpdate={onUpdate}
-        />
+          <div className="row">
+            <div className="col-md-6">
+              <h5>Components</h5>
+              <DisplayComponents
+                build={build}
+                cpuName={build.cpu_name}
+                cpuSpecs={build.cpu_specs}
+                gpus={build.gpus}
+                motherboardName={build.motherboard_name}
+                motherboardSpecs={build.motherboard_specs}
+                onUpdate={onUpdate}
+              />
+            </div>
 
-        <button
-          onClick={() => {
-            deleteBuildById(build.id);
-            onUpdate();
-          }}
-          className="btn btn-danger"
-        >
-          Delete Build
-        </button>
+            <div className="col-md-6">
+              <h5>Build Info</h5>
+              <p>
+                <strong>Description:</strong> {build.description || "N/A"}
+              </p>
+              <p>
+                <strong>Status:</strong> {build.status}
+              </p>
+              <p>
+                <strong>Total Cost:</strong> £{build.total_cost}
+              </p>
+              <p>
+                <strong>Sale Price:</strong>{" "}
+                {build.sale_price ? `£${build.sale_price}` : "Not sold yet"}
+              </p>
+              <p>
+                <strong>Sold Date:</strong> {build.sold_date || "N/A"}
+              </p>
+              <p>
+                <strong>Profit:</strong>{" "}
+                {build.profit ? `£${build.profit}` : "N/A"}
+              </p>
+              <img
+                style={{ width: "200px", height: "200px", objectFit: "cover" }}
+                src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9xaFX9gc2zGTmdvYGkGq0tKk6aV8X0iZOwVC4RXRWgw&s&ec=72940543`}
+                alt="Build image"
+                className="img-fluid"
+              />
+            </div>
+          </div>
 
-        <p>
-          <strong>Description:</strong> {build.description || "N/A"}
-        </p>
-        <p>
-          <strong>Status:</strong> {build.status}
-        </p>
-        <p>
-          <strong>Total Cost:</strong> £{build.total_cost}
-        </p>
-        <p>
-          <strong>Sale Price:</strong>{" "}
-          {build.sale_price ? `£${build.sale_price}` : "Not sold yet"}
-        </p>
-        <p>
-          <strong>Sold Date:</strong> {build.sold_date || "N/A"}
-        </p>
-        <p>
-          <strong>Profit:</strong> {build.profit ? `£${build.profit}` : "N/A"}
-        </p>
-        <img
-          style={{ width: "200px", height: "200px" }}
-          src={`${BACKEND_URL}${build.image_url}`}
-          alt="Build image"
-        />
+          <div className="row mt-3">
+            <div className="col-md-6 d-flex align-items-end">
+              <button
+                onClick={() => {
+                  deleteBuildById(build.id);
+                  onUpdate();
+                }}
+                className="btn btn-danger"
+              >
+                Delete Build
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };

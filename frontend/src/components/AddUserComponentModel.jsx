@@ -160,17 +160,20 @@ const styles = {
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 1050, // Ensure overlay is above everything else
   },
   modal: {
     backgroundColor: "white",
     padding: "20px",
     borderRadius: "8px",
     width: "400px",
-    boxShadow: "0px 0px 10px rgba(0,0,0,0.1)",
+    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
+    zIndex: 1060, // Ensure modal content is above the overlay
+    position: "relative", // Make sure modal content stays relative to its overlay
   },
   input: {
     width: "100%",
