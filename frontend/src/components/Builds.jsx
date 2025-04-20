@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { getUserBuilds, deleteBuildById } from "../handlers/apiHandler";
 import EditBuildForm from "./EditBuildForm";
+import { deleteBuildById } from "../handlers/apiHandler";
 
 const styles = {
   card: {
@@ -14,17 +14,8 @@ const styles = {
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-function Builds() {
-  const [builds, setBuilds] = useState([]);
+function Builds({ builds, onUpdate }) {
   const [editingBuildId, setEditingBuildId] = useState(null); // Track which build is being edited
-
-  useEffect(() => {
-    const getBuilds = async () => {
-      const result = await getUserBuilds();
-      setBuilds(result);
-    };
-    getBuilds();
-  }, []);
 
   const displayBuild = (build) => {
     const handleEditClick = () => {
@@ -43,12 +34,17 @@ function Builds() {
 
         {/* Conditionally render the EditBuildForm */}
         {editingBuildId === build.id && (
-          <EditBuildForm buildId={build.id} onClose={handleEditClick} />
+          <EditBuildForm
+            buildId={build.id}
+            onClose={handleEditClick}
+            onSuccess={onUpdate}
+          />
         )}
 
         <button
           onClick={() => {
             deleteBuildById(build.id);
+            onUpdate();
           }}
           className="btn btn-danger"
         >

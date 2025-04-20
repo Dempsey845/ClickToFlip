@@ -4,7 +4,7 @@ import { addBuildWithBuildPayLoad } from "../handlers/apiHandler";
 import ImageUploader from "./ImageUploader";
 import "./AddBuildForm.css"; // for overlay styles
 
-function AddBuildForm() {
+function AddBuildForm({ onUpdate }) {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     buildName: "",
@@ -89,6 +89,7 @@ function AddBuildForm() {
       const data = await addBuildWithBuildPayLoad(buildPayload);
       setBuildId(data.buildId);
       setAdded(true);
+      onUpdate();
       setShowModal(false); // close modal on success
 
       // Reset form
