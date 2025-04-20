@@ -339,6 +339,23 @@ router.patch("/changeComponent/:prevComponentId/:buildId", async (req, res) => {
       return res.status(403).json({ error: "Forbidden. Not your build." });
     }
 
+    // Check if the previous component is in the build and exists in the components table
+    const prevComponentCheck = await db.query(
+      `
+      SELECT bc.component_id 
+      FROM build_components bc
+      LEFT JOIN components c ON bc.component_id = c.id
+      WHERE bc.build_id = $1 AND c.id = $2
+      `,
+      [buildId, prevComponentId]
+    );
+
+    if (prevComponentCheck.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ error: "Previous component not found in this build." });
+    }
+
     // Update the build_components table
     const result = await db.query(
       `

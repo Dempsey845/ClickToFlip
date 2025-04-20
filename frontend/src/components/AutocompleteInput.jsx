@@ -4,12 +4,14 @@ import {
   getGPUComponents,
   getMotherboardComponents,
 } from "../handlers/apiHandler";
+import AddUserComponentModel from "./AddUserComponentModel";
 
 const AutocompleteInput = ({ type, onSelect }) => {
   const [components, setComponents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredComponents, setFilteredComponents] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState(null);
+  const [showAddComponentModal, setShowAddComponentModal] = useState(false);
 
   useEffect(() => {
     const fetchComponents = async () => {
@@ -56,6 +58,7 @@ const AutocompleteInput = ({ type, onSelect }) => {
     setSearchTerm(component.name);
     setSelectedComponent(component);
     setFilteredComponents([]);
+    setShowAddComponentModal(false); // Hide modal once a component is selected
     onSelect(component); // Returns full { id, name, type } object
   };
 
@@ -83,6 +86,33 @@ const AutocompleteInput = ({ type, onSelect }) => {
             </li>
           ))}
         </ul>
+      )}
+
+      {filteredComponents.length === 0 && searchTerm && (
+        <button
+          onClick={() => setShowAddComponentModal(true)}
+          style={{
+            padding: "10px",
+            backgroundColor: "#007bff",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+            marginTop: "10px",
+          }}
+        >
+          Add a New {type}
+        </button>
+      )}
+
+      {showAddComponentModal && (
+        <AddUserComponentModel
+          type={type}
+          setShowAddComponentModal={setShowAddComponentModal}
+          onClose={() => {
+            setSearchTerm("");
+          }}
+        />
       )}
     </div>
   );

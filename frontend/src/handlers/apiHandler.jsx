@@ -238,6 +238,21 @@ const changeComponent = async (buildId, prevComponentId, newComponent) => {
   }
 };
 
+const addUserComponent = async (component) => {
+  try {
+    const result = await axios.post(
+      `${BACKEND_URL}/api/components/addUserComponent`,
+      component,
+      { withCredentials: true }
+    );
+    toast.success(`Added Component: ${component.name}!`);
+  } catch (err) {
+    toast.error(
+      `Error adding component: ${err.response?.data?.error || err.message}`
+    );
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -253,4 +268,5 @@ export {
   getBuildById,
   deleteBuildById,
   changeComponent,
+  addUserComponent,
 };
