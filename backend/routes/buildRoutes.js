@@ -92,16 +92,69 @@ router.get("/", async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const result = await db.query("SELECT * FROM builds WHERE user_id = $1", [
-      userId,
-    ]);
+    const query = `SELECT 
+  b.id,
+  b.name,
+  b.description,
+  b.status,
+  b.total_cost,
+  b.sale_price,
+  b.sold_date,
+  b.profit,
+
+  -- CPU: expect one
+  cpu.name AS cpu_name,
+  cpu.specs AS cpu_specs,
+
+  -- GPUs: array of objects
+  gpu.gpus,
+
+  -- Motherboard: expect one
+  motherboard.name AS motherboard_name,
+  motherboard.specs AS motherboard_specs
+
+FROM builds b
+
+-- CPU subquery
+LEFT JOIN (
+  SELECT bc.build_id, c.name, c.specs
+  FROM build_components bc
+  JOIN components c ON bc.component_id = c.id
+  WHERE c.type = 'CPU'
+) cpu ON b.id = cpu.build_id
+
+-- GPU subquery: array of JSON objects (name + specs)
+LEFT JOIN (
+  SELECT bc.build_id, 
+         ARRAY_AGG(JSON_BUILD_OBJECT('name', c.name, 'specs', c.specs)) AS gpus
+  FROM build_components bc
+  JOIN components c ON bc.component_id = c.id
+  WHERE c.type = 'GPU'
+  GROUP BY bc.build_id
+) gpu ON b.id = gpu.build_id
+
+-- Motherboard subquery
+LEFT JOIN (
+  SELECT bc.build_id, c.name, c.specs
+  FROM build_components bc
+  JOIN components c ON bc.component_id = c.id
+  WHERE c.type = 'Motherboard'
+) motherboard ON b.id = motherboard.build_id
+
+WHERE b.user_id = $1
+ORDER BY b.id DESC;
+
+`;
+
+    const result = await db.query(query, [userId]);
 
     if (result.rows.length === 0) {
-      return res.status(204).send(); // 204 No Content
+      return res.status(204).send(); // No builds
     }
 
     return res.status(200).json(result.rows);
   } catch (err) {
+    console.error("Error fetching builds:", err);
     return res
       .status(500)
       .json({ error: "Failed to query db for user builds" });
@@ -128,24 +181,29 @@ router.get("/:buildId", async (req, res) => {
       return res.status(403).json({ error: "Forbidden. Not your build." });
     }
 
-    // Query to fetch build data with associated components (CPU, GPUs, Motherboard)
-    const query = `SELECT b.id, b.name, b.description, b.status, b.total_cost, b.sale_price, b.sold_date, b.profit, 
-       c_cpu.name AS cpu_name, 
-       ARRAY_AGG(DISTINCT c_gpu.name) AS gpu_names, 
-       c_motherboard.name AS motherboard_name
-        FROM builds b
-        -- Join to get CPU component for this build
-        LEFT JOIN build_components bc_cpu ON b.id = bc_cpu.build_id
-        LEFT JOIN components c_cpu ON bc_cpu.component_id = c_cpu.id AND c_cpu.type = 'CPU'  -- Only select CPUs
-        -- Join to get GPU components for this build
-        LEFT JOIN build_components bc_gpu ON b.id = bc_gpu.build_id
-        LEFT JOIN components c_gpu ON bc_gpu.component_id = c_gpu.id AND c_gpu.type = 'GPU'  -- Only select GPUs
-        -- Join to get Motherboard component for this build
-        LEFT JOIN build_components bc_motherboard ON b.id = bc_motherboard.build_id
-        LEFT JOIN components c_motherboard ON bc_motherboard.component_id = c_motherboard.id AND c_motherboard.type = 'Motherboard'  -- Only select Motherboards
-        WHERE b.id = $1
-        GROUP BY b.id, c_cpu.name, c_motherboard.name;
-`;
+    // Query to fetch build data with component names and specs
+    const query = `
+      SELECT 
+        b.id, b.name, b.description, b.status, b.total_cost, b.sale_price, b.sold_date, b.profit,
+        c_cpu.name AS cpu_name, 
+        c_cpu.specs AS cpu_specs,
+        ARRAY_AGG(DISTINCT c_gpu.name) AS gpu_names,  -- The old format: just GPU names
+        ARRAY_AGG(DISTINCT jsonb_build_object('name', c_gpu.name, 'specs', c_gpu.specs)) AS gpus,  -- The new format with GPU specs
+        c_motherboard.name AS motherboard_name,
+        c_motherboard.specs AS motherboard_specs
+      FROM builds b
+      -- CPU Join
+      LEFT JOIN build_components bc_cpu ON b.id = bc_cpu.build_id
+      LEFT JOIN components c_cpu ON bc_cpu.component_id = c_cpu.id AND c_cpu.type = 'CPU'
+      -- GPU Join
+      LEFT JOIN build_components bc_gpu ON b.id = bc_gpu.build_id
+      LEFT JOIN components c_gpu ON bc_gpu.component_id = c_gpu.id AND c_gpu.type = 'GPU'
+      -- Motherboard Join
+      LEFT JOIN build_components bc_motherboard ON b.id = bc_motherboard.build_id
+      LEFT JOIN components c_motherboard ON bc_motherboard.component_id = c_motherboard.id AND c_motherboard.type = 'Motherboard'
+      WHERE b.id = $1
+      GROUP BY b.id, c_cpu.name, c_cpu.specs, c_motherboard.name, c_motherboard.specs;
+    `;
 
     const result = await db.query(query, [buildId]);
 

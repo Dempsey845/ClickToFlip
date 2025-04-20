@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import EditBuildForm from "./EditBuildForm";
 import { deleteBuildById } from "../handlers/apiHandler";
+import DisplayComponents from "./DisplayComponents";
 
 const styles = {
   card: {
@@ -40,6 +41,14 @@ function Builds({ builds, onUpdate }) {
             onSuccess={onUpdate}
           />
         )}
+
+        <DisplayComponents
+          cpuName={build.cpu_name}
+          cpuSpecs={build.cpu_specs}
+          gpus={build.gpus}
+          motherboardName={build.motherboard_name}
+          motherboardSpecs={build.motherboard_specs}
+        />
 
         <button
           onClick={() => {
