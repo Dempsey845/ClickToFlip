@@ -43,11 +43,13 @@ function Builds({ builds, onUpdate }) {
         )}
 
         <DisplayComponents
+          build={build}
           cpuName={build.cpu_name}
           cpuSpecs={build.cpu_specs}
           gpus={build.gpus}
           motherboardName={build.motherboard_name}
           motherboardSpecs={build.motherboard_specs}
+          onUpdate={onUpdate}
         />
 
         <button

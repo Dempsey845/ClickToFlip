@@ -92,58 +92,63 @@ router.get("/", async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const query = `SELECT 
-  b.id,
-  b.name,
-  b.description,
-  b.status,
-  b.total_cost,
-  b.sale_price,
-  b.sold_date,
-  b.profit,
+    const query = `
+  SELECT 
+    b.id,
+    b.name,
+    b.description,
+    b.status,
+    b.total_cost,
+    b.sale_price,
+    b.sold_date,
+    b.profit,
 
-  -- CPU: expect one
-  cpu.name AS cpu_name,
-  cpu.specs AS cpu_specs,
+    -- CPU: expect one
+    cpu.cpu_id,
+    cpu.name AS cpu_name,
+    cpu.specs AS cpu_specs,
 
-  -- GPUs: array of objects
-  gpu.gpus,
+    -- GPUs: array of objects and array of IDs
+    gpu.gpus,
+    gpu.gpu_ids,
 
-  -- Motherboard: expect one
-  motherboard.name AS motherboard_name,
-  motherboard.specs AS motherboard_specs
+    -- Motherboard: expect one
+    motherboard.motherboard_id,
+    motherboard.name AS motherboard_name,
+    motherboard.specs AS motherboard_specs
 
-FROM builds b
+  FROM builds b
 
--- CPU subquery
-LEFT JOIN (
-  SELECT bc.build_id, c.name, c.specs
-  FROM build_components bc
-  JOIN components c ON bc.component_id = c.id
-  WHERE c.type = 'CPU'
-) cpu ON b.id = cpu.build_id
+  -- CPU subquery: fetch one CPU per build
+  LEFT JOIN (
+    SELECT bc.build_id, c.id AS cpu_id, c.name, c.specs
+    FROM build_components bc
+    JOIN components c ON bc.component_id = c.id
+    WHERE c.type = 'CPU'
+  ) cpu ON b.id = cpu.build_id
 
--- GPU subquery: array of JSON objects (name + specs)
-LEFT JOIN (
-  SELECT bc.build_id, 
-         ARRAY_AGG(JSON_BUILD_OBJECT('name', c.name, 'specs', c.specs)) AS gpus
-  FROM build_components bc
-  JOIN components c ON bc.component_id = c.id
-  WHERE c.type = 'GPU'
-  GROUP BY bc.build_id
-) gpu ON b.id = gpu.build_id
+  -- GPU subquery: fetch all GPUs for a build, including ids and JSON object (name + specs)
+  LEFT JOIN (
+    SELECT 
+      bc.build_id, 
+      ARRAY_AGG(c.id ORDER BY bc.component_id) AS gpu_ids,  -- Order by component_id instead of bc.id
+      ARRAY_AGG(JSON_BUILD_OBJECT('id', c.id, 'name', c.name, 'specs', c.specs) ORDER BY bc.component_id) AS gpus  -- Full GPU objects
+    FROM build_components bc
+    JOIN components c ON bc.component_id = c.id
+    WHERE c.type = 'GPU'
+    GROUP BY bc.build_id
+  ) gpu ON b.id = gpu.build_id
 
--- Motherboard subquery
-LEFT JOIN (
-  SELECT bc.build_id, c.name, c.specs
-  FROM build_components bc
-  JOIN components c ON bc.component_id = c.id
-  WHERE c.type = 'Motherboard'
-) motherboard ON b.id = motherboard.build_id
+  -- Motherboard subquery: fetch one motherboard per build
+  LEFT JOIN (
+    SELECT bc.build_id, c.id AS motherboard_id, c.name, c.specs
+    FROM build_components bc
+    JOIN components c ON bc.component_id = c.id
+    WHERE c.type = 'Motherboard'
+  ) motherboard ON b.id = motherboard.build_id
 
-WHERE b.user_id = $1
-ORDER BY b.id DESC;
-
+  WHERE b.user_id = $1
+  ORDER BY b.id DESC;
 `;
 
     const result = await db.query(query, [userId]);
@@ -310,6 +315,51 @@ router.patch("/:buildId", async (req, res) => {
   } catch (err) {
     console.error("Error updating build:", err);
     return res.status(500).json({ error: "Failed to update build." });
+  }
+});
+
+router.patch("/changeComponent/:prevComponentId/:buildId", async (req, res) => {
+  const { prevComponentId, buildId } = req.params;
+  const newComponentId = Number(Object.keys(req.body)[0]);
+  const userId = req.user.id;
+
+  if (!req.isAuthenticated()) {
+    console.error("Unauthorized: User not authenticated.");
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  try {
+    // Check if the build belongs to the user
+    const check = await db.query(
+      "SELECT * FROM builds WHERE id = $1 AND user_id = $2",
+      [buildId, userId]
+    );
+
+    if (check.rows.length === 0) {
+      return res.status(403).json({ error: "Forbidden. Not your build." });
+    }
+
+    // Update the build_components table
+    const result = await db.query(
+      `
+      UPDATE build_components
+      SET component_id = $1
+      WHERE build_id = $2 AND component_id = $3
+      RETURNING *;
+      `,
+      [newComponentId, buildId, prevComponentId]
+    );
+
+    if (result.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ error: "Component not found in this build." });
+    }
+
+    return res.status(200).json({ message: "Component updated successfully." });
+  } catch (err) {
+    console.error("Error updating component:", err);
+    return res.status(500).json({ error: "Server error updating component." });
   }
 });
 

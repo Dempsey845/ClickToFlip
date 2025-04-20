@@ -1,3 +1,7 @@
+import AutocompleteInput from "./AutocompleteInput";
+import { changeComponent } from "../handlers/apiHandler";
+import { use, useState } from "react";
+
 function parseCpuSpecsString(specString) {
   const result = {};
 
@@ -84,14 +88,55 @@ function parseGpuSpecsString(specString) {
 }
 
 function DisplayComponents({
+  build,
   cpuName,
   cpuSpecs,
   gpus,
   motherboardName,
   motherboardSpecs,
+  onUpdate,
 }) {
+  const [showChangeCpuButton, setShowChangeCpuButton] = useState(false);
+  const [showChangeMoboButton, setShowChangeMoboButton] = useState(false);
+  const [showChangeGpusButton, setShowChangeGpusButton] = useState(false);
+  const [newCPU, setNewCPU] = useState(null);
+  const [newGPU, setNewGPU] = useState(null);
+  const [newMobo, setNewMobo] = useState(null);
   const parsedCpuSpecs = parseCpuSpecsString(cpuSpecs);
   const parsedMoboSpecs = parseMotherboardSpecsString(motherboardSpecs);
+
+  const handleCPUChange = (component) => {
+    setShowChangeCpuButton(true);
+    setNewCPU(component);
+  };
+
+  const handleCPUSubmit = async () => {
+    await changeComponent(build.id, build.cpu_id, newCPU);
+    setShowChangeCpuButton(false);
+    onUpdate();
+  };
+
+  const handleMoboChange = (component) => {
+    setShowChangeMoboButton(true);
+    setNewMobo(component);
+  };
+
+  const handleMoboSubmit = async () => {
+    await changeComponent(build.id, build.motherboard_id, newMobo);
+    setShowChangeMoboButton(false);
+    onUpdate();
+  };
+
+  const handleGPUChange = (component) => {
+    setShowChangeGpusButton(true);
+    setNewGPU(component);
+  };
+
+  const handleGPUSubmit = async (gpuIndex) => {
+    await changeComponent(build.id, build.gpu_ids[gpuIndex], newGPU);
+    setShowChangeGpusButton(false);
+    onUpdate();
+  };
 
   return (
     <div className="container mt-4">
@@ -115,6 +160,11 @@ function DisplayComponents({
           ) : (
             <p className="text-muted">No CPU specs available.</p>
           )}
+          <p>Change CPU: </p>
+          <AutocompleteInput type={"CPU"} onSelect={handleCPUChange} />
+          {showChangeCpuButton && (
+            <button onClick={handleCPUSubmit}>Update CPU</button>
+          )}
         </div>
       </div>
 
@@ -130,7 +180,7 @@ function DisplayComponents({
             gpus.map((gpu, index) => {
               const parsedSpecs = parseGpuSpecsString(gpu.specs);
               return (
-                <div key={index} className="mb-3">
+                <div key={gpu.id} className="mb-3">
                   <strong>{gpu.name}</strong>
                   {parsedSpecs && Object.keys(parsedSpecs).length > 0 ? (
                     <ul className="list-group list-group-flush mt-1">
@@ -139,10 +189,20 @@ function DisplayComponents({
                           Memory: {parsedSpecs.memory}
                         </li>
                       )}
-                      {/* Add more GPU specs here if needed */}
                     </ul>
                   ) : (
                     <p className="text-muted">No GPU specs available.</p>
+                  )}
+                  <p>Change GPU: </p>
+                  <AutocompleteInput type={"GPU"} onSelect={handleGPUChange} />
+                  {showChangeGpusButton && (
+                    <button
+                      onClick={() => {
+                        handleGPUSubmit(index);
+                      }}
+                    >
+                      Update GPU
+                    </button>
                   )}
                 </div>
               );
@@ -172,6 +232,11 @@ function DisplayComponents({
             </ul>
           ) : (
             <p className="text-muted">No motherboard specs available.</p>
+          )}
+          <p>Change Motherboard: </p>
+          <AutocompleteInput type={"Motherboard"} onSelect={handleMoboChange} />
+          {showChangeMoboButton && (
+            <button onClick={handleMoboSubmit}>Update Motherboard</button>
           )}
         </div>
       </div>

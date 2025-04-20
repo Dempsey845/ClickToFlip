@@ -26,7 +26,7 @@ async function registerUserWithFormData(formData) {
     const response = await axios.post(`${BACKEND_URL}/api/register`, formData, {
       withCredentials: true,
     });
-    console.log("Register response: ", response);
+    //console.log("Register response: ", response);
     toast.success("Registration successful!");
   } catch (err) {
     console.error("Error posting register: ", err);
@@ -48,7 +48,7 @@ async function attemptLoginWithFormData(formData) {
     const response = await axios.post(`${BACKEND_URL}/api/login`, formData, {
       withCredentials: true,
     });
-    console.log("Login response: ", response);
+    //console.log("Login response: ", response);
 
     // Manually check for login success
     if (
@@ -75,7 +75,7 @@ async function isAuthenticated() {
     const response = await axios.get(`${BACKEND_URL}/api/check-auth`, {
       withCredentials: true,
     });
-    console.log("check-auth response: ", response);
+    //console.log("check-auth response: ", response);
     return response.data.isAuthenticated;
   } catch (err) {
     toast.error("Error authenticating: ", err);
@@ -127,7 +127,7 @@ const addBuildWithBuildPayLoad = async (buildPayload) => {
       buildPayload,
       { withCredentials: true }
     );
-    //console.log("Build created:", response.data);
+    ////console.log("Build created:", response.data);
     toast.success("Build created successfully!");
     return response.data;
   } catch (err) {
@@ -186,7 +186,7 @@ const updateBuild = async (buildId, updateData) => {
     );
 
     toast.success("Build updated successfully!");
-    console.log("Updated build:", response.data);
+    //console.log("Updated build:", response.data);
     return response.data;
   } catch (err) {
     const errorMsg =
@@ -222,6 +222,22 @@ const deleteBuildById = async (buildId) => {
   }
 };
 
+const changeComponent = async (buildId, prevComponentId, newComponent) => {
+  try {
+    const response = await axios.patch(
+      `${BACKEND_URL}/api/builds/changeComponent/${prevComponentId}/${buildId}`,
+      newComponent.id,
+      { withCredentials: true }
+    );
+    toast.success(`Updated to ${newComponent.name}!`);
+    return response.data;
+  } catch (err) {
+    toast.error(
+      `Error changing component: ${err.response?.data?.error || err.message}`
+    );
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -236,4 +252,5 @@ export {
   updateBuild,
   getBuildById,
   deleteBuildById,
+  changeComponent,
 };
