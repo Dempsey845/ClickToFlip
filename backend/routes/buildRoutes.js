@@ -102,6 +102,7 @@ router.get("/", async (req, res) => {
     b.sale_price,
     b.sold_date,
     b.profit,
+    b.image_url,
 
     -- CPU: expect one
     cpu.cpu_id,

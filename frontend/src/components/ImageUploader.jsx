@@ -2,15 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { uploadImageWithFormData } from "../handlers/apiHandler";
 
-function ImageUploader({ buildId, customButton, trigger }) {
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
+function ImageUploader({ buildId, onUploaded, uploadText = "Upload Image" }) {
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
-
-  useEffect(() => {
-    if (trigger) {
-      handleUpload();
-    }
-  }, [trigger]);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -28,19 +24,20 @@ function ImageUploader({ buildId, customButton, trigger }) {
 
     const resultUrl = await uploadImageWithFormData(formData);
     setImageUrl(resultUrl);
+    onUploaded();
   };
 
   return (
-    <div>
-      <input type="file" onChange={handleFileChange} />
-      {!customButton && <button onClick={handleUpload}>Upload Image</button>}
-
-      {imageUrl && (
-        <div>
-          <h3>Uploaded Image:</h3>
-          <img src={imageUrl} alt="Uploaded" style={{ width: "200px" }} />
-        </div>
-      )}
+    <div className="d-flex flex-column gap-2">
+      <input
+        type="file"
+        accept=".jpg,.jpeg,.png"
+        className="form-control"
+        onChange={handleFileChange}
+      />
+      <button className="btn btn-primary" onClick={handleUpload}>
+        {uploadText}
+      </button>
     </div>
   );
 }

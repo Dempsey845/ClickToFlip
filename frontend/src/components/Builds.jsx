@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import EditBuildForm from "./EditBuildForm";
 import { deleteBuildById } from "../handlers/apiHandler";
 import DisplayComponents from "./DisplayComponents";
+import ImageUploader from "./ImageUploader";
 
 const styles = {
   card: {
@@ -23,6 +24,8 @@ function Builds({ builds, onUpdate }) {
       // Toggle visibility of the form for this specific build
       setEditingBuildId(editingBuildId === build.id ? null : build.id);
     };
+
+    console.log(build);
 
     return (
       <div key={build.id} className="card mb-4 shadow-sm">
@@ -81,10 +84,11 @@ function Builds({ builds, onUpdate }) {
               </p>
               <img
                 style={{ width: "500px", height: "500px", objectFit: "cover" }}
-                src={`http://localhost:5000/uploads/20250307_164718.jpg`}
+                src={`${BACKEND_URL}${build.image_url}`}
                 alt="Build image"
                 className="img-fluid"
               />
+              <ImageUploader uploadText="Replace Image" buildId={build.id} />
             </div>
           </div>
 

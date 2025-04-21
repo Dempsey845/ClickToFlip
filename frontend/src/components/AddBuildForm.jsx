@@ -21,8 +21,9 @@ function AddBuildForm({ onUpdate }) {
   const [selectedMotherboard, setSelectedMotherboard] = useState(null);
   const [formErrors, setFormErrors] = useState({});
   const [selectedGPUs, setSelectedGPUs] = useState([null]);
-  const [added, setAdded] = useState(false);
   const [buildId, setBuildId] = useState(null);
+  const [created, setCreated] = useState(false);
+  const [modelTitle, setModelTitle] = useState("Add New PC Build");
 
   const handleGPUChange = (index, value) => {
     const updated = [...selectedGPUs];
@@ -88,9 +89,11 @@ function AddBuildForm({ onUpdate }) {
 
       const data = await addBuildWithBuildPayLoad(buildPayload);
       setBuildId(data.buildId);
-      setAdded(true);
       onUpdate();
-      setShowModal(false); // close modal on success
+      //setShowModal(false); // close modal on success
+      console.log("Build ID: ", buildId);
+      setModelTitle("Upload Image of Build");
+      setCreated(true);
 
       // Reset form
       setFormData({
@@ -111,6 +114,180 @@ function AddBuildForm({ onUpdate }) {
     }
   };
 
+  const showBuildForm = () => {
+    return (
+      <form onSubmit={handleOnSubmit}>
+        {/* Basic Info */}
+        <div className="mb-3">
+          <label htmlFor="buildName" className="form-label">
+            Build Name
+          </label>
+          <input
+            className="form-control"
+            id="buildName"
+            name="buildName"
+            type="text"
+            value={formData.buildName}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="description" className="form-label">
+            Description
+          </label>
+          <textarea
+            className="form-control"
+            id="description"
+            name="description"
+            rows="3"
+            value={formData.description}
+            onChange={handleInputChange}
+          />
+        </div>
+
+        <div className="mb-3">
+          <label htmlFor="status" className="form-label">
+            Status
+          </label>
+          <select
+            className="form-select"
+            id="status"
+            name="status"
+            value={formData.status}
+            onChange={handleInputChange}
+          >
+            <option value="planned">Planned</option>
+            <option value="in progress">In Progress</option>
+            <option value="completed">Completed</option>
+            <option value="sold">Sold</option>
+          </select>
+        </div>
+
+        {/* Components */}
+        <div className="mb-3">
+          <label className="form-label">
+            CPU <span className="text-danger">*</span>
+          </label>
+          <AutocompleteInput type="CPU" onSelect={setSelectedCPU} />
+          {formErrors.cpu && (
+            <div className="form-text text-danger">{formErrors.cpu}</div>
+          )}
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">GPU(s)</label>
+          {selectedGPUs.map((gpu, index) => (
+            <div key={index} className="mb-2">
+              <AutocompleteInput
+                type="GPU"
+                onSelect={(val) => handleGPUChange(index, val)}
+              />
+            </div>
+          ))}
+          <button
+            type="button"
+            className="btn btn-outline-secondary btn-sm"
+            onClick={addGPUInput}
+          >
+            + Add GPU
+          </button>
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">Motherboard</label>
+          <AutocompleteInput
+            type="Motherboard"
+            onSelect={setSelectedMotherboard}
+          />
+        </div>
+
+        {/* Financials */}
+        <div className="row">
+          <div className="col-md-4 mb-3">
+            <label htmlFor="totalCost" className="form-label">
+              Total Cost (£)
+            </label>
+            <input
+              className="form-control"
+              id="totalCost"
+              name="totalCost"
+              type="number"
+              step="0.01"
+              value={formData.totalCost}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <label htmlFor="salePrice" className="form-label">
+              Sale Price (£)
+            </label>
+            <input
+              className="form-control"
+              id="salePrice"
+              name="salePrice"
+              type="number"
+              step="0.01"
+              value={formData.salePrice}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          <div className="col-md-4 mb-3">
+            <label htmlFor="profit" className="form-label">
+              Profit (£)
+            </label>
+            <input
+              className="form-control"
+              id="profit"
+              name="profit"
+              type="number"
+              value={formData.profit}
+              readOnly
+            />
+          </div>
+        </div>
+
+        {formData.salePrice && (
+          <div className="mb-3">
+            <label htmlFor="soldDate" className="form-label">
+              Sold Date
+            </label>
+            <input
+              className="form-control"
+              id="soldDate"
+              name="soldDate"
+              type="date"
+              value={formData.soldDate}
+              onChange={handleInputChange}
+            />
+          </div>
+        )}
+        <div className="d-grid mt-4">
+          <button type="submit" className="btn btn-primary btn-lg">
+            Add Build
+          </button>
+        </div>
+      </form>
+    );
+  };
+
+  const showImageUploadForm = () => {
+    return (
+      <ImageUploader
+        buildId={buildId}
+        onUploaded={() => {
+          // Close model
+          setModelTitle("Add New PC Build");
+          setCreated(false);
+          setShowModal(false);
+        }}
+      />
+    );
+  };
+
   return (
     <>
       <button className="btn btn-success" onClick={() => setShowModal(true)}>
@@ -121,175 +298,15 @@ function AddBuildForm({ onUpdate }) {
         <div className="modal-overlay">
           <div className="modal-content shadow-lg rounded p-4 bg-white">
             <div className="d-flex justify-content-between mb-3">
-              <h4>Add New PC Build</h4>
+              <h4>{modelTitle}</h4>
               <button
                 className="btn-close"
                 onClick={() => setShowModal(false)}
               />
             </div>
 
-            <form onSubmit={handleOnSubmit}>
-              {/* Basic Info */}
-              <div className="mb-3">
-                <label htmlFor="buildName" className="form-label">
-                  Build Name
-                </label>
-                <input
-                  className="form-control"
-                  id="buildName"
-                  name="buildName"
-                  type="text"
-                  value={formData.buildName}
-                  onChange={handleInputChange}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="description" className="form-label">
-                  Description
-                </label>
-                <textarea
-                  className="form-control"
-                  id="description"
-                  name="description"
-                  rows="3"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                />
-              </div>
-
-              <div className="mb-3">
-                <label htmlFor="status" className="form-label">
-                  Status
-                </label>
-                <select
-                  className="form-select"
-                  id="status"
-                  name="status"
-                  value={formData.status}
-                  onChange={handleInputChange}
-                >
-                  <option value="planned">Planned</option>
-                  <option value="in progress">In Progress</option>
-                  <option value="completed">Completed</option>
-                  <option value="sold">Sold</option>
-                </select>
-              </div>
-
-              {/* Components */}
-              <div className="mb-3">
-                <label className="form-label">
-                  CPU <span className="text-danger">*</span>
-                </label>
-                <AutocompleteInput type="CPU" onSelect={setSelectedCPU} />
-                {formErrors.cpu && (
-                  <div className="form-text text-danger">{formErrors.cpu}</div>
-                )}
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">GPU(s)</label>
-                {selectedGPUs.map((gpu, index) => (
-                  <div key={index} className="mb-2">
-                    <AutocompleteInput
-                      type="GPU"
-                      onSelect={(val) => handleGPUChange(index, val)}
-                    />
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  className="btn btn-outline-secondary btn-sm"
-                  onClick={addGPUInput}
-                >
-                  + Add GPU
-                </button>
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Motherboard</label>
-                <AutocompleteInput
-                  type="Motherboard"
-                  onSelect={setSelectedMotherboard}
-                />
-              </div>
-
-              {/* Financials */}
-              <div className="row">
-                <div className="col-md-4 mb-3">
-                  <label htmlFor="totalCost" className="form-label">
-                    Total Cost (£)
-                  </label>
-                  <input
-                    className="form-control"
-                    id="totalCost"
-                    name="totalCost"
-                    type="number"
-                    step="0.01"
-                    value={formData.totalCost}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="col-md-4 mb-3">
-                  <label htmlFor="salePrice" className="form-label">
-                    Sale Price (£)
-                  </label>
-                  <input
-                    className="form-control"
-                    id="salePrice"
-                    name="salePrice"
-                    type="number"
-                    step="0.01"
-                    value={formData.salePrice}
-                    onChange={handleInputChange}
-                  />
-                </div>
-
-                <div className="col-md-4 mb-3">
-                  <label htmlFor="profit" className="form-label">
-                    Profit (£)
-                  </label>
-                  <input
-                    className="form-control"
-                    id="profit"
-                    name="profit"
-                    type="number"
-                    value={formData.profit}
-                    readOnly
-                  />
-                </div>
-              </div>
-
-              {formData.salePrice && (
-                <div className="mb-3">
-                  <label htmlFor="soldDate" className="form-label">
-                    Sold Date
-                  </label>
-                  <input
-                    className="form-control"
-                    id="soldDate"
-                    name="soldDate"
-                    type="date"
-                    value={formData.soldDate}
-                    onChange={handleInputChange}
-                  />
-                </div>
-              )}
-
-              <ImageUploader
-                buildId={buildId}
-                customButton={true}
-                trigger={added}
-              />
-
-              <div className="d-grid mt-4">
-                <button type="submit" className="btn btn-primary btn-lg">
-                  Add Build
-                </button>
-              </div>
-            </form>
+            {!created && showBuildForm()}
+            {created && showImageUploadForm()}
           </div>
         </div>
       )}
