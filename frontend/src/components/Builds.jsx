@@ -80,8 +80,8 @@ function Builds({ builds, onUpdate }) {
                 {build.profit ? `£${build.profit}` : "N/A"}
               </p>
               <img
-                style={{ width: "200px", height: "200px", objectFit: "cover" }}
-                src={`https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT9xaFX9gc2zGTmdvYGkGq0tKk6aV8X0iZOwVC4RXRWgw&s&ec=72940543`}
+                style={{ width: "500px", height: "500px", objectFit: "cover" }}
+                src={`http://localhost:5000/uploads/20250307_164718.jpg`}
                 alt="Build image"
                 className="img-fluid"
               />

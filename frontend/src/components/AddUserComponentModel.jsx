@@ -5,7 +5,7 @@ const AddUserComponentModel = ({
   type,
   setShowAddComponentModal,
   onClose,
-  onComponentAdded, // callback to refresh list
+  onComponentAdded,
 }) => {
   const [name, setName] = useState("");
   const [brand, setBrand] = useState("");
