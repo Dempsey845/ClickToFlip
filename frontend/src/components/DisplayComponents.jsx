@@ -178,13 +178,13 @@ function DisplayComponents({
       {/* GPUs */}
       <div className="card mb-3">
         <div className="card-header">
-          <h5 className="mb-0">GPU{gpus.length !== 1 ? "s" : ""}</h5>
+          <h5 className="mb-0">GPU{gpus?.length !== 1 ? "s" : ""}</h5>
         </div>
         <div className="card-body">
-          {gpus.length === 0 ? (
+          {gpus?.length === 0 ? (
             <p className="text-muted">No GPUs added.</p>
           ) : (
-            gpus.map((gpu, index) => {
+            gpus?.map((gpu, index) => {
               const parsedSpecs = parseGpuSpecsString(gpu.specs);
               return (
                 <div key={gpu.id} className="mb-3">

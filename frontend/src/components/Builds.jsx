@@ -5,16 +5,6 @@ import DisplayComponents from "./DisplayComponents";
 import ImageUploader from "./ImageUploader";
 import { deleteImageByURL } from "../handlers/apiHandler";
 
-const styles = {
-  card: {
-    border: "1px solid #ccc",
-    borderRadius: "1rem",
-    padding: "1rem",
-    margin: "1rem 0",
-    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
-  },
-};
-
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function Builds({ builds, onUpdate }) {

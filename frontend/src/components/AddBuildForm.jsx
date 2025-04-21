@@ -56,6 +56,7 @@ function AddBuildForm({ onUpdate }) {
 
     const errors = {};
     if (!selectedCPU) errors.cpu = "CPU is required";
+    if (!selectedMotherboard) errors.motherboard = "Motherboard is required";
 
     if (Object.keys(errors).length > 0) {
       setFormErrors(errors);
@@ -196,11 +197,18 @@ function AddBuildForm({ onUpdate }) {
         </div>
 
         <div className="mb-3">
-          <label className="form-label">Motherboard</label>
+          <label className="form-label">
+            Motherboard <span className="text-danger">*</span>
+          </label>
           <AutocompleteInput
             type="Motherboard"
             onSelect={setSelectedMotherboard}
           />
+          {formErrors.motherboard && (
+            <div className="form-text text-danger">
+              {formErrors.motherboard}
+            </div>
+          )}
         </div>
 
         {/* Financials */}
@@ -301,7 +309,10 @@ function AddBuildForm({ onUpdate }) {
               <h4>{modelTitle}</h4>
               <button
                 className="btn-close"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setCreated(false);
+                }}
               />
             </div>
 
