@@ -136,6 +136,31 @@ const addBuildWithBuildPayLoad = async (buildPayload) => {
   }
 };
 
+// Add GPU
+const addGPUToBuild = async (buildId, gpuId) => {
+  try {
+    await axios.post(`${BACKEND_URL}/api/builds/addGPU/${buildId}`, gpuId, {
+      withCredentials: true,
+    });
+    toast.success("Added new GPU to build.");
+  } catch (err) {
+    toast.error("Error adding GPU to build");
+  }
+};
+
+// Delete GPU
+const deleteGPUFromBuild = async (buildId, gpuId) => {
+  try {
+    await axios.delete(`${BACKEND_URL}/api/builds/deleteGPU/${buildId}`, {
+      withCredentials: true,
+      data: { gpuId },
+    });
+    toast.success("Removed GPU from build.");
+  } catch (err) {
+    toast.error("Failed to remove GPU from build.");
+  }
+};
+
 // GET builds
 const getUserBuilds = async () => {
   try {
@@ -282,6 +307,8 @@ export {
   getGPUComponents,
   getMotherboardComponents,
   addBuildWithBuildPayLoad,
+  addGPUToBuild,
+  deleteGPUFromBuild,
   getUserBuilds,
   uploadImageWithFormData,
   updateBuild,

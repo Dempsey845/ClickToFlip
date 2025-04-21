@@ -1,5 +1,9 @@
 import AutocompleteInput from "./AutocompleteInput";
-import { changeComponent } from "../handlers/apiHandler";
+import {
+  addGPUToBuild,
+  changeComponent,
+  deleteGPUFromBuild,
+} from "../handlers/apiHandler";
 import { useState } from "react";
 
 function parseCpuSpecsString(specString) {
@@ -75,6 +79,8 @@ function parseMotherboardSpecsString(specString) {
 
 function parseGpuSpecsString(specString) {
   const result = {};
+  if (!specString || typeof specString !== "string") return result;
+
   const entries = specString.split(",");
 
   entries.forEach((entry) => {
@@ -107,8 +113,17 @@ function DisplayComponents({
   const [newCPU, setNewCPU] = useState(null);
   const [newGPU, setNewGPU] = useState(null);
   const [newMobo, setNewMobo] = useState(null);
+  const [localGpus, setLocalGpus] = useState(gpus || []);
   const parsedCpuSpecs = parseCpuSpecsString(cpuSpecs);
   const parsedMoboSpecs = parseMotherboardSpecsString(motherboardSpecs);
+
+  const handleAddGPU = () => {
+    if (newGPU) {
+      setLocalGpus((prev) => [...prev, newGPU]);
+      setNewGPU(null);
+      addGPUToBuild(build.id, newGPU.id);
+    }
+  };
 
   const handleCPUChange = (component) => {
     setShowChangeCpuButton(true);
@@ -132,9 +147,12 @@ function DisplayComponents({
     onUpdate();
   };
 
-  const handleGPUChange = (component) => {
-    setShowChangeGpusButton(true);
-    setNewGPU(component);
+  const handleGPUChange = (selected, index) => {
+    setLocalGpus((prev) => {
+      const updated = [...prev];
+      updated[index] = selected;
+      return updated;
+    });
   };
 
   const handleGPUSubmit = async (gpuIndex) => {
@@ -178,16 +196,17 @@ function DisplayComponents({
       {/* GPUs */}
       <div className="card mb-3">
         <div className="card-header">
-          <h5 className="mb-0">GPU{gpus?.length !== 1 ? "s" : ""}</h5>
+          <h5 className="mb-0">GPU{localGpus?.length !== 1 ? "s" : ""}</h5>
         </div>
         <div className="card-body">
-          {gpus?.length === 0 ? (
+          {localGpus?.length === 0 ? (
             <p className="text-muted">No GPUs added.</p>
           ) : (
-            gpus?.map((gpu, index) => {
+            localGpus.length > 0 &&
+            localGpus?.map((gpu, index) => {
               const parsedSpecs = parseGpuSpecsString(gpu.specs);
               return (
-                <div key={gpu.id} className="mb-3">
+                <div key={gpu.id} className="mb-4">
                   <strong>{gpu.name}</strong>
                   {parsedSpecs && Object.keys(parsedSpecs).length > 0 ? (
                     <ul className="list-group list-group-flush mt-1">
@@ -196,13 +215,26 @@ function DisplayComponents({
                   ) : (
                     <p className="text-muted">No GPU specs available.</p>
                   )}
+                  <button
+                    onClick={async () => {
+                      await deleteGPUFromBuild(build.id, gpu.id);
+                      onUpdate();
+                    }}
+                    className="btn btn-sm btn-outline-danger ms-2"
+                  >
+                    Remove
+                  </button>
                   <p>Change GPU: </p>
-                  <AutocompleteInput type={"GPU"} onSelect={handleGPUChange} />
+                  <AutocompleteInput
+                    type={"GPU"}
+                    onSelect={(selectedGPU) =>
+                      handleGPUChange(selectedGPU, index)
+                    }
+                  />
                   {showChangeGpusButton && (
                     <button
-                      onClick={() => {
-                        handleGPUSubmit(index);
-                      }}
+                      onClick={() => handleGPUSubmit(index)}
+                      className="btn btn-sm btn-outline-primary mt-2"
                     >
                       Update GPU
                     </button>
@@ -211,6 +243,14 @@ function DisplayComponents({
               );
             })
           )}
+
+          {/* Add GPU Section */}
+          <hr />
+          <h6>Add New GPU:</h6>
+          <AutocompleteInput type={"GPU"} onSelect={setNewGPU} />
+          <button onClick={handleAddGPU} className="btn btn-success mt-2">
+            Add GPU
+          </button>
         </div>
       </div>
 

@@ -342,6 +342,53 @@ router.patch("/:buildId", async (req, res) => {
   }
 });
 
+router.post("/addGPU/:buildId", async (req, res) => {
+  const buildId = parseInt(req.params.buildId);
+  const gpuId = parseInt(Object.keys(req.body)[0], 10);
+
+  if (!buildId || !gpuId) {
+    return res.status(400).json({ error: "Invalid buildId or gpuId" });
+  }
+
+  try {
+    await db.query(
+      "INSERT INTO build_components (build_id, component_id) VALUES ($1, $2)",
+      [buildId, gpuId]
+    );
+    res.status(201).json({ message: "GPU added to build successfully." });
+  } catch (err) {
+    console.error("Error adding GPU:", err);
+    res.status(500).json({ error: "Failed to add GPU to build." });
+  }
+});
+
+router.delete("/deleteGPU/:buildId", async (req, res) => {
+  const buildId = parseInt(req.params.buildId, 10);
+  const gpuId = parseInt(req.body.gpuId, 10);
+  if (!buildId || !gpuId) {
+    return res.status(400).json({ error: "Invalid buildId or gpuId" });
+  }
+
+  try {
+    await db.query(
+      `
+      DELETE FROM build_components
+      WHERE ctid IN (
+        SELECT ctid FROM build_components
+        WHERE build_id = $1 AND component_id = $2
+        LIMIT 1
+      )
+      `,
+      [buildId, gpuId]
+    );
+
+    res.status(201).json({ message: "GPU deleted from build successfully." });
+  } catch (err) {
+    console.error("Error deleting GPU:", err);
+    res.status(500).json({ error: "Failed to delete GPU from build." });
+  }
+});
+
 router.patch("/changeComponent/:prevComponentId/:buildId", async (req, res) => {
   const { prevComponentId, buildId } = req.params;
   const newComponentId = Number(Object.keys(req.body)[0]);
