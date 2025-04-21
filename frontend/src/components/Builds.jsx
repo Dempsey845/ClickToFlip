@@ -3,6 +3,7 @@ import EditBuildForm from "./EditBuildForm";
 import { deleteBuildById } from "../handlers/apiHandler";
 import DisplayComponents from "./DisplayComponents";
 import ImageUploader from "./ImageUploader";
+import { deleteImageByURL } from "../handlers/apiHandler";
 
 const styles = {
   card: {
@@ -18,6 +19,13 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function Builds({ builds, onUpdate }) {
   const [editingBuildId, setEditingBuildId] = useState(null); // Track which build is being edited
+
+  const handleImageReplace = (build) => {
+    if (build.image_url) {
+      const imageURL = build.image_url;
+      deleteImageByURL(imageURL);
+    }
+  };
 
   const displayBuild = (build) => {
     const handleEditClick = () => {
@@ -88,7 +96,13 @@ function Builds({ builds, onUpdate }) {
                 alt="Build image"
                 className="img-fluid"
               />
-              <ImageUploader uploadText="Replace Image" buildId={build.id} />
+              <ImageUploader
+                beforeUploaded={() => {
+                  handleImageReplace(build);
+                }}
+                uploadText="Replace Image"
+                buildId={build.id}
+              />
             </div>
           </div>
 
@@ -96,7 +110,7 @@ function Builds({ builds, onUpdate }) {
             <div className="col-md-6 d-flex align-items-end">
               <button
                 onClick={() => {
-                  deleteBuildById(build.id);
+                  deleteBuildById(build);
                   onUpdate();
                 }}
                 className="btn btn-danger"

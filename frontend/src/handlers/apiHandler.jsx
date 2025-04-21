@@ -208,7 +208,8 @@ const getBuildById = async (buildId) => {
   }
 };
 
-const deleteBuildById = async (buildId) => {
+const deleteBuildById = async (build) => {
+  const buildId = build.id;
   try {
     const response = await axios.delete(
       `${BACKEND_URL}/api/builds/${buildId}`,
@@ -220,6 +221,25 @@ const deleteBuildById = async (buildId) => {
       `Error deleting build: ${err.response?.data?.error || err.message}`
     );
   }
+};
+
+const deleteImageByFilename = async (filename) => {
+  try {
+    await axios.delete(`${BACKEND_URL}/api/builds/image/${filename}`, {
+      withCredentials: true,
+    });
+  } catch {
+    toast.error(
+      `Error deleting image: ${err.response?.data?.error || err.message}`
+    );
+  }
+};
+
+const deleteImageByURL = async (imageURL) => {
+  // imageURL example = /uploads/1745238988354.jpg
+  // convert to filename e.g: 1745238988354.jpg
+  const filename = imageURL.slice(9);
+  await deleteImageByFilename(filename);
 };
 
 const changeComponent = async (buildId, prevComponentId, newComponent) => {
@@ -267,6 +287,8 @@ export {
   updateBuild,
   getBuildById,
   deleteBuildById,
+  deleteImageByFilename,
+  deleteImageByURL,
   changeComponent,
   addUserComponent,
 };

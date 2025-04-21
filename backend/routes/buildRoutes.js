@@ -1,6 +1,29 @@
 import express from "express";
+import fs from "fs";
 import db from "../config/db.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const router = express.Router();
+
+function deleteImageFromURL(imageURL) {
+  try {
+    const filename = imageURL.split("/uploads/")[1];
+    const filePath = path.join(__dirname, "..", "uploads", filename);
+
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error("Error deleting image:", err);
+      } else {
+        console.log(`Deleted image: ${filename}`);
+      }
+    });
+  } catch (err) {
+    console.error("Error processing image URL:", err);
+  }
+}
 
 // POST /api/builds
 router.post("/", async (req, res) => {
@@ -381,6 +404,26 @@ router.patch("/changeComponent/:prevComponentId/:buildId", async (req, res) => {
   }
 });
 
+router.delete("/image/:filename", async (req, res) => {
+  if (!req.isAuthenticated()) {
+    console.error("Unauthorized: User not authenticated.");
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  const { filename } = req.params;
+  const filePath = path.join(__dirname, "..", "uploads", filename);
+
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error("Error deleting image:", err);
+      return res.status(500).json({ error: "Failed to delete image." });
+    }
+
+    console.log(`Deleted image: ${filename}`);
+    return res.status(200).json({ message: "Image deleted successfully." });
+  });
+});
+
 router.delete("/:buildId", async (req, res) => {
   if (!req.isAuthenticated()) {
     console.error("Unauthorized: User not authenticated.");
@@ -396,6 +439,7 @@ router.delete("/:buildId", async (req, res) => {
       "SELECT * FROM builds WHERE id = $1 AND user_id = $2",
       [buildId, userId]
     );
+    const build = check.rows[0];
 
     if (check.rows.length === 0) {
       return res.status(403).json({ error: "Forbidden. Not your build." });
@@ -403,6 +447,12 @@ router.delete("/:buildId", async (req, res) => {
 
     // Delete the build
     await db.query("DELETE FROM builds WHERE id = $1", [buildId]);
+
+    // Delete the image
+    if (build.image_url) {
+      const imageURL = build.image_url;
+      deleteImageFromURL(imageURL);
+    }
 
     return res.status(200).json({ message: "Build deleted successfully." });
   } catch (err) {

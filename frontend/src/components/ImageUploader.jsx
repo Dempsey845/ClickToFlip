@@ -4,7 +4,12 @@ import { uploadImageWithFormData } from "../handlers/apiHandler";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-function ImageUploader({ buildId, onUploaded, uploadText = "Upload Image" }) {
+function ImageUploader({
+  buildId,
+  onUploaded,
+  beforeUploaded,
+  uploadText = "Upload Image",
+}) {
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
 
@@ -22,9 +27,11 @@ function ImageUploader({ buildId, onUploaded, uploadText = "Upload Image" }) {
     formData.append("image", file);
     formData.append("buildId", buildId);
 
+    if (beforeUploaded) beforeUploaded();
+
     const resultUrl = await uploadImageWithFormData(formData);
     setImageUrl(resultUrl);
-    onUploaded();
+    if (onUploaded) onUploaded();
   };
 
   return (
