@@ -1,6 +1,6 @@
 import AutocompleteInput from "./AutocompleteInput";
 import { changeComponent } from "../handlers/apiHandler";
-import { use, useState } from "react";
+import { useState } from "react";
 
 function parseCpuSpecsString(specString) {
   const result = {};
@@ -13,21 +13,26 @@ function parseCpuSpecsString(specString) {
 
     if (!rawKey || !rawValue) return;
 
-    const key = rawKey.trim().toLowerCase();
+    const key = rawKey.trim();
     const value = rawValue.trim();
 
     switch (key) {
-      case "cores":
+      case "Cores":
         const cores = parseInt(value, 10);
         if (!isNaN(cores)) {
-          result.cores = cores;
+          result.Cores = cores;
         }
         break;
 
-      case "tdp":
+      case "TDP":
         // Accept strings like "65W" or "N/A"
         if (value.toLowerCase() !== "naw" && value.toLowerCase() !== "n/a") {
-          result.tdp = value;
+          result.TDP = value;
+        }
+        break;
+      default:
+        if (value.toLowerCase() != "naw" && value.toLowerCase() != "n/a") {
+          result[key] = value;
         }
         break;
     }
@@ -138,6 +143,15 @@ function DisplayComponents({
     onUpdate();
   };
 
+  const displaySpecs = (parsedSpecs) => {
+    const mapped = Object.entries(parsedSpecs).map(([k, v]) => (
+      <li key={k} className="list-group-item">
+        {k}: {v}
+      </li>
+    ));
+    return mapped;
+  };
+
   return (
     <div className="container mt-4">
       {/* CPU */}
@@ -148,14 +162,7 @@ function DisplayComponents({
         <div className="card-body">
           {parsedCpuSpecs && Object.keys(parsedCpuSpecs).length > 0 ? (
             <ul className="list-group list-group-flush">
-              {parsedCpuSpecs.cores !== undefined && (
-                <li className="list-group-item">
-                  Cores: {parsedCpuSpecs.cores}
-                </li>
-              )}
-              {parsedCpuSpecs.tdp && (
-                <li className="list-group-item">TDP: {parsedCpuSpecs.tdp}</li>
-              )}
+              {displaySpecs(parsedCpuSpecs)}
             </ul>
           ) : (
             <p className="text-muted">No CPU specs available.</p>
@@ -184,11 +191,7 @@ function DisplayComponents({
                   <strong>{gpu.name}</strong>
                   {parsedSpecs && Object.keys(parsedSpecs).length > 0 ? (
                     <ul className="list-group list-group-flush mt-1">
-                      {parsedSpecs.memory && (
-                        <li className="list-group-item">
-                          Memory: {parsedSpecs.memory}
-                        </li>
-                      )}
+                      {displaySpecs(parsedSpecs)}
                     </ul>
                   ) : (
                     <p className="text-muted">No GPU specs available.</p>
@@ -219,16 +222,7 @@ function DisplayComponents({
         <div className="card-body">
           {parsedMoboSpecs && Object.keys(parsedMoboSpecs).length > 0 ? (
             <ul className="list-group list-group-flush">
-              {parsedMoboSpecs.socket && (
-                <li className="list-group-item">
-                  Socket: {parsedMoboSpecs.socket}
-                </li>
-              )}
-              {parsedMoboSpecs.chipset && (
-                <li className="list-group-item">
-                  Chipset: {parsedMoboSpecs.chipset}
-                </li>
-              )}
+              {displaySpecs(parsedMoboSpecs)}
             </ul>
           ) : (
             <p className="text-muted">No motherboard specs available.</p>
