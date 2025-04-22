@@ -291,6 +291,7 @@ const addUserComponent = async (component) => {
       { withCredentials: true }
     );
     toast.success(`Added Component: ${component.name}!`);
+    return result.data.newComponent;
   } catch (err) {
     toast.error(
       `Error adding component: ${err.response?.data?.error || err.message}`

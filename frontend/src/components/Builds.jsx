@@ -17,6 +17,8 @@ function Builds({ builds, onUpdate }) {
     }
   };
 
+  console.log(builds[0]);
+
   const displayBuild = (build) => {
     const handleEditClick = () => {
       // Toggle visibility of the form for this specific build

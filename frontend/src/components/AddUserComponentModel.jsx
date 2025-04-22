@@ -6,6 +6,7 @@ const AddUserComponentModel = ({
   setShowAddComponentModal,
   onClose,
   onComponentAdded,
+  onComponentAddedWithData,
   fields = [
     { key: "Cores", value: "" },
     { key: "TDP", value: "" },
@@ -72,9 +73,10 @@ const AddUserComponentModel = ({
 
     const newComponent = { name, type, brand, model, specs: specsString };
 
-    await addUserComponent(newComponent);
+    const data = await addUserComponent(newComponent);
     setShowAddComponentModal(false);
     if (onComponentAdded) onComponentAdded(); // trigger refresh
+    if (onComponentAddedWithData) onComponentAddedWithData(data);
   };
 
   const handleClose = () => {

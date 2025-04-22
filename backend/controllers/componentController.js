@@ -74,15 +74,19 @@ export const addUserComponent = async (req, res) => {
 
   try {
     // Insert the user-specific component directly into the `components` table
-    await db.query(
+    const result = await db.query(
       `INSERT INTO components (user_id, name, type, brand, model, specs)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING *`,
       [user_id, name, type, brand, model, specs]
     );
 
-    return res
-      .status(200)
-      .json({ message: "User component added successfully." });
+    const newComponent = result.rows[0];
+
+    return res.status(200).json({
+      message: "User component added successfully.",
+      newComponent: newComponent,
+    });
   } catch (err) {
     console.error("Error adding user component:", err);
     return res

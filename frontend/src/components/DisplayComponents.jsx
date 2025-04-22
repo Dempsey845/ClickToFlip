@@ -112,7 +112,7 @@ function DisplayComponents({
   const [showChangeMoboButton, setShowChangeMoboButton] = useState(false);
   const [showChangeGpusButton, setShowChangeGpusButton] = useState(false);
   const [newCPU, setNewCPU] = useState(null);
-  const [newGPU, setNewGPU] = useState(null);
+  const [newGPUs, setNewGPUs] = useState([]);
   const [newMobo, setNewMobo] = useState(null);
   const [localGpus, setLocalGpus] = useState(gpus || []);
   const [showEditModel, setShowEditModel] = useState(false);
@@ -124,6 +124,7 @@ function DisplayComponents({
     brand: "",
     model: "",
   });
+  const [prevComponentId, setPrevComponentId] = useState(0);
   const parsedCpuSpecs = parseCpuSpecsString(cpuSpecs);
   const parsedMoboSpecs = parseMotherboardSpecsString(motherboardSpecs);
 
@@ -163,10 +164,24 @@ function DisplayComponents({
       updated[index] = selected;
       return updated;
     });
+
+    setNewGPUs((prev) => {
+      const updated = [...prev];
+      updated[index] = selected;
+      return updated;
+    });
+
+    setShowChangeGpusButton(true);
   };
 
   const handleGPUSubmit = async (gpuIndex) => {
-    await changeComponent(build.id, build.gpu_ids[gpuIndex], newGPU);
+    const newGpu = newGPUs[gpuIndex];
+    if (!newGpu) {
+      console.warn("No new GPU selected for index", gpuIndex);
+      return;
+    }
+
+    await changeComponent(build.id, build.gpu_ids[gpuIndex], newGpu);
     setShowChangeGpusButton(false);
     onUpdate();
   };
@@ -178,6 +193,12 @@ function DisplayComponents({
       </li>
     ));
     return mapped;
+  };
+
+  const handleNewUserComponent = async (data) => {
+    const newComponent = data;
+    await changeComponent(build.id, prevComponentId, newComponent);
+    onUpdate();
   };
 
   const convertParsedToFields = (parsed) => {
@@ -209,11 +230,13 @@ function DisplayComponents({
           defaultName={editModelFields.name}
           disabledNameInput={true}
           onClose={() => {
+            setPrevComponentId(null);
             setShowEditModel(false);
           }}
           customTitle={editModelFields.title}
           defaultBrand={editModelFields.brand}
           defaultModel={editModelFields.model}
+          onComponentAddedWithData={handleNewUserComponent}
         />
       )}
       {/* CPU */}
@@ -222,6 +245,7 @@ function DisplayComponents({
           <h5 className="mb-0">CPU: {cpuName || "N/A"}</h5>
           <button
             onClick={() => {
+              setPrevComponentId(build.cpu_id);
               setEditModelFields({
                 type: "CPU",
                 fields: convertParsedToFields(parsedCpuSpecs),
@@ -264,11 +288,29 @@ function DisplayComponents({
           ) : (
             localGpus.length > 0 &&
             localGpus?.map((gpu, index) => {
+              console.log(gpu, index);
               const parsedSpecs = parseGpuSpecsString(gpu.specs);
               return (
                 <div key={gpu.id} className="mb-4">
                   <strong>{gpu.name}</strong>
-                  <button className="btn btn-primary mb-3">Edit GPU</button>
+                  <button
+                    onClick={() => {
+                      console.log(gpu);
+                      setPrevComponentId(gpu.id);
+                      setEditModelFields({
+                        type: "GPU",
+                        fields: convertParsedToFields(parsedSpecs),
+                        name: `${gpu.name} (Custom)`,
+                        title: `Edit ${gpu.name} Properties`,
+                        brand: gpu.brand,
+                        model: gpu.model,
+                      });
+                      setShowEditModel(true);
+                    }}
+                    className="btn btn-primary mb-3"
+                  >
+                    Edit GPU
+                  </button>
                   {parsedSpecs && Object.keys(parsedSpecs).length > 0 ? (
                     <ul className="list-group list-group-flush mt-1">
                       {displaySpecs(parsedSpecs)}
@@ -288,9 +330,10 @@ function DisplayComponents({
                   <p>Change GPU: </p>
                   <AutocompleteInput
                     type={"GPU"}
-                    onSelect={(selectedGPU) =>
-                      handleGPUChange(selectedGPU, index)
-                    }
+                    onSelect={(selectedGPU) => {
+                      handleGPUChange(selectedGPU, index);
+                      setShowChangeGpusButton(true);
+                    }}
                   />
                   {showChangeGpusButton && (
                     <button
@@ -308,7 +351,7 @@ function DisplayComponents({
           {/* Add GPU Section */}
           <hr />
           <h6>Add New GPU:</h6>
-          <AutocompleteInput type={"GPU"} onSelect={setNewGPU} />
+          <AutocompleteInput type={"GPU"} onSelect={setNewGPUs} />
           <button onClick={handleAddGPU} className="btn btn-success mt-2">
             Add GPU
           </button>
@@ -319,7 +362,23 @@ function DisplayComponents({
       <div className="card">
         <div className="card-header">
           <h5 className="mb-0">Motherboard: {motherboardName || "N/A"}</h5>
-          <button className="btn btn-primary mb-3">Edit Motherboard</button>
+          <button
+            onClick={() => {
+              setPrevComponentId(build.motherboard_id);
+              setEditModelFields({
+                type: "Motherboard",
+                fields: convertParsedToFields(parsedMoboSpecs),
+                name: `${motherboardName} (Custom)`,
+                title: `Edit ${motherboardName} Properties`,
+                brand: build.motherboard_brand,
+                model: build.motherboard_model,
+              });
+              setShowEditModel(true);
+            }}
+            className="btn btn-primary mb-3"
+          >
+            Edit Motherboard
+          </button>
         </div>
         <div className="card-body">
           {parsedMoboSpecs && Object.keys(parsedMoboSpecs).length > 0 ? (

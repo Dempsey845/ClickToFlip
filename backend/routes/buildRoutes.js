@@ -141,7 +141,9 @@ router.get("/", async (req, res) => {
     -- Motherboard: expect one
     motherboard.motherboard_id,
     motherboard.name AS motherboard_name,
-    motherboard.specs AS motherboard_specs
+    motherboard.specs AS motherboard_specs,
+    motherboard.brand AS motherboard_brand,
+    motherboard.model AS motherboard_model
 
   FROM builds b
 
@@ -155,19 +157,29 @@ router.get("/", async (req, res) => {
 
   -- GPU subquery: fetch all GPUs for a build, including ids and JSON object (name + specs)
   LEFT JOIN (
-    SELECT 
-      bc.build_id, 
-      ARRAY_AGG(c.id ORDER BY bc.component_id) AS gpu_ids,  -- Order by component_id instead of bc.id
-      ARRAY_AGG(JSON_BUILD_OBJECT('id', c.id, 'name', c.name, 'specs', c.specs) ORDER BY bc.component_id) AS gpus  -- Full GPU objects
-    FROM build_components bc
-    JOIN components c ON bc.component_id = c.id
-    WHERE c.type = 'GPU'
-    GROUP BY bc.build_id
-  ) gpu ON b.id = gpu.build_id
+  SELECT 
+    bc.build_id, 
+    ARRAY_AGG(c.id ORDER BY bc.component_id) AS gpu_ids,
+    ARRAY_AGG(
+      JSON_BUILD_OBJECT(
+        'id', c.id,
+        'name', c.name,
+        'brand', c.brand,
+        'model', c.model,
+        'specs', c.specs
+      )
+      ORDER BY bc.component_id
+    ) AS gpus
+  FROM build_components bc
+  JOIN components c ON bc.component_id = c.id
+  WHERE c.type = 'GPU'
+  GROUP BY bc.build_id
+) AS gpu ON b.id = gpu.build_id
+
 
   -- Motherboard subquery: fetch one motherboard per build
   LEFT JOIN (
-    SELECT bc.build_id, c.id AS motherboard_id, c.name, c.specs
+    SELECT bc.build_id, c.id AS motherboard_id, c.name, c.specs, c.brand, c.model
     FROM build_components bc
     JOIN components c ON bc.component_id = c.id
     WHERE c.type = 'Motherboard'
