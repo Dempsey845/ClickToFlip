@@ -5,6 +5,7 @@ import {
   deleteGPUFromBuild,
 } from "../handlers/apiHandler";
 import { useState } from "react";
+import AddUserComponentModel from "./AddUserComponentModel";
 
 function parseCpuSpecsString(specString) {
   const result = {};
@@ -114,6 +115,15 @@ function DisplayComponents({
   const [newGPU, setNewGPU] = useState(null);
   const [newMobo, setNewMobo] = useState(null);
   const [localGpus, setLocalGpus] = useState(gpus || []);
+  const [showEditModel, setShowEditModel] = useState(false);
+  const [editModelFields, setEditModelFields] = useState({
+    type: "",
+    fields: [{ key: "", value: "" }],
+    name: "",
+    title: "",
+    brand: "",
+    model: "",
+  });
   const parsedCpuSpecs = parseCpuSpecsString(cpuSpecs);
   const parsedMoboSpecs = parseMotherboardSpecsString(motherboardSpecs);
 
@@ -170,12 +180,62 @@ function DisplayComponents({
     return mapped;
   };
 
+  const convertParsedToFields = (parsed) => {
+    /*
+    {
+      "Cores": 6,
+      "TDP": "65W"
+    } ->
+    { key: "Cores", value: "6" },
+    { key: "TDP", value: "65W" }
+    */
+
+    const fields = [];
+
+    for (const [k, v] of Object.entries(parsed)) {
+      fields.push({ key: k, value: `${v}` });
+    }
+
+    return fields;
+  };
+
   return (
     <div className="container mt-4">
+      {showEditModel && (
+        <AddUserComponentModel
+          type={editModelFields.type}
+          fields={editModelFields.fields}
+          setShowAddComponentModal={setShowEditModel}
+          defaultName={editModelFields.name}
+          disabledNameInput={true}
+          onClose={() => {
+            setShowEditModel(false);
+          }}
+          customTitle={editModelFields.title}
+          defaultBrand={editModelFields.brand}
+          defaultModel={editModelFields.model}
+        />
+      )}
       {/* CPU */}
       <div className="card mb-3">
         <div className="card-header">
           <h5 className="mb-0">CPU: {cpuName || "N/A"}</h5>
+          <button
+            onClick={() => {
+              setEditModelFields({
+                type: "CPU",
+                fields: convertParsedToFields(parsedCpuSpecs),
+                name: `${cpuName} (Custom)`,
+                title: `Edit ${cpuName} Properties`,
+                brand: build.cpu_brand,
+                model: build.cpu_model,
+              });
+              setShowEditModel(true);
+            }}
+            className="btn btn-primary mb-3"
+          >
+            Edit CPU
+          </button>
         </div>
         <div className="card-body">
           {parsedCpuSpecs && Object.keys(parsedCpuSpecs).length > 0 ? (
@@ -208,6 +268,7 @@ function DisplayComponents({
               return (
                 <div key={gpu.id} className="mb-4">
                   <strong>{gpu.name}</strong>
+                  <button className="btn btn-primary mb-3">Edit GPU</button>
                   {parsedSpecs && Object.keys(parsedSpecs).length > 0 ? (
                     <ul className="list-group list-group-flush mt-1">
                       {displaySpecs(parsedSpecs)}
@@ -258,6 +319,7 @@ function DisplayComponents({
       <div className="card">
         <div className="card-header">
           <h5 className="mb-0">Motherboard: {motherboardName || "N/A"}</h5>
+          <button className="btn btn-primary mb-3">Edit Motherboard</button>
         </div>
         <div className="card-body">
           {parsedMoboSpecs && Object.keys(parsedMoboSpecs).length > 0 ? (

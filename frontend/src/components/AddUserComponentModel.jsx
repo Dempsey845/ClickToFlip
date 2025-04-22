@@ -6,14 +6,20 @@ const AddUserComponentModel = ({
   setShowAddComponentModal,
   onClose,
   onComponentAdded,
-}) => {
-  const [name, setName] = useState("");
-  const [brand, setBrand] = useState("");
-  const [model, setModel] = useState("");
-  const [specFields, setSpecFields] = useState([
+  fields = [
     { key: "Cores", value: "" },
     { key: "TDP", value: "" },
-  ]);
+  ],
+  defaultName = "",
+  customTitle = null,
+  disabledNameInput = false,
+  defaultBrand = "",
+  defaultModel = "",
+}) => {
+  const [name, setName] = useState(defaultName);
+  const [brand, setBrand] = useState(defaultBrand);
+  const [model, setModel] = useState(defaultModel);
+  const [specFields, setSpecFields] = useState(fields);
 
   const getBrandOptions = (componentType) => {
     switch (componentType) {
@@ -58,6 +64,7 @@ const AddUserComponentModel = ({
   };
 
   const handleSave = async () => {
+    console.log("Spec Fields: ", specFields);
     const specsString = specFields
       .filter((f) => f.key.trim() && f.value.trim())
       .map((f) => `${f.key.trim()}: ${f.value.trim()}`)
@@ -81,7 +88,7 @@ const AddUserComponentModel = ({
   return (
     <div style={styles.overlay}>
       <div style={styles.modal}>
-        <h2>Add New {type}</h2>
+        {customTitle ? <h2>{customTitle}</h2> : <h2>Add New {type}</h2>}
 
         <label>Name:</label>
         <input
@@ -89,6 +96,7 @@ const AddUserComponentModel = ({
           onChange={(e) => setName(e.target.value)}
           placeholder={`Enter ${type} name`}
           style={styles.input}
+          disabled={disabledNameInput}
         />
 
         <label>Brand:</label>

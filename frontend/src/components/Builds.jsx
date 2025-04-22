@@ -23,8 +23,6 @@ function Builds({ builds, onUpdate }) {
       setEditingBuildId(editingBuildId === build.id ? null : build.id);
     };
 
-    console.log(build);
-
     return (
       <div key={build.id} className="card mb-4 shadow-sm">
         <div className="card-body">

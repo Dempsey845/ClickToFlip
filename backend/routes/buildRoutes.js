@@ -131,6 +131,8 @@ router.get("/", async (req, res) => {
     cpu.cpu_id,
     cpu.name AS cpu_name,
     cpu.specs AS cpu_specs,
+    cpu.brand AS cpu_brand,
+    cpu.model AS cpu_model,
 
     -- GPUs: array of objects and array of IDs
     gpu.gpus,
@@ -145,7 +147,7 @@ router.get("/", async (req, res) => {
 
   -- CPU subquery: fetch one CPU per build
   LEFT JOIN (
-    SELECT bc.build_id, c.id AS cpu_id, c.name, c.specs
+    SELECT bc.build_id, c.id AS cpu_id, c.name, c.specs, c.brand, c.model
     FROM build_components bc
     JOIN components c ON bc.component_id = c.id
     WHERE c.type = 'CPU'

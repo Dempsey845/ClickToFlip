@@ -92,7 +92,6 @@ function AddBuildForm({ onUpdate }) {
       setBuildId(data.buildId);
       onUpdate();
       //setShowModal(false); // close modal on success
-      console.log("Build ID: ", buildId);
       setModelTitle("Upload Image of Build");
       setCreated(true);
 
