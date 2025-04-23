@@ -1,6 +1,37 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 
+/*
+  Example fields:
+  const fields = [
+  {
+    name: "name",
+    label: "Build Name",
+    type: "text",
+    required: true,
+  },
+  {
+    name: "description",
+    label: "Description",
+    type: "textarea",
+    required: false,
+  },
+  {
+    name: "type",
+    label: "Build Type",
+    type: "select",
+    options: [
+      { label: "Gaming", value: "gaming" },
+      { label: "Workstation", value: "workstation" },
+      { label: "Budget", value: "budget" },
+    ],
+    required: true,
+  },
+  {
+];
+
+*/
+
 function CustomFormModel({
   show,
   onHide,

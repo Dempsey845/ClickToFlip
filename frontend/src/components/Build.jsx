@@ -2,14 +2,19 @@ import { useState } from "react";
 import EditBuildForm from "./EditBuildForm";
 import DisplayComponents from "./DisplayComponents";
 import ImageUploader from "./ImageUploader";
-import { deleteBuildById } from "../handlers/apiHandler";
-import { deleteImageByURL } from "../handlers/apiHandler";
+import AddGPUForm from "./AddGPUForm";
+import {
+  deleteBuildById,
+  deleteImageByURL,
+  addGPUToBuild,
+} from "../handlers/apiHandler";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function Build({ build, onUpdate }) {
   const [localBuild, setLocalBuild] = useState(build);
   const [editing, setEditing] = useState(false);
+  const [showAddGPUForm, setShowAddGPUForm] = useState(false);
 
   const handleEditClick = () => {
     setEditing(!editing);
@@ -36,6 +41,22 @@ function Build({ build, onUpdate }) {
     });
   };
 
+  const handleAddGPUClick = () => {
+    setShowAddGPUForm(true);
+  };
+
+  const handleAddGPU = async (gpu) => {
+    const added = await addGPUToBuild(build.id, gpu.id);
+    if (added) {
+      setLocalBuild((prev) => {
+        const updatedBuild = { ...prev };
+        if (!updatedBuild.gpus) updatedBuild.gpus = [];
+        updatedBuild.gpus.push(gpu);
+        return updatedBuild;
+      });
+    }
+  };
+
   return (
     <div className="card mb-4 shadow-sm">
       <div className="card-body">
@@ -49,6 +70,15 @@ function Build({ build, onUpdate }) {
             {editing ? "Close Edit Form" : "Edit Build"}
           </button>
         </div>
+
+        <AddGPUForm
+          show={showAddGPUForm}
+          onSubmit={(gpu) => {
+            console.log("Selected GPU:", gpu);
+            handleAddGPU(gpu);
+          }}
+          onClose={() => setShowAddGPUForm(false)}
+        />
 
         {/* Conditionally render the EditBuildForm */}
         {editing && (
@@ -65,6 +95,17 @@ function Build({ build, onUpdate }) {
         <div className="row">
           <div className="col-md-6">
             <h5>Components</h5>
+            <button
+              className="btn btn-sm btn-outline-primary mt-2"
+              title="Add GPU"
+              onClick={() => {
+                setShowAddGPUForm(true);
+              }}
+            >
+              <i className="bi bi-plus-lg"></i>
+              <i className="bi bi-gpu-card"></i>
+            </button>
+
             <DisplayComponents build={localBuild} onUpdate={onUpdate} />
           </div>
 
@@ -92,18 +133,28 @@ function Build({ build, onUpdate }) {
               <strong>Profit:</strong>{" "}
               {localBuild.profit ? `£${localBuild.profit}` : "N/A"}
             </p>
-            <img
-              style={{ width: "500px", height: "500px", objectFit: "cover" }}
-              src={`${BACKEND_URL}${localBuild.image_url}`}
-              alt="Build image"
-              className="img-fluid"
-            />
+            {localBuild.image_url ? (
+              <img
+                style={{ width: "500px", height: "500px", objectFit: "cover" }}
+                src={`${BACKEND_URL}${localBuild.image_url}`}
+                alt="Build image"
+                className="img-fluid border rounded"
+              />
+            ) : (
+              <div
+                style={{ width: "500px", height: "500px" }}
+                className="d-flex align-items-center justify-content-center bg-secondary text-white border rounded"
+              >
+                <span>No image available</span>
+              </div>
+            )}
+
             <ImageUploader
               beforeUploaded={() => {
                 handleImageReplace();
               }}
               onUploaded={handleImageUpload}
-              uploadText="Replace Image"
+              uploadText={localBuild.image_url ? "Replace Image" : "Add Image"}
               buildId={localBuild.id}
             />
           </div>
@@ -114,6 +165,7 @@ function Build({ build, onUpdate }) {
             <button
               onClick={() => {
                 deleteBuildById(localBuild);
+                setLocalBuild(null);
                 onUpdate();
               }}
               className="btn btn-danger"

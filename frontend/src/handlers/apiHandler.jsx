@@ -143,8 +143,10 @@ const addGPUToBuild = async (buildId, gpuId) => {
       withCredentials: true,
     });
     toast.success("Added new GPU to build.");
+    return true;
   } catch (err) {
     toast.error("Error adding GPU to build");
+    return false;
   }
 };
 
