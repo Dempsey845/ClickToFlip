@@ -6,6 +6,8 @@ import {
   getMotherboardComponents,
   addUserComponent,
   updateUserComponent,
+  getUserComponents,
+  getUserComponentsByType,
 } from "../controllers/componentController.js";
 
 const router = express.Router();
@@ -16,5 +18,7 @@ router.get("/cpu", getCPUComponents);
 router.get("/motherboard", getMotherboardComponents);
 router.post("/addUserComponent", addUserComponent);
 router.patch("/updateUserComponent/:id", updateUserComponent);
+router.get("/getUserComponents", getUserComponents);
+router.get("/getUserComponents/:type", getUserComponentsByType);
 
 export default router;

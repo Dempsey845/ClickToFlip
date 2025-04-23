@@ -314,6 +314,20 @@ const updateUserComponent = async (id, component) => {
   }
 };
 
+const getUserComponentsByType = async (type) => {
+  try {
+    const result = await axios.get(
+      `${BACKEND_URL}/api/components/getUserComponents/${type}`,
+      { withCredentials: true }
+    );
+    return result.data;
+  } catch (err) {
+    toast.error("Error getting user components.");
+    console.error(`${err.response?.data?.error || err.message}`);
+    return [];
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -335,4 +349,5 @@ export {
   changeComponent,
   addUserComponent,
   updateUserComponent,
+  getUserComponentsByType,
 };

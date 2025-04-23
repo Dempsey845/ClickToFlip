@@ -3,12 +3,14 @@ import {
   getCPUComponents,
   getGPUComponents,
   getMotherboardComponents,
+  getUserComponentsByType,
 } from "../handlers/apiHandler";
 import AddUserComponentModel from "./AddUserComponentModel";
 import "./AutocompleteInput.css";
 
 const AutocompleteInput = ({ type, onSelect }) => {
   const [components, setComponents] = useState([]);
+  const [userComponents, setUserComponents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredComponents, setFilteredComponents] = useState([]);
   const [selectedComponent, setSelectedComponent] = useState(null);
@@ -19,6 +21,7 @@ const AutocompleteInput = ({ type, onSelect }) => {
   const [brandFilter, setBrandFilter] = useState("");
   const [showUserComponentsOnly, setShowUserComponentsOnly] = useState(false);
 
+  // Fetch general components based on type (CPU, GPU, etc.)
   const fetchComponents = async () => {
     try {
       let data = [];
@@ -40,8 +43,20 @@ const AutocompleteInput = ({ type, onSelect }) => {
     }
   };
 
+  // Fetch user components based on the selected type
+  const fetchUserComponents = async () => {
+    try {
+      const data = await getUserComponentsByType(type);
+      console.log("User data: ", data);
+      setUserComponents(data);
+    } catch (err) {
+      console.error("Error fetching user components:", err);
+    }
+  };
+
   useEffect(() => {
     fetchComponents();
+    fetchUserComponents(); // Fetch user components every time the type changes
   }, [type, updates]);
 
   const handleUpdate = () => setUpdates((prev) => [...prev, "Input updated"]);
@@ -50,15 +65,16 @@ const AutocompleteInput = ({ type, onSelect }) => {
     const query = e.target.value;
     setSearchTerm(query);
 
-    const matches = components.filter((component) => {
+    const pool = showUserComponentsOnly ? userComponents : components;
+
+    const matches = pool.filter((component) => {
       const matchesSearch = component.name
         ?.toLowerCase()
         .includes(query.toLowerCase());
       const matchesBrand =
         !brandFilter ||
         component.brand?.toLowerCase() === brandFilter.toLowerCase();
-      const matchesUserComponent = true;
-      return matchesSearch && matchesBrand && matchesUserComponent;
+      return matchesSearch && matchesBrand;
     });
 
     setFilteredComponents(query ? matches : []);
@@ -69,7 +85,7 @@ const AutocompleteInput = ({ type, onSelect }) => {
     setSelectedComponent(component);
     setFilteredComponents([]);
     setShowAddComponentModal(false);
-    onSelect(component);
+    onSelect(component); // Pass selected component back to parent
   };
 
   return (

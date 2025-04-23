@@ -29,6 +29,39 @@ export const getComponents = (req, res) => {
   );
 };
 
+export const getUserComponents = (req, res) => {
+  const userId = req.user.id;
+  db.query(
+    "SELECT * FROM components WHERE user_id = $1",
+    [userId],
+    (err, result) => {
+      if (err) {
+        console.error("Error fetching user components: ", err);
+        return result.status(500).json({ error: "Internal server error" });
+      }
+      res.status(200).json(result).rows;
+    }
+  );
+};
+
+export const getUserComponentsByType = (req, res) => {
+  const userId = req.user.id;
+  const { type } = req.params;
+
+  db.query(
+    "SELECT * FROM components WHERE user_id = $1 AND type = $2",
+    [userId, type],
+    (err, result) => {
+      if (err) {
+        console.error("Error fetching user components: ", err);
+        return res.status(500).json({ error: "Internal server error" });
+      }
+
+      res.status(200).json(result.rows);
+    }
+  );
+};
+
 export const getGPUComponents = async (req, res) => {
   try {
     const rows = await getComponentsByType("GPU", req.user.id);

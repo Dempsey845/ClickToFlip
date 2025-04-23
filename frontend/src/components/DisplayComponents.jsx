@@ -31,7 +31,7 @@ function DisplayComponents({ build, onUpdate }) {
         buildId={build.id}
         onUpdate={onUpdate}
       />
-      {gpuComponents.map((gpu) => {
+      {gpuComponents?.map((gpu) => {
         return (
           <div key={gpu.id}>
             <BuildComponent
