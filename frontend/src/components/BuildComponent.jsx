@@ -153,9 +153,10 @@ function BuildComponent({ component, type, buildId, onUpdate }) {
                 });
                 setShowEditModel(true);
               }}
-              className="btn btn-primary mb-3"
+              className="btn btn-outline-primary btn-sm ms-2"
+              title={`Edit ${type}`}
             >
-              Edit {type}
+              <i className="bi bi-gear-fill"></i>
             </button>
           </h5>
           <AutocompleteInput type={type} onSelect={handleComponentChange} />

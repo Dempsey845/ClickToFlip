@@ -70,24 +70,22 @@ const AutocompleteInput = ({ type, onSelect }) => {
   };
 
   return (
-    <div>
+    <div className="mb-3">
       <input
         type="text"
+        className="form-control mb-2"
         value={searchTerm}
         onChange={handleSearch}
         placeholder={`Search for a ${type}...`}
       />
       {filteredComponents.length > 0 && (
-        <ul style={{ listStyle: "none", padding: 0 }}>
+        <ul className="list-group">
           {filteredComponents.map((component) => (
             <li
               key={component.id}
               onClick={() => handleSelect(component)}
-              style={{
-                cursor: "pointer",
-                padding: "5px",
-                borderBottom: "1px solid #ccc",
-              }}
+              className="list-group-item list-group-item-action"
+              style={{ cursor: "pointer" }}
             >
               {component.name} ({component.type})
             </li>
@@ -98,17 +96,10 @@ const AutocompleteInput = ({ type, onSelect }) => {
       {filteredComponents.length === 0 && searchTerm && (
         <button
           onClick={() => setShowAddComponentModal(true)}
-          style={{
-            padding: "10px",
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            borderRadius: "5px",
-            cursor: "pointer",
-            marginTop: "10px",
-          }}
+          className="btn btn-outline-primary btn-sm ms-2"
+          style={{ marginLeft: "10px" }}
         >
-          Add a New {type}
+          <i className="bi bi-database-fill-add"></i>
         </button>
       )}
 
