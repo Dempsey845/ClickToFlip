@@ -314,6 +314,19 @@ const updateUserComponent = async (id, component) => {
   }
 };
 
+const getUserComponents = async (type) => {
+  try {
+    const result = await axios.get(
+      `${BACKEND_URL}/api/components/getUserComponents`,
+      { withCredentials: true }
+    );
+    return result.data.rows;
+  } catch (err) {
+    console.error(`${err.response?.data?.error || err.message}`);
+    return [];
+  }
+};
+
 const getUserComponentsByType = async (type) => {
   try {
     const result = await axios.get(
@@ -322,7 +335,6 @@ const getUserComponentsByType = async (type) => {
     );
     return result.data;
   } catch (err) {
-    toast.error("Error getting user components.");
     console.error(`${err.response?.data?.error || err.message}`);
     return [];
   }
@@ -349,5 +361,6 @@ export {
   changeComponent,
   addUserComponent,
   updateUserComponent,
+  getUserComponents,
   getUserComponentsByType,
 };

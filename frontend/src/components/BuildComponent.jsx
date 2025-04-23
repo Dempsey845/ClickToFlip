@@ -48,7 +48,13 @@ function convertParsedToFields(parsed) {
   return fields;
 }
 
-function BuildComponent({ component, type, buildId, onUpdate }) {
+function BuildComponent({
+  component,
+  type,
+  buildId,
+  onUpdate,
+  useBuild = true,
+}) {
   // Component example:
   // {id: 7743, name: "djkal", specs: "socket: AM4, test: 10", "brand": "dafsa", model: "dadad"}
   // type: CPU / GPU / Motherboard
@@ -102,7 +108,7 @@ function BuildComponent({ component, type, buildId, onUpdate }) {
 
   const handleNewUserComponent = async (data) => {
     setNewComponent(data);
-    await changeComponent(buildId, prevComponentId, data);
+    if (useBuild) await changeComponent(buildId, prevComponentId, data);
     setPrevComponentId(data.id);
     setParsedSpecs(parseSpecsString(data.specs));
     setLocalComponent(data);
@@ -162,7 +168,9 @@ function BuildComponent({ component, type, buildId, onUpdate }) {
               <i className="bi bi-gear-fill"></i>
             </button>
           </h5>
-          <AutocompleteInput type={type} onSelect={handleComponentChange} />
+          {useBuild && (
+            <AutocompleteInput type={type} onSelect={handleComponentChange} />
+          )}
           {showComponentChangeButton && (
             <button
               className="btn btn-sm btn-outline-primary mt-2"

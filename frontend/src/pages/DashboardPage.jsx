@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import AddBuildForm from "../components/AddBuildForm";
 import Builds from "../components/Builds";
 import { getUserBuilds } from "../handlers/apiHandler";
+import UserComponents from "../components/UserComponents";
 
 function DashboardPage({ onLogout }) {
   const [builds, setBuilds] = useState([]);
@@ -32,6 +33,10 @@ function DashboardPage({ onLogout }) {
       {/* Builds Section */}
       <div className="card mb-4 p-3">
         <Builds builds={builds} onUpdate={handleUpdate} />
+      </div>
+
+      <div className="card mb-4 p-3">
+        <UserComponents onUpdate={handleUpdate} />
       </div>
 
       {/* Logout Button */}
