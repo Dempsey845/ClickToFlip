@@ -119,7 +119,7 @@ const AutocompleteInput = ({ type, onSelect }) => {
           onClose={() => {
             setSearchTerm("");
           }}
-          onComponentAdded={handleUpdate}
+          onUpdate={handleUpdate}
         />
       )}
     </div>

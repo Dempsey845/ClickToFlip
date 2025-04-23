@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { addUserComponent } from "../handlers/apiHandler";
+import { addUserComponent, updateUserComponent } from "../handlers/apiHandler";
 
 const AddUserComponentModel = ({
   type,
@@ -16,6 +16,9 @@ const AddUserComponentModel = ({
   disabledNameInput = false,
   defaultBrand = "",
   defaultModel = "",
+  update = false,
+  componentId,
+  onUpdate,
 }) => {
   const [name, setName] = useState(defaultName);
   const [brand, setBrand] = useState(defaultBrand);
@@ -73,10 +76,16 @@ const AddUserComponentModel = ({
 
     const newComponent = { name, type, brand, model, specs: specsString };
 
-    const data = await addUserComponent(newComponent);
+    const data = update
+      ? await updateUserComponent(componentId, newComponent)
+      : await addUserComponent(newComponent);
     setShowAddComponentModal(false);
+
+    console.log(`Update?: ${update}`);
+
     if (onComponentAdded) onComponentAdded(); // trigger refresh
-    if (onComponentAddedWithData) onComponentAddedWithData(data);
+    if (onComponentAddedWithData && !update) onComponentAddedWithData(data);
+    await onUpdate();
   };
 
   const handleClose = () => {
@@ -124,7 +133,7 @@ const AddUserComponentModel = ({
         />
 
         <label>Specs:</label>
-        {specFields.map((field, index) => (
+        {specFields?.map((field, index) => (
           <div key={index} style={styles.specRow}>
             <input
               value={field.key}
@@ -154,6 +163,7 @@ const AddUserComponentModel = ({
           <button onClick={handleClose} style={styles.cancelBtn}>
             Close
           </button>
+          {update && <button style={styles.removeBtn}>Delete</button>}
           <button onClick={handleSave} style={styles.saveBtn}>
             Save
           </button>

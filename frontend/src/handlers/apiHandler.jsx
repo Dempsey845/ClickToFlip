@@ -299,6 +299,21 @@ const addUserComponent = async (component) => {
   }
 };
 
+const updateUserComponent = async (id, component) => {
+  try {
+    const result = await axios.patch(
+      `${BACKEND_URL}/api/components/updateUserComponent/${id}`,
+      component,
+      { withCredentials: true }
+    );
+    toast.success(`Updated Component: ${result.data.updatedComponent.name}`);
+    return result.data.updatedComponent;
+  } catch (err) {
+    toast.error("Error updating user component.");
+    console.error(`${err.response?.data?.error || err.message}`);
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -319,4 +334,5 @@ export {
   deleteImageByURL,
   changeComponent,
   addUserComponent,
+  updateUserComponent,
 };

@@ -4,7 +4,7 @@ import db from "../config/db.js";
 const getComponentsByType = (type, userId) => {
   return new Promise((resolve, reject) => {
     db.query(
-      `SELECT id, name, type FROM components WHERE type = $1 AND (user_id = $2 OR user_id IS NULL)`,
+      `SELECT * FROM components WHERE type = $1 AND (user_id = $2 OR user_id IS NULL)`,
       [type, userId],
       (err, result) => {
         if (err) return reject(err);
@@ -17,7 +17,7 @@ const getComponentsByType = (type, userId) => {
 
 export const getComponents = (req, res) => {
   db.query(
-    "SELECT id, name, type FROM components WHERE user_id = $1 OR user_id IS NULL",
+    "SELECT * FROM components WHERE user_id = $1 OR user_id IS NULL",
     [req.user.id],
     (err, result) => {
       if (err) {
@@ -92,5 +92,54 @@ export const addUserComponent = async (req, res) => {
     return res
       .status(500)
       .json({ error: "Server error adding user component." });
+  }
+};
+
+export const updateUserComponent = async (req, res) => {
+  if (!req.isAuthenticated()) {
+    console.error("Unauthorized: User not authenticated.");
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  const { id } = req.params;
+  const { name, type, brand, model, specs } = req.body;
+  const user_id = req.user.id;
+
+  if (!name || !type || !brand || !model) {
+    return res.status(400).json({ error: "Missing required fields." });
+  }
+
+  try {
+    // Check if the component belongs to the user
+    const check = await db.query(
+      `SELECT * FROM components WHERE id = $1 AND user_id = $2`,
+      [id, user_id]
+    );
+
+    if (check.rows.length === 0) {
+      return res.status(403).json({
+        error: "Forbidden. Component not found or not owned by user.",
+      });
+    }
+
+    const result = await db.query(
+      `UPDATE components
+       SET name = $1, type = $2, brand = $3, model = $4, specs = $5
+       WHERE id = $6 AND user_id = $7
+       RETURNING *`,
+      [name, type, brand, model, specs, id, user_id]
+    );
+
+    const updatedComponent = result.rows[0];
+
+    return res.status(200).json({
+      message: "User component updated successfully.",
+      updatedComponent,
+    });
+  } catch (err) {
+    console.error("Error updating user component:", err);
+    return res
+      .status(500)
+      .json({ error: "Server error updating user component." });
   }
 };

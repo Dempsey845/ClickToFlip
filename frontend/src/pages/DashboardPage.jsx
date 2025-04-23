@@ -5,20 +5,19 @@ import { getUserBuilds } from "../handlers/apiHandler";
 
 function DashboardPage({ onLogout }) {
   const [builds, setBuilds] = useState([]);
-  const [updates, setUpdates] = useState([]);
+  const [updateCount, setUpdateCount] = useState(0);
+
+  const getBuilds = async () => {
+    const result = await getUserBuilds();
+    setBuilds(result);
+  };
 
   useEffect(() => {
-    const getBuilds = async () => {
-      const result = await getUserBuilds();
-      setBuilds(result);
-    };
     getBuilds();
-  }, [updates]);
+  }, [updateCount]);
 
-  const handleUpdate = () => {
-    setUpdates((prev) => {
-      return [...prev, "New update"];
-    });
+  const handleUpdate = async () => {
+    setUpdateCount((prev) => prev + 1);
   };
 
   return (

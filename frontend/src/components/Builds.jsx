@@ -17,8 +17,6 @@ function Builds({ builds, onUpdate }) {
     }
   };
 
-  console.log(builds[0]);
-
   const displayBuild = (build) => {
     const handleEditClick = () => {
       // Toggle visibility of the form for this specific build
@@ -47,15 +45,7 @@ function Builds({ builds, onUpdate }) {
           <div className="row">
             <div className="col-md-6">
               <h5>Components</h5>
-              <DisplayComponents
-                build={build}
-                cpuName={build.cpu_name}
-                cpuSpecs={build.cpu_specs}
-                gpus={build.gpus}
-                motherboardName={build.motherboard_name}
-                motherboardSpecs={build.motherboard_specs}
-                onUpdate={onUpdate}
-              />
+              <DisplayComponents build={build} onUpdate={onUpdate} />
             </div>
 
             <div className="col-md-6">
