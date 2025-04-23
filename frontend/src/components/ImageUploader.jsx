@@ -31,7 +31,7 @@ function ImageUploader({
 
     const resultUrl = await uploadImageWithFormData(formData);
     setImageUrl(resultUrl);
-    if (onUploaded) onUploaded();
+    if (onUploaded) onUploaded(resultUrl, buildId);
   };
 
   return (

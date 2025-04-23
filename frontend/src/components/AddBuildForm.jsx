@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import AutocompleteInput from "../components/AutocompleteInput";
 import { addBuildWithBuildPayLoad } from "../handlers/apiHandler";
-import ImageUploader from "./ImageUploader";
-import "./AddBuildForm.css"; // for overlay styles
+import "./AddBuildForm.css";
 
-function AddBuildForm({ onUpdate }) {
+function AddBuildForm({ onUpdate, onImageAdded }) {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     buildName: "",
@@ -22,8 +21,6 @@ function AddBuildForm({ onUpdate }) {
   const [formErrors, setFormErrors] = useState({});
   const [selectedGPUs, setSelectedGPUs] = useState([null]);
   const [buildId, setBuildId] = useState(null);
-  const [created, setCreated] = useState(false);
-  const [modelTitle, setModelTitle] = useState("Add New PC Build");
 
   const handleGPUChange = (index, value) => {
     const updated = [...selectedGPUs];
@@ -91,9 +88,7 @@ function AddBuildForm({ onUpdate }) {
       const data = await addBuildWithBuildPayLoad(buildPayload);
       setBuildId(data.buildId);
       onUpdate();
-      //setShowModal(false); // close modal on success
-      setModelTitle("Upload Image of Build");
-      setCreated(true);
+      setShowModal(false); // close modal on success
 
       // Reset form
       setFormData({
@@ -281,20 +276,6 @@ function AddBuildForm({ onUpdate }) {
     );
   };
 
-  const showImageUploadForm = () => {
-    return (
-      <ImageUploader
-        buildId={buildId}
-        onUploaded={() => {
-          // Close model
-          setModelTitle("Add New PC Build");
-          setCreated(false);
-          setShowModal(false);
-        }}
-      />
-    );
-  };
-
   return (
     <>
       <button className="btn btn-success" onClick={() => setShowModal(true)}>
@@ -305,18 +286,16 @@ function AddBuildForm({ onUpdate }) {
         <div className="modal-overlay">
           <div className="modal-content shadow-lg rounded p-4 bg-white">
             <div className="d-flex justify-content-between mb-3">
-              <h4>{modelTitle}</h4>
+              <h4>Add New PC Build</h4>
               <button
                 className="btn-close"
                 onClick={() => {
                   setShowModal(false);
-                  setCreated(false);
                 }}
               />
             </div>
 
-            {!created && showBuildForm()}
-            {created && showImageUploadForm()}
+            {showBuildForm()}
           </div>
         </div>
       )}

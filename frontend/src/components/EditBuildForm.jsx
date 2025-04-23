@@ -97,7 +97,7 @@ function EditBuildForm({ buildId, onClose, onSuccess }) {
 
     try {
       await updateBuild(buildId, payload);
-      if (onSuccess) onSuccess();
+      if (onSuccess) onSuccess(payload);
       if (onClose) onClose();
     } catch (err) {
       console.error("Update failed:", err);
