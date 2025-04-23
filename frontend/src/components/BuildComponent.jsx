@@ -115,6 +115,12 @@ function BuildComponent({
     onUpdate();
   };
 
+  const handleUpdatedData = (data) => {
+    console.log("Data: ", data);
+    setNewComponent(data);
+    setParsedSpecs(parseSpecsString(data.specs));
+  };
+
   return (
     <div key={localComponent.id} className="component">
       {showEditModel && (
@@ -135,14 +141,15 @@ function BuildComponent({
           update={update}
           componentId={editModelFields.id}
           onUpdate={onUpdate}
+          onDataUpdated={handleUpdatedData}
         />
       )}
       <div className="card mb-3">
         <div className="card-header">
           <h5 className="mb-0">
-            {type == "CPU" && <i class="bi bi-cpu"></i>}{" "}
-            {type == "GPU" && <i class="bi bi-gpu-card"></i>}{" "}
-            {type == "Motherboard" && <i class="bi bi-motherboard"></i>}{" "}
+            {type == "CPU" && <i className="bi bi-cpu"></i>}{" "}
+            {type == "GPU" && <i className="bi bi-gpu-card"></i>}{" "}
+            {type == "Motherboard" && <i className="bi bi-motherboard"></i>}{" "}
             {localComponent.name || "N/A"}
             <button
               onClick={() => {

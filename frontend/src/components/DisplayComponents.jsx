@@ -16,7 +16,6 @@ function DisplayComponents({ build, onUpdate }) {
     model: build.motherboard_model,
   };
   const gpuComponents = build.gpus;
-  console.log("gpus: ", gpuComponents);
   return (
     <div className="components">
       <BuildComponent

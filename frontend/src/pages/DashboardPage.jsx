@@ -2,11 +2,12 @@ import { useState, useEffect } from "react";
 import AddBuildForm from "../components/AddBuildForm";
 import Builds from "../components/Builds";
 import { getUserBuilds } from "../handlers/apiHandler";
-import UserComponents from "../components/UserComponents";
+import { useNavigate } from "react-router-dom";
 
 function DashboardPage({ onLogout }) {
   const [builds, setBuilds] = useState([]);
   const [updateCount, setUpdateCount] = useState(0);
+  const navigate = useNavigate();
 
   const getBuilds = async () => {
     const result = await getUserBuilds();
@@ -30,13 +31,24 @@ function DashboardPage({ onLogout }) {
         <AddBuildForm onUpdate={handleUpdate} />
       </div>
 
+      <div className="card mb-4 p-4 shadow-sm">
+        <div className="d-flex justify-content-between align-items-center">
+          <h5 className="mb-0 text-primary">Edit Your Components</h5>
+          <button
+            onClick={() => {
+              navigate("/my-components");
+            }}
+            className="btn btn-outline-primary d-flex align-items-center py-2 px-3"
+          >
+            <i className="bi bi-pencil-square fs-5 me-2"></i>
+            Edit
+          </button>
+        </div>
+      </div>
+
       {/* Builds Section */}
       <div className="card mb-4 p-3">
         <Builds builds={builds} onUpdate={handleUpdate} />
-      </div>
-
-      <div className="card mb-4 p-3">
-        <UserComponents onUpdate={handleUpdate} />
       </div>
 
       {/* Logout Button */}

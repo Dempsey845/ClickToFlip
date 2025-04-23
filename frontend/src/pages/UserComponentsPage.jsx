@@ -1,8 +1,8 @@
-import BuildComponent from "./BuildComponent";
+import BuildComponent from "../components/BuildComponent";
 import { getUserComponents } from "../handlers/apiHandler";
 import { useState, useEffect } from "react";
 
-function UserComponents({ onUpdate }) {
+function UserComponentsPage({ onUpdate }) {
   const [components, setComponents] = useState(null);
 
   useEffect(() => {
@@ -16,17 +16,19 @@ function UserComponents({ onUpdate }) {
 
   const displayComponent = (component) => {
     return (
-      <BuildComponent
-        key={component.id}
-        component={component}
-        type={component.type}
-        useBuild={false}
-        onUpdate={onUpdate}
-      />
+      <div className="container mt-4">
+        <BuildComponent
+          key={component.id}
+          component={component}
+          type={component.type}
+          useBuild={false}
+          onUpdate={onUpdate}
+        />
+      </div>
     );
   };
 
   return <div>{components?.map(displayComponent)}</div>;
 }
 
-export default UserComponents;
+export default UserComponentsPage;

@@ -14,6 +14,7 @@ import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";
 import DashboardPage from "./pages/DashboardPage";
 import Header from "./components/Header";
+import UserComponentsPage from "./pages/UserComponentsPage";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -60,6 +61,16 @@ function App() {
           element={
             authenticated ? (
               <DashboardPage onLogout={attemptLogout} />
+            ) : (
+              <Navigate to="/signin" replace />
+            )
+          }
+        />
+        <Route
+          path="/my-components"
+          element={
+            authenticated ? (
+              <UserComponentsPage />
             ) : (
               <Navigate to="/signin" replace />
             )

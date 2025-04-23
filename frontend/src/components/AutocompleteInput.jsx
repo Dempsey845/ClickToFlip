@@ -47,7 +47,6 @@ const AutocompleteInput = ({ type, onSelect }) => {
   const fetchUserComponents = async () => {
     try {
       const data = await getUserComponentsByType(type);
-      console.log("User data: ", data);
       setUserComponents(data);
     } catch (err) {
       console.error("Error fetching user components:", err);

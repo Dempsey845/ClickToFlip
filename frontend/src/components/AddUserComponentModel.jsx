@@ -19,6 +19,7 @@ const AddUserComponentModel = ({
   update = false,
   componentId,
   onUpdate,
+  onDataUpdated,
 }) => {
   const [name, setName] = useState(defaultName);
   const [brand, setBrand] = useState(defaultBrand);
@@ -81,7 +82,7 @@ const AddUserComponentModel = ({
       : await addUserComponent(newComponent);
     setShowAddComponentModal(false);
 
-    console.log(`Update?: ${update}`);
+    if (update) onDataUpdated(data);
 
     if (onComponentAdded) onComponentAdded(); // trigger refresh
     if (onComponentAddedWithData && !update) onComponentAddedWithData(data);
