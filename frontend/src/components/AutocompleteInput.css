@@ -1,0 +1,10 @@
+.fade-slide-in {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.fade-slide-in.show {
+  opacity: 1;
+  transform: translateY(0);
+}

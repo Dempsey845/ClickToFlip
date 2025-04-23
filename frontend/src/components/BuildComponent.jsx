@@ -134,7 +134,10 @@ function BuildComponent({ component, type, buildId, onUpdate }) {
       <div className="card mb-3">
         <div className="card-header">
           <h5 className="mb-0">
-            {type}: {localComponent.name || "N/A"}
+            {type == "CPU" && <i class="bi bi-cpu"></i>}{" "}
+            {type == "GPU" && <i class="bi bi-gpu-card"></i>}{" "}
+            {type == "Motherboard" && <i class="bi bi-motherboard"></i>}{" "}
+            {localComponent.name || "N/A"}
             <button
               onClick={() => {
                 const isCustom = localComponent.name.includes("(Custom)");
