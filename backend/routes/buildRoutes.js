@@ -116,78 +116,101 @@ router.get("/", async (req, res) => {
 
   try {
     const query = `
-  SELECT 
-    b.id,
-    b.name,
-    b.description,
-    b.status,
-    b.total_cost,
-    b.sale_price,
-    b.sold_date,
-    b.profit,
-    b.image_url,
-
-    -- CPU: expect one
-    cpu.cpu_id,
-    cpu.name AS cpu_name,
-    cpu.specs AS cpu_specs,
-    cpu.brand AS cpu_brand,
-    cpu.model AS cpu_model,
-
-    -- GPUs: array of objects and array of IDs
-    gpu.gpus,
-    gpu.gpu_ids,
-
-    -- Motherboard: expect one
-    motherboard.motherboard_id,
-    motherboard.name AS motherboard_name,
-    motherboard.specs AS motherboard_specs,
-    motherboard.brand AS motherboard_brand,
-    motherboard.model AS motherboard_model
-
-  FROM builds b
-
-  -- CPU subquery: fetch one CPU per build
-  LEFT JOIN (
-    SELECT bc.build_id, c.id AS cpu_id, c.name, c.specs, c.brand, c.model
-    FROM build_components bc
-    JOIN components c ON bc.component_id = c.id
-    WHERE c.type = 'CPU'
-  ) cpu ON b.id = cpu.build_id
-
-  -- GPU subquery: fetch all GPUs for a build, including ids and JSON object (name + specs)
-  LEFT JOIN (
-  SELECT 
-    bc.build_id, 
-    ARRAY_AGG(c.id ORDER BY bc.component_id) AS gpu_ids,
-    ARRAY_AGG(
-      JSON_BUILD_OBJECT(
-        'id', c.id,
-        'name', c.name,
-        'brand', c.brand,
-        'model', c.model,
-        'specs', c.specs
-      )
-      ORDER BY bc.component_id
-    ) AS gpus
-  FROM build_components bc
-  JOIN components c ON bc.component_id = c.id
-  WHERE c.type = 'GPU'
-  GROUP BY bc.build_id
-) AS gpu ON b.id = gpu.build_id
-
-
-  -- Motherboard subquery: fetch one motherboard per build
-  LEFT JOIN (
-    SELECT bc.build_id, c.id AS motherboard_id, c.name, c.specs, c.brand, c.model
-    FROM build_components bc
-    JOIN components c ON bc.component_id = c.id
-    WHERE c.type = 'Motherboard'
-  ) motherboard ON b.id = motherboard.build_id
-
-  WHERE b.user_id = $1
-  ORDER BY b.id DESC;
-`;
+    SELECT 
+      b.id,
+      b.name,
+      b.description,
+      b.status,
+      b.total_cost,
+      b.sale_price,
+      b.sold_date,
+      b.profit,
+      b.image_url,
+  
+      -- CPU: expect one
+      cpu.cpu_id,
+      cpu.name AS cpu_name,
+      cpu.specs AS cpu_specs,
+      cpu.brand AS cpu_brand,
+      cpu.model AS cpu_model,
+  
+      -- GPUs: array of objects and array of IDs
+      gpu.gpus,
+      gpu.gpu_ids,
+  
+      -- Motherboard: expect one
+      motherboard.motherboard_id,
+      motherboard.name AS motherboard_name,
+      motherboard.specs AS motherboard_specs,
+      motherboard.brand AS motherboard_brand,
+      motherboard.model AS motherboard_model,
+  
+      -- Unified components list
+      all_components.components
+  
+    FROM builds b
+  
+    -- CPU subquery
+    LEFT JOIN (
+      SELECT bc.build_id, c.id AS cpu_id, c.name, c.specs, c.brand, c.model
+      FROM build_components bc
+      JOIN components c ON bc.component_id = c.id
+      WHERE c.type = 'CPU'
+    ) cpu ON b.id = cpu.build_id
+  
+    -- GPU subquery
+    LEFT JOIN (
+      SELECT 
+        bc.build_id, 
+        ARRAY_AGG(c.id ORDER BY bc.component_id) AS gpu_ids,
+        ARRAY_AGG(
+          JSON_BUILD_OBJECT(
+            'id', c.id,
+            'name', c.name,
+            'brand', c.brand,
+            'model', c.model,
+            'specs', c.specs
+          )
+          ORDER BY bc.component_id
+        ) AS gpus
+      FROM build_components bc
+      JOIN components c ON bc.component_id = c.id
+      WHERE c.type = 'GPU'
+      GROUP BY bc.build_id
+    ) AS gpu ON b.id = gpu.build_id
+  
+    -- Motherboard subquery
+    LEFT JOIN (
+      SELECT bc.build_id, c.id AS motherboard_id, c.name, c.specs, c.brand, c.model
+      FROM build_components bc
+      JOIN components c ON bc.component_id = c.id
+      WHERE c.type = 'Motherboard'
+    ) motherboard ON b.id = motherboard.build_id
+  
+    -- All components with build_component ID
+    LEFT JOIN (
+      SELECT 
+        bc.build_id,
+        ARRAY_AGG(
+          jsonb_build_object(
+            'component_reference_id', bc.id,
+            'component_id', c.id,
+            'type', c.type,
+            'name', c.name,
+            'brand', c.brand,
+            'model', c.model,
+            'specs', c.specs
+          )
+          ORDER BY bc.id
+        ) AS components
+      FROM build_components bc
+      JOIN components c ON bc.component_id = c.id
+      GROUP BY bc.build_id
+    ) all_components ON b.id = all_components.build_id
+  
+    WHERE b.user_id = $1
+    ORDER BY b.id DESC;
+  `;
 
     const result = await db.query(query, [userId]);
 
@@ -365,11 +388,17 @@ router.post("/addGPU/:buildId", async (req, res) => {
   }
 
   try {
-    await db.query(
-      "INSERT INTO build_components (build_id, component_id) VALUES ($1, $2)",
+    const result = await db.query(
+      "INSERT INTO build_components (build_id, component_id) VALUES ($1, $2) RETURNING id",
       [buildId, gpuId]
     );
-    res.status(201).json({ message: "GPU added to build successfully." });
+
+    const componentId = result.rows[0].id;
+
+    res.status(201).json({
+      message: "GPU added to build successfully.",
+      componentId: componentId,
+    });
   } catch (err) {
     console.error("Error adding GPU:", err);
     res.status(500).json({ error: "Failed to add GPU to build." });
@@ -447,7 +476,7 @@ router.patch("/changeComponent/:prevComponentId/:buildId", async (req, res) => {
       UPDATE build_components
       SET component_id = $1
       WHERE build_id = $2 AND component_id = $3
-      RETURNING *;
+      RETURNING id AS reference_id, component_id;
       `,
       [newComponentId, buildId, prevComponentId]
     );
@@ -458,7 +487,13 @@ router.patch("/changeComponent/:prevComponentId/:buildId", async (req, res) => {
         .json({ error: "Component not found in this build." });
     }
 
-    return res.status(200).json({ message: "Component updated successfully." });
+    return res.status(200).json({
+      message: "Component updated successfully.",
+      updatedComponent: {
+        reference_id: result.rows[0].reference_id,
+        component_id: result.rows[0].component_id,
+      },
+    });
   } catch (err) {
     console.error("Error updating component:", err);
     return res.status(500).json({ error: "Server error updating component." });

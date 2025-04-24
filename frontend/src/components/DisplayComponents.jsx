@@ -1,43 +1,26 @@
 import BuildComponent from "./BuildComponent";
 
 function DisplayComponents({ build, onUpdate }) {
-  const cpuComponent = {
-    id: build.cpu_id,
-    name: build.cpu_name,
-    specs: build.cpu_specs,
-    brand: build.cpu_brand,
-    model: build.cpu_model,
-  };
-  const motherboardComponent = {
-    id: build.motherboard_id,
-    name: build.motherboard_name,
-    specs: build.motherboard_specs,
-    brand: build.motherboard_brand,
-    model: build.motherboard_model,
-  };
-  const gpuComponents = build.gpus;
+  // Filter the components array to get unique components based on component_reference_id
+  const uniqueComponents = build.components?.filter(
+    (component, index, self) =>
+      index ===
+      self.findIndex(
+        (c) => c.component_reference_id === component.component_reference_id
+      )
+  );
+
   return (
     <div className="components">
-      <BuildComponent
-        component={cpuComponent}
-        type="CPU"
-        buildId={build.id}
-        onUpdate={onUpdate}
-      />
-      <BuildComponent
-        component={motherboardComponent}
-        type="Motherboard"
-        buildId={build.id}
-        onUpdate={onUpdate}
-      />
-      {gpuComponents?.map((gpu) => {
+      {uniqueComponents?.map((component, index) => {
         return (
-          <div key={gpu.id}>
+          <div key={`${build.id}-${component.id}-${index}`}>
             <BuildComponent
-              component={gpu}
-              type="GPU"
+              component={component}
+              type={component.type}
               buildId={build.id}
               onUpdate={onUpdate}
+              referenceId={component.component_reference_id}
             />
           </div>
         );

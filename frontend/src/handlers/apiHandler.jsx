@@ -139,11 +139,18 @@ const addBuildWithBuildPayLoad = async (buildPayload) => {
 // Add GPU
 const addGPUToBuild = async (buildId, gpuId) => {
   try {
-    await axios.post(`${BACKEND_URL}/api/builds/addGPU/${buildId}`, gpuId, {
-      withCredentials: true,
-    });
+    const response = await axios.post(
+      `${BACKEND_URL}/api/builds/addGPU/${buildId}`,
+      gpuId,
+      {
+        withCredentials: true,
+      }
+    );
+
+    const componentId = response.data.componentId;
+
     toast.success("Added new GPU to build.");
-    return true;
+    return componentId;
   } catch (err) {
     toast.error("Error adding GPU to build");
     return false;
@@ -285,6 +292,23 @@ const changeComponent = async (buildId, prevComponentId, newComponent) => {
   }
 };
 
+const removeBuildComponent = async (componentReferenceId) => {
+  try {
+    const response = await axios.delete(
+      `${BACKEND_URL}/api/components/buildComponents/${componentReferenceId}`,
+      { withCredentials: true }
+    );
+    toast.success("Successfully removed component from build.");
+    return response;
+  } catch {
+    toast.error(
+      `Error removing component from build: ${
+        err.response?.data?.error || err.message
+      }`
+    );
+  }
+};
+
 const addUserComponent = async (component) => {
   try {
     const result = await axios.post(
@@ -361,6 +385,7 @@ export {
   deleteImageByFilename,
   deleteImageByURL,
   changeComponent,
+  removeBuildComponent,
   addUserComponent,
   updateUserComponent,
   getUserComponents,

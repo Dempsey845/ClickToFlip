@@ -176,3 +176,27 @@ export const updateUserComponent = async (req, res) => {
       .json({ error: "Server error updating user component." });
   }
 };
+
+export const deleteComponent = async (req, res) => {
+  if (!req.isAuthenticated()) {
+    console.error("Unauthorized: User not authenticated.");
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  const { reference_id } = req.params;
+  try {
+    const result = await db.query(
+      "DELETE FROM build_components WHERE id = $1 RETURNING *",
+      [reference_id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Component not found." });
+    }
+
+    return res.status(200).json({ message: "Component deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting component:", err);
+    return res.status(500).json({ error: "Server error deleting component." });
+  }
+};

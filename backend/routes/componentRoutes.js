@@ -8,6 +8,7 @@ import {
   updateUserComponent,
   getUserComponents,
   getUserComponentsByType,
+  deleteComponent,
 } from "../controllers/componentController.js";
 
 const router = express.Router();
@@ -20,5 +21,6 @@ router.post("/addUserComponent", addUserComponent);
 router.patch("/updateUserComponent/:id", updateUserComponent);
 router.get("/getUserComponents", getUserComponents);
 router.get("/getUserComponents/:type", getUserComponentsByType);
+router.delete("/buildComponents/:reference_id", deleteComponent);
 
 export default router;

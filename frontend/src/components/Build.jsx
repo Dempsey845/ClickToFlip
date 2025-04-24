@@ -41,17 +41,16 @@ function Build({ build, onUpdate }) {
     });
   };
 
-  const handleAddGPUClick = () => {
-    setShowAddGPUForm(true);
-  };
-
   const handleAddGPU = async (gpu) => {
-    const added = await addGPUToBuild(build.id, gpu.id);
-    if (added) {
+    console.log("adding gpu");
+    const referenceId = await addGPUToBuild(build.id, gpu.id);
+    if (referenceId) {
       setLocalBuild((prev) => {
         const updatedBuild = { ...prev };
-        if (!updatedBuild.gpus) updatedBuild.gpus = [];
-        updatedBuild.gpus.push(gpu);
+        updatedBuild.components.push({
+          ...gpu,
+          component_reference_id: referenceId,
+        });
         return updatedBuild;
       });
     }
