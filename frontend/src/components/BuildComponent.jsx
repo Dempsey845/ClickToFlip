@@ -62,7 +62,11 @@ function BuildComponent({
   const [localComponent, setLocalComponent] = useState({
     ...component,
     component_reference_id: referenceId,
+    count: component.count,
+    component_reference_ids: component.component_reference_ids,
   });
+  component.type === "GPU" &&
+    console.log("Component being displayed: ", localComponent);
   const [parsedSpecs, setParsedSpecs] = useState(
     parseSpecsString(localComponent.specs)
   );
@@ -90,7 +94,6 @@ function BuildComponent({
 
   useEffect(() => {
     setPrevComponentId(localComponent.component_id | localComponent.id);
-    console.log("new: ", localComponent);
   }, [localComponent]);
 
   const handleComponentChange = (newC) => {
@@ -100,9 +103,6 @@ function BuildComponent({
   };
 
   const handleComponentChangeSubmit = async () => {
-    if (!newComponent || !newComponent.id) {
-      console.log("No new component or id");
-    }
     const result = await changeComponent(
       buildId,
       prevComponentId,
@@ -138,11 +138,23 @@ function BuildComponent({
   };
 
   const removeGPU = async () => {
-    //TODO: remove GPU;
-    const result = await removeBuildComponent(
-      localComponent.component_reference_id
-    );
-    setDeleted(true);
+    if (localComponent.count && localComponent.count > 1) {
+      const updatedIds = localComponent.component_reference_ids.slice(1);
+      const newId = updatedIds[0];
+
+      setLocalComponent((prev) => ({
+        ...prev,
+        component_reference_id: newId,
+        component_reference_ids: updatedIds,
+        count: prev.count - 1,
+      }));
+
+      await removeBuildComponent(localComponent.component_reference_ids[0]);
+    } else {
+      setDeleted(true);
+      await removeBuildComponent(localComponent.component_reference_id);
+    }
+
     onUpdate();
   };
 
@@ -178,7 +190,8 @@ function BuildComponent({
               {type == "CPU" && <i className="bi bi-cpu"></i>}{" "}
               {type == "GPU" && <i className="bi bi-gpu-card"></i>}{" "}
               {type == "Motherboard" && <i className="bi bi-motherboard"></i>}{" "}
-              {localComponent.name || "N/A"}
+              {localComponent.name || "N/A"}{" "}
+              {localComponent.count > 1 && `(${localComponent.count})`}
               <button
                 onClick={() => {
                   const isCustom = localComponent.name.includes("(Custom)");

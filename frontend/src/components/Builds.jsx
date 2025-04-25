@@ -6,8 +6,6 @@ function Builds({ builds, onUpdate }) {
     return <Build key={build.id} build={build} onUpdate={onUpdate} />;
   };
 
-  console.log(builds);
-
   return (
     <div>
       <Stats builds={builds} /> {builds.length > 0 && builds.map(displayBuild)}

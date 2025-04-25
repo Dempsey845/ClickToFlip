@@ -50,6 +50,7 @@ function Build({ build, onUpdate }) {
         updatedBuild.components.push({
           ...gpu,
           component_reference_id: referenceId,
+          count: gpu.count,
         });
         return updatedBuild;
       });
