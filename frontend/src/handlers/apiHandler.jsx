@@ -366,6 +366,21 @@ const getUserComponentsByType = async (type) => {
   }
 };
 
+const deleteUserComponent = async (componentId) => {
+  try {
+    const result = await axios.delete(
+      `${BACKEND_URL}/api/components/userComponents/${componentId}`,
+      { withCredentials: true }
+    );
+    toast.success("Successfully removed user component.");
+    return result.data;
+  } catch (err) {
+    console.error(`${err.response?.data?.error || err.message}`);
+    toast.error(`${err.response?.data?.error || err.message}`);
+    return [];
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -390,4 +405,5 @@ export {
   updateUserComponent,
   getUserComponents,
   getUserComponentsByType,
+  deleteUserComponent,
 };

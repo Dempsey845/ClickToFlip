@@ -200,3 +200,29 @@ export const deleteComponent = async (req, res) => {
     return res.status(500).json({ error: "Server error deleting component." });
   }
 };
+
+export const deleteUserComponent = async (req, res) => {
+  if (!req.isAuthenticated()) {
+    console.error("Unauthorized: User not authenticated.");
+    return res.status(401).json({ error: "Unauthorized. Please log in." });
+  }
+
+  const userId = req.user.id;
+  const { component_id } = req.params;
+
+  try {
+    const result = await db.query(
+      "DELETE FROM components WHERE id = $1 AND user_id = $2 RETURNING *",
+      [component_id, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Component not found." });
+    }
+
+    return res.status(200).json({ message: "Component deleted successfully." });
+  } catch (err) {
+    console.error("Error deleting component:", err);
+    return res.status(500).json({ error: "Server error deleting component." });
+  }
+};

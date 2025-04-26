@@ -1,5 +1,5 @@
 import BuildComponent from "../components/BuildComponent";
-import { getUserComponents } from "../handlers/apiHandler";
+import { getUserComponents, deleteUserComponent } from "../handlers/apiHandler";
 import { useState, useEffect } from "react";
 
 function UserComponentsPage({ onUpdate }) {
@@ -14,21 +14,31 @@ function UserComponentsPage({ onUpdate }) {
     fetchComponents();
   }, []);
 
-  const displayComponent = (component) => {
+  const handleDeleteUserComponent = async (componentId) => {
+    await deleteUserComponent(componentId);
+  };
+
+  const displayComponent = (component, index) => {
     return (
-      <div className="container mt-4">
-        <BuildComponent
-          key={component.id}
-          component={component}
-          type={component.type}
-          useBuild={false}
-          onUpdate={onUpdate}
-        />
-      </div>
+      <BuildComponent
+        key={`${component.id}:${index}`}
+        component={component}
+        type={component.type}
+        useBuild={false}
+        onUpdate={onUpdate}
+        userComponent={true}
+        onUserComponentDelete={handleDeleteUserComponent}
+      />
     );
   };
 
-  return <div>{components?.map(displayComponent)}</div>;
+  return (
+    <div className="container mt-4">
+      {components?.map((component, index) => {
+        return displayComponent(component, index);
+      })}
+    </div>
+  );
 }
 
 export default UserComponentsPage;

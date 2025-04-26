@@ -55,6 +55,8 @@ function BuildComponent({
   onUpdate,
   useBuild = true,
   referenceId,
+  userComponent = false,
+  onUserComponentDelete,
 }) {
   // Component example:
   // {id: 7743, name: "djkal", specs: "socket: AM4, test: 10", "brand": "dafsa", model: "dadad"}
@@ -215,10 +217,21 @@ function BuildComponent({
               >
                 <i className="bi bi-gear-fill"></i>
               </button>
-              {type === "GPU" && (
+              {type === "GPU" && !userComponent && (
                 <button
                   className="btn btn-outline-danger btn-sm ms-2"
                   onClick={removeGPU}
+                >
+                  <i className="bi bi-trash3"></i>
+                </button>
+              )}
+              {userComponent && (
+                <button
+                  className="btn btn-outline-danger btn-sm ms-2"
+                  onClick={() => {
+                    onUserComponentDelete(localComponent.id);
+                    setDeleted(true);
+                  }}
                 >
                   <i className="bi bi-trash3"></i>
                 </button>
