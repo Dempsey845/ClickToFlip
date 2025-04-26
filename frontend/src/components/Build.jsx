@@ -62,28 +62,28 @@ function Build({ build, onUpdate }) {
   if (!show) return <div> </div>;
 
   return (
-    <div className="card mb-4 shadow-sm">
-      <div className="card-body">
-        <div className="mb-4 p-2 d-flex justify-content-between align-items-center">
+    <div className="card mb-4 shadow-sm border-0">
+      <div className="card-body p-4">
+        {/* Build Header */}
+        <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className="card-title mb-0">{localBuild?.name}</h2>
           <button
             onClick={handleEditClick}
-            className="btn btn-outline-primary d-flex align-items-center py-2 px-3"
+            className="btn btn-outline-primary d-flex align-items-center gap-2"
           >
-            <i className="bi bi-pencil-square fs-5 me-2"></i>
-            {editing ? "Close Edit Form" : "Edit Build"}
+            <i className="bi bi-pencil-square fs-5"></i>
+            {editing ? "Close Edit" : "Edit Build"}
           </button>
         </div>
 
+        {/* Add GPU Form */}
         <AddGPUForm
           show={showAddGPUForm}
-          onSubmit={(gpu) => {
-            handleAddGPU(gpu);
-          }}
+          onSubmit={(gpu) => handleAddGPU(gpu)}
           onClose={() => setShowAddGPUForm(false)}
         />
 
-        {/* Conditionally render the EditBuildForm */}
+        {/* Edit Build Form */}
         {editing && (
           <EditBuildForm
             buildId={localBuild?.id}
@@ -95,70 +95,79 @@ function Build({ build, onUpdate }) {
           />
         )}
 
-        <div className="row">
+        {/* Main Content */}
+        <div className="row g-4">
+          {/* Components Section */}
           <div className="col-md-6">
-            <h5>Components</h5>
-            <button
-              className="btn btn-sm btn-outline-primary mt-2"
-              title="Add GPU"
-              onClick={() => {
-                setShowAddGPUForm(true);
-              }}
-            >
-              <i className="bi bi-plus-lg"></i>
-              <i className="bi bi-gpu-card"></i>
-            </button>
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <h5 className="mb-0">Components</h5>
+              <button
+                className="btn btn-sm btn-outline-primary"
+                title="Add GPU"
+                onClick={() => setShowAddGPUForm(true)}
+              >
+                <i className="bi bi-plus-lg me-1"></i>
+                <i className="bi bi-gpu-card"></i>
+              </button>
+            </div>
 
             {localBuild && (
               <DisplayComponents build={localBuild} onUpdate={onUpdate} />
             )}
           </div>
 
+          {/* Build Info Section */}
           <div className="col-md-6">
             <h5>Build Info</h5>
-            <p>
-              <strong>Description:</strong> {localBuild?.description || "N/A"}
-            </p>
-            <p>
-              <strong>Status:</strong> {localBuild?.status}
-            </p>
-            <p>
-              <strong>Total Cost:</strong> £{localBuild?.total_cost}
-            </p>
-            <p>
-              <strong>Sale Price:</strong>{" "}
-              {localBuild?.sale_price
-                ? `£${localBuild?.sale_price}`
-                : "Not sold yet"}
-            </p>
-            <p>
-              <strong>Sold Date:</strong> {localBuild?.sold_date || "N/A"}
-            </p>
-            <p>
-              <strong>Profit:</strong>{" "}
-              {localBuild?.profit ? `£${localBuild?.profit}` : "N/A"}
-            </p>
-            {localBuild?.image_url ? (
-              <img
-                style={{ width: "500px", height: "500px", objectFit: "cover" }}
-                src={`${BACKEND_URL}${localBuild?.image_url}`}
-                alt="Build image"
-                className="img-fluid border rounded"
-              />
-            ) : (
-              <div
-                style={{ width: "500px", height: "500px" }}
-                className="d-flex align-items-center justify-content-center bg-secondary text-white border rounded"
-              >
-                <span>No image available</span>
-              </div>
-            )}
+            <ul className="list-unstyled">
+              <li>
+                <strong>Description:</strong>{" "}
+                {localBuild?.description.substr(0, 200) || "N/A"}
+              </li>
+              <li>
+                <strong>Status:</strong> {localBuild?.status}
+              </li>
+              <li>
+                <strong>Total Cost:</strong> £{localBuild?.total_cost}
+              </li>
+              <li>
+                <strong>Sale Price:</strong>{" "}
+                {localBuild?.sale_price
+                  ? `£${localBuild?.sale_price}`
+                  : "Not sold yet"}
+              </li>
+              <li>
+                <strong>Sold Date:</strong> {localBuild?.sold_date || "N/A"}
+              </li>
+              <li>
+                <strong>Profit:</strong>{" "}
+                {localBuild?.profit ? `£${localBuild?.profit}` : "N/A"}
+              </li>
+            </ul>
 
+            {/* Build Image */}
+            <div className="my-3 text-center">
+              {localBuild?.image_url ? (
+                <img
+                  src={`${BACKEND_URL}${localBuild.image_url}`}
+                  alt="Build image"
+                  className="img-fluid rounded border"
+                  style={{ maxHeight: "400px", objectFit: "cover" }}
+                />
+              ) : (
+                <div
+                  className="d-flex align-items-center justify-content-center bg-secondary text-white rounded border"
+                  style={{ height: "400px" }}
+                >
+                  No image available
+                </div>
+              )}
+            </div>
+
+            {/* Image Upload */}
             {localBuild && (
               <ImageUploader
-                beforeUploaded={() => {
-                  handleImageReplace();
-                }}
+                beforeUploaded={handleImageReplace}
                 onUploaded={handleImageUpload}
                 uploadText={
                   localBuild.image_url ? "Replace Image" : "Add Image"
@@ -169,20 +178,19 @@ function Build({ build, onUpdate }) {
           </div>
         </div>
 
-        <div className="row mt-3">
-          <div className="col-md-6 d-flex align-items-end">
-            <button
-              onClick={() => {
-                deleteBuildById(localBuild);
-                setLocalBuild(null);
-                onUpdate();
-                setShow(false);
-              }}
-              className="btn btn-danger"
-            >
-              Delete Build
-            </button>
-          </div>
+        {/* Delete Build Button */}
+        <div className="d-flex justify-content-end mt-4">
+          <button
+            onClick={() => {
+              deleteBuildById(localBuild);
+              setLocalBuild(null);
+              onUpdate();
+              setShow(false);
+            }}
+            className="btn btn-danger"
+          >
+            Delete Build
+          </button>
         </div>
       </div>
     </div>
