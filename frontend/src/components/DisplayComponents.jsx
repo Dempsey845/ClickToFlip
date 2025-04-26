@@ -43,7 +43,6 @@ function DisplayComponents({ build, onUpdate }) {
     });
 
     const newGrouped = Array.from(gpuMap.values());
-    console.log("gpu grouped: ", newGrouped);
 
     setGpusGrouped([...newGrouped]);
   }, [build]); // track build updates

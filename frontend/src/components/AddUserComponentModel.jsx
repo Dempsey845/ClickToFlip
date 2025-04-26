@@ -20,6 +20,7 @@ const AddUserComponentModel = ({
   componentId,
   onUpdate,
   onDataUpdated,
+  addingCustom = false,
 }) => {
   const [name, setName] = useState(defaultName);
   const [brand, setBrand] = useState(defaultBrand);
@@ -69,13 +70,21 @@ const AddUserComponentModel = ({
   };
 
   const handleSave = async () => {
-    console.log("Spec Fields: ", specFields);
+    if (!name.trim() || !brand.trim() || !model.trim()) {
+      alert("Please fill in all required fields: Name, Brand, and Model.");
+      return;
+    }
+
     const specsString = specFields
       .filter((f) => f.key.trim() && f.value.trim())
       .map((f) => `${f.key.trim()}: ${f.value.trim()}`)
       .join(", ");
 
     const newComponent = { name, type, brand, model, specs: specsString };
+
+    if (addingCustom) {
+      newComponent.name = newComponent.name + " (Custom)";
+    }
 
     const data = update
       ? await updateUserComponent(componentId, newComponent)
@@ -86,7 +95,7 @@ const AddUserComponentModel = ({
 
     if (onComponentAdded) onComponentAdded(); // trigger refresh
     if (onComponentAddedWithData && !update) onComponentAddedWithData(data);
-    await onUpdate();
+    if (onUpdate) onUpdate();
   };
 
   const handleClose = () => {

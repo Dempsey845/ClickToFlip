@@ -67,8 +67,6 @@ function BuildComponent({
     count: component.count,
     component_reference_ids: component.component_reference_ids,
   });
-  component.type === "GPU" &&
-    console.log("Component being displayed: ", localComponent);
   const [parsedSpecs, setParsedSpecs] = useState(
     parseSpecsString(localComponent.specs)
   );

@@ -1,9 +1,12 @@
 import BuildComponent from "../components/BuildComponent";
+import AddUserComponentModel from "../components/AddUserComponentModel";
 import { getUserComponents, deleteUserComponent } from "../handlers/apiHandler";
 import { useState, useEffect } from "react";
 
 function UserComponentsPage({ onUpdate }) {
   const [components, setComponents] = useState(null);
+  const [showAddModel, setShowAddModel] = useState(false);
+  const [addType, setAddType] = useState("CPU");
 
   useEffect(() => {
     const fetchComponents = async () => {
@@ -33,10 +36,76 @@ function UserComponentsPage({ onUpdate }) {
   };
 
   return (
-    <div className="container mt-4">
-      {components?.map((component, index) => {
-        return displayComponent(component, index);
-      })}
+    <div className="user-components">
+      {showAddModel && (
+        <AddUserComponentModel
+          type={addType}
+          setShowAddComponentModal={setShowAddModel}
+          onClose={() => {
+            setShowAddModel(false);
+          }}
+          onComponentAddedWithData={(data) => {
+            setShowAddModel(false);
+            setComponents((prev) => {
+              const newComponents = [...prev, data];
+              return newComponents;
+            });
+          }}
+          onUpdate={onUpdate}
+          addingCustom={true}
+        />
+      )}
+      <div className="container mt-4">
+        {/* Create Custom Component Card */}
+        <div className="card mb-4 shadow-sm">
+          <div className="card-body text-center">
+            <h5 className="card-title">Create a Custom Component</h5>
+            <p className="card-text">
+              Design and add your own component to use in builds!
+            </p>
+            <div className="d-flex flex-wrap justify-content-center gap-2">
+              <button
+                className="btn btn-primary d-flex align-items-center gap-2"
+                onClick={() => {
+                  setAddType("CPU");
+                  setShowAddModel(true);
+                }}
+              >
+                <i className="bi bi-cpu"></i> Create New CPU
+              </button>
+
+              <button
+                className="btn btn-success d-flex align-items-center gap-2"
+                onClick={() => {
+                  setAddType("GPU");
+                  setShowAddModel(true);
+                }}
+              >
+                <i className="bi bi-gpu-card"></i> Create New GPU
+              </button>
+
+              <button
+                className="btn btn-warning d-flex align-items-center gap-2"
+                onClick={() => {
+                  setAddType("Motherboard");
+                  setShowAddModel(true);
+                }}
+              >
+                <i className="bi bi-motherboard"></i> Create New Motherboard
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* User Components List */}
+        <div className="row">
+          {components?.map((component, index) => (
+            <div key={component.id} className="col-md-6 col-lg-4 mb-4">
+              {displayComponent(component, index)}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
