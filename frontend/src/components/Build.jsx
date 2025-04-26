@@ -12,6 +12,7 @@ import {
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function Build({ build, onUpdate }) {
+  const [show, setShow] = useState(true);
   const [localBuild, setLocalBuild] = useState(build);
   const [editing, setEditing] = useState(false);
   const [showAddGPUForm, setShowAddGPUForm] = useState(false);
@@ -22,16 +23,18 @@ function Build({ build, onUpdate }) {
 
   const handleImageReplace = () => {
     // Delete previous image if there is one
-    localBuild.image_url && deleteImageByURL(localBuild.image_url);
+    localBuild?.image_url && deleteImageByURL(localBuild.image_url);
   };
 
   const handleImageUpload = (newImageUrl) => {
+    if (!localBuild) return;
     setLocalBuild((prev) => {
       return { ...prev, image_url: newImageUrl };
     });
   };
 
   const updateLocalBuild = (payload) => {
+    if (!localBuild) return;
     setLocalBuild((prev) => {
       const updatedBuild = { ...prev };
       for (const [key, value] of Object.entries(payload)) {
@@ -42,7 +45,6 @@ function Build({ build, onUpdate }) {
   };
 
   const handleAddGPU = async (gpu) => {
-    console.log("adding gpu");
     const referenceId = await addGPUToBuild(build.id, gpu.id);
     if (referenceId) {
       setLocalBuild((prev) => {
@@ -57,11 +59,13 @@ function Build({ build, onUpdate }) {
     }
   };
 
+  if (!show) return <div> </div>;
+
   return (
     <div className="card mb-4 shadow-sm">
       <div className="card-body">
         <div className="mb-4 p-2 d-flex justify-content-between align-items-center">
-          <h2 className="card-title mb-0">{localBuild.name}</h2>
+          <h2 className="card-title mb-0">{localBuild?.name}</h2>
           <button
             onClick={handleEditClick}
             className="btn btn-outline-primary d-flex align-items-center py-2 px-3"
@@ -74,7 +78,6 @@ function Build({ build, onUpdate }) {
         <AddGPUForm
           show={showAddGPUForm}
           onSubmit={(gpu) => {
-            console.log("Selected GPU:", gpu);
             handleAddGPU(gpu);
           }}
           onClose={() => setShowAddGPUForm(false)}
@@ -83,7 +86,7 @@ function Build({ build, onUpdate }) {
         {/* Conditionally render the EditBuildForm */}
         {editing && (
           <EditBuildForm
-            buildId={localBuild.id}
+            buildId={localBuild?.id}
             onClose={handleEditClick}
             onSuccess={(payload) => {
               updateLocalBuild(payload);
@@ -106,37 +109,39 @@ function Build({ build, onUpdate }) {
               <i className="bi bi-gpu-card"></i>
             </button>
 
-            <DisplayComponents build={localBuild} onUpdate={onUpdate} />
+            {localBuild && (
+              <DisplayComponents build={localBuild} onUpdate={onUpdate} />
+            )}
           </div>
 
           <div className="col-md-6">
             <h5>Build Info</h5>
             <p>
-              <strong>Description:</strong> {localBuild.description || "N/A"}
+              <strong>Description:</strong> {localBuild?.description || "N/A"}
             </p>
             <p>
-              <strong>Status:</strong> {localBuild.status}
+              <strong>Status:</strong> {localBuild?.status}
             </p>
             <p>
-              <strong>Total Cost:</strong> £{localBuild.total_cost}
+              <strong>Total Cost:</strong> £{localBuild?.total_cost}
             </p>
             <p>
               <strong>Sale Price:</strong>{" "}
-              {localBuild.sale_price
-                ? `£${localBuild.sale_price}`
+              {localBuild?.sale_price
+                ? `£${localBuild?.sale_price}`
                 : "Not sold yet"}
             </p>
             <p>
-              <strong>Sold Date:</strong> {localBuild.sold_date || "N/A"}
+              <strong>Sold Date:</strong> {localBuild?.sold_date || "N/A"}
             </p>
             <p>
               <strong>Profit:</strong>{" "}
-              {localBuild.profit ? `£${localBuild.profit}` : "N/A"}
+              {localBuild?.profit ? `£${localBuild?.profit}` : "N/A"}
             </p>
-            {localBuild.image_url ? (
+            {localBuild?.image_url ? (
               <img
                 style={{ width: "500px", height: "500px", objectFit: "cover" }}
-                src={`${BACKEND_URL}${localBuild.image_url}`}
+                src={`${BACKEND_URL}${localBuild?.image_url}`}
                 alt="Build image"
                 className="img-fluid border rounded"
               />
@@ -149,14 +154,18 @@ function Build({ build, onUpdate }) {
               </div>
             )}
 
-            <ImageUploader
-              beforeUploaded={() => {
-                handleImageReplace();
-              }}
-              onUploaded={handleImageUpload}
-              uploadText={localBuild.image_url ? "Replace Image" : "Add Image"}
-              buildId={localBuild.id}
-            />
+            {localBuild && (
+              <ImageUploader
+                beforeUploaded={() => {
+                  handleImageReplace();
+                }}
+                onUploaded={handleImageUpload}
+                uploadText={
+                  localBuild.image_url ? "Replace Image" : "Add Image"
+                }
+                buildId={localBuild.id}
+              />
+            )}
           </div>
         </div>
 
@@ -167,6 +176,7 @@ function Build({ build, onUpdate }) {
                 deleteBuildById(localBuild);
                 setLocalBuild(null);
                 onUpdate();
+                setShow(false);
               }}
               className="btn btn-danger"
             >
