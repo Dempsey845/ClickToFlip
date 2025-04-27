@@ -67,9 +67,25 @@ function Header({ isAuthenticated, onLogout }) {
 
         <div className="col-md-3 text-end">
           {isAuthenticated ? (
-            <button onClick={handleLogout} className="btn btn-outline-danger">
-              Logout
-            </button>
+            <div className="">
+              <button
+                type="button"
+                class="btn btn-outline-secondary me-2"
+                title="Settings"
+                onClick={() => {
+                  navigate("/settings");
+                }}
+              >
+                <i class=" bi bi-gear-wide-connected"></i>
+              </button>
+              <button
+                onClick={handleLogout}
+                className="btn btn-outline-danger"
+                title="Logout"
+              >
+                <i class="bi bi-box-arrow-left"></i>
+              </button>
+            </div>
           ) : (
             <>
               <button

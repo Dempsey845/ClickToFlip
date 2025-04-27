@@ -8,3 +8,35 @@
   opacity: 1;
   transform: translateY(0);
 }
+
+/* Dark mode styles */
+.dark-mode {
+  background-color: #333;
+  color: #fff;
+}
+
+.dark-input {
+  background-color: #555;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.dark-btn {
+  border-color: #444;
+  color: #fff;
+}
+
+.dark-select {
+  background-color: #555;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+.dark-list-group {
+  background-color: #444;
+}
+
+.dark-item {
+  background-color: #555;
+  color: #fff;
+}

@@ -11,7 +11,7 @@ import {
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-function Build({ build, onUpdate }) {
+function Build({ build, onUpdate, darkMode }) {
   const [show, setShow] = useState(true);
   const [localBuild, setLocalBuild] = useState(build);
   const [editing, setEditing] = useState(false);
@@ -62,14 +62,20 @@ function Build({ build, onUpdate }) {
   if (!show) return <div> </div>;
 
   return (
-    <div className="card mb-4 shadow-sm border-0">
-      <div className="card-body p-4">
+    <div
+      className={`card mb-4 shadow-sm border-0 ${darkMode ? "dark-card" : ""}`}
+    >
+      <div className={`card-body p-4 ${darkMode ? "dark-card-body" : ""}`}>
         {/* Build Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="card-title mb-0">{localBuild?.name}</h2>
+          <h2 className={`card-title mb-0 ${darkMode ? "text-light" : ""}`}>
+            {localBuild?.name}
+          </h2>
           <button
             onClick={handleEditClick}
-            className="btn btn-outline-primary d-flex align-items-center gap-2"
+            className={`btn btn-outline-primary d-flex align-items-center gap-2 ${
+              darkMode ? "dark-btn" : ""
+            }`}
           >
             <i className="bi bi-pencil-square fs-5"></i>
             {editing ? "Close Edit" : "Edit Build"}
@@ -81,6 +87,7 @@ function Build({ build, onUpdate }) {
           show={showAddGPUForm}
           onSubmit={(gpu) => handleAddGPU(gpu)}
           onClose={() => setShowAddGPUForm(false)}
+          darkMode={darkMode}
         />
 
         {/* Edit Build Form */}
@@ -92,6 +99,7 @@ function Build({ build, onUpdate }) {
               updateLocalBuild(payload);
               onUpdate();
             }}
+            darkMode={darkMode}
           />
         )}
 
@@ -100,9 +108,13 @@ function Build({ build, onUpdate }) {
           {/* Components Section */}
           <div className="col-md-6">
             <div className="d-flex justify-content-between align-items-center mb-3">
-              <h5 className="mb-0">Components</h5>
+              <h5 className={`mb-0 ${darkMode ? "text-light" : ""}`}>
+                Components
+              </h5>
               <button
-                className="btn btn-sm btn-outline-primary"
+                className={`btn btn-sm btn-outline-primary ${
+                  darkMode ? "dark-btn" : ""
+                }`}
                 title="Add GPU"
                 onClick={() => setShowAddGPUForm(true)}
               >
@@ -112,13 +124,17 @@ function Build({ build, onUpdate }) {
             </div>
 
             {localBuild && (
-              <DisplayComponents build={localBuild} onUpdate={onUpdate} />
+              <DisplayComponents
+                build={localBuild}
+                onUpdate={onUpdate}
+                darkMode={darkMode}
+              />
             )}
           </div>
 
           {/* Build Info Section */}
           <div className="col-md-6">
-            <h5>Build Info</h5>
+            <h5 className={darkMode ? "text-light" : ""}>Build Info</h5>
             <ul className="list-unstyled">
               <li>
                 <strong>Description:</strong>{" "}
@@ -156,7 +172,9 @@ function Build({ build, onUpdate }) {
                 />
               ) : (
                 <div
-                  className="d-flex align-items-center justify-content-center bg-secondary text-white rounded border"
+                  className={`d-flex align-items-center justify-content-center ${
+                    darkMode ? "bg-dark" : "bg-secondary"
+                  } text-white rounded border`}
                   style={{ height: "400px" }}
                 >
                   No image available

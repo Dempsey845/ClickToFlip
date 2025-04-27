@@ -8,7 +8,7 @@ import {
 import AddUserComponentModel from "./AddUserComponentModel";
 import "./AutocompleteInput.css";
 
-const AutocompleteInput = ({ type, onSelect }) => {
+const AutocompleteInput = ({ type, onSelect, darkMode }) => {
   const [components, setComponents] = useState([]);
   const [userComponents, setUserComponents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -88,11 +88,11 @@ const AutocompleteInput = ({ type, onSelect }) => {
   };
 
   return (
-    <div className="mb-4">
+    <div className={`mb-4 ${darkMode ? "dark-mode" : ""}`}>
       <div className="d-flex align-items-center gap-2 mb-2">
         <input
           type="text"
-          className="form-control"
+          className={`form-control ${darkMode ? "dark-input" : ""}`}
           value={searchTerm}
           onChange={handleSearch}
           placeholder={`Search for a ${type}...`}
@@ -100,7 +100,9 @@ const AutocompleteInput = ({ type, onSelect }) => {
         {filteredComponents.length === 0 && searchTerm && (
           <button
             onClick={() => setShowAddComponentModal(true)}
-            className="btn btn-outline-primary btn-sm"
+            className={`btn btn-outline-primary btn-sm ${
+              darkMode ? "dark-btn" : ""
+            }`}
             title="Add new component"
           >
             <i className="bi bi-database-fill-add"></i>
@@ -113,9 +115,15 @@ const AutocompleteInput = ({ type, onSelect }) => {
         {searchTerm.length > 0 && (
           <div className="mb-3 d-flex flex-wrap gap-3 align-items-center">
             <div>
-              <label className="form-label mb-1">Filter by brand</label>
+              <label
+                className={`form-label mb-1 ${darkMode ? "text-light" : ""}`}
+              >
+                Filter by brand
+              </label>
               <select
-                className="form-select form-select-sm"
+                className={`form-select form-select-sm ${
+                  darkMode ? "dark-select" : ""
+                }`}
                 value={brandFilter}
                 onChange={(e) => setBrandFilter(e.target.value)}
               >
@@ -139,7 +147,10 @@ const AutocompleteInput = ({ type, onSelect }) => {
                 onChange={(e) => setShowUserComponentsOnly(e.target.checked)}
                 id="userCompCheck"
               />
-              <label className="form-check-label" htmlFor="userCompCheck">
+              <label
+                className={`form-check-label ${darkMode ? "text-light" : ""}`}
+                htmlFor="userCompCheck"
+              >
                 User Components Only
               </label>
             </div>
@@ -149,12 +160,18 @@ const AutocompleteInput = ({ type, onSelect }) => {
 
       {/* Search results */}
       {filteredComponents.length > 0 && (
-        <ul className="list-group shadow-sm">
+        <ul
+          className={`list-group shadow-sm ${
+            darkMode ? "dark-list-group" : ""
+          }`}
+        >
           {filteredComponents.map((component) => (
             <li
               key={component.id}
               onClick={() => handleSelect(component)}
-              className="list-group-item list-group-item-action"
+              className={`list-group-item list-group-item-action ${
+                darkMode ? "dark-item" : ""
+              }`}
               style={{ cursor: "pointer" }}
             >
               {component.name}{" "}
@@ -171,6 +188,7 @@ const AutocompleteInput = ({ type, onSelect }) => {
           setShowAddComponentModal={setShowAddComponentModal}
           onClose={() => setSearchTerm("")}
           onUpdate={handleUpdate}
+          darkMode={darkMode}
         />
       )}
     </div>

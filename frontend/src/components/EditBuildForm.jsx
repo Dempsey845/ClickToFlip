@@ -10,7 +10,7 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
-function EditBuildForm({ buildId, onClose, onSuccess }) {
+function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
   const [formData, setFormData] = useState({
     buildName: "",
     description: "",
@@ -109,8 +109,19 @@ function EditBuildForm({ buildId, onClose, onSuccess }) {
   }
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content shadow-lg rounded p-4 bg-white">
+    <div
+      className="modal-overlay"
+      style={{
+        backgroundColor: darkMode ? "rgba(0, 0, 0, 0.7)" : "rgba(0, 0, 0, 0.5)", // Overlay color
+      }}
+    >
+      <div
+        className="modal-content shadow-lg rounded p-4"
+        style={{
+          backgroundColor: darkMode ? "#333" : "#fff", // Modal background color
+          color: darkMode ? "#fff" : "#000", // Text color
+        }}
+      >
         <div className="d-flex justify-content-between mb-3">
           <h4>Edit PC Build</h4>
           <button className="btn-close" onClick={onClose} />
@@ -118,34 +129,61 @@ function EditBuildForm({ buildId, onClose, onSuccess }) {
 
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
-            <label className="form-label">Build Name</label>
+            <label
+              className="form-label"
+              style={{ color: darkMode ? "#fff" : "#000" }} // Label color
+            >
+              Build Name
+            </label>
             <input
               className="form-control"
               name="buildName"
               value={formData.buildName}
               onChange={handleInputChange}
               required
+              style={{
+                backgroundColor: darkMode ? "#444" : "#fff", // Input background color
+                color: darkMode ? "#fff" : "#000", // Input text color
+              }}
             />
           </div>
 
           <div className="mb-3">
-            <label className="form-label">Description</label>
+            <label
+              className="form-label"
+              style={{ color: darkMode ? "#fff" : "#000" }} // Label color
+            >
+              Description
+            </label>
             <textarea
               className="form-control"
               name="description"
               rows="3"
               value={formData.description}
               onChange={handleInputChange}
+              style={{
+                backgroundColor: darkMode ? "#444" : "#fff", // Textarea background
+                color: darkMode ? "#fff" : "#000", // Textarea text color
+              }}
             />
           </div>
 
           <div className="mb-3">
-            <label className="form-label">Status</label>
+            <label
+              className="form-label"
+              style={{ color: darkMode ? "#fff" : "#000" }} // Label color
+            >
+              Status
+            </label>
             <select
               className="form-select"
               name="status"
               value={formData.status}
               onChange={handleInputChange}
+              style={{
+                backgroundColor: darkMode ? "#444" : "#fff", // Select background color
+                color: darkMode ? "#fff" : "#000", // Select text color
+              }}
             >
               <option value="planned">Planned</option>
               <option value="in progress">In Progress</option>
@@ -156,7 +194,12 @@ function EditBuildForm({ buildId, onClose, onSuccess }) {
 
           <div className="row">
             <div className="col-md-4 mb-3">
-              <label className="form-label">Total Cost (£)</label>
+              <label
+                className="form-label"
+                style={{ color: darkMode ? "#fff" : "#000" }} // Label color
+              >
+                Total Cost (£)
+              </label>
               <input
                 className="form-control"
                 name="totalCost"
@@ -164,11 +207,20 @@ function EditBuildForm({ buildId, onClose, onSuccess }) {
                 step="0.01"
                 value={formData.totalCost || 0}
                 onChange={handleInputChange}
+                style={{
+                  backgroundColor: darkMode ? "#444" : "#fff", // Input background
+                  color: darkMode ? "#fff" : "#000", // Input text color
+                }}
               />
             </div>
 
             <div className="col-md-4 mb-3">
-              <label className="form-label">Sale Price (£)</label>
+              <label
+                className="form-label"
+                style={{ color: darkMode ? "#fff" : "#000" }} // Label color
+              >
+                Sale Price (£)
+              </label>
               <input
                 className="form-control"
                 name="salePrice"
@@ -176,36 +228,65 @@ function EditBuildForm({ buildId, onClose, onSuccess }) {
                 step="0.01"
                 value={formData.salePrice || 0}
                 onChange={handleInputChange}
+                style={{
+                  backgroundColor: darkMode ? "#444" : "#fff", // Input background
+                  color: darkMode ? "#fff" : "#000", // Input text color
+                }}
               />
             </div>
 
             <div className="col-md-4 mb-3">
-              <label className="form-label">Profit (£)</label>
+              <label
+                className="form-label"
+                style={{ color: darkMode ? "#fff" : "#000" }} // Label color
+              >
+                Profit (£)
+              </label>
               <input
                 className="form-control"
                 name="profit"
                 type="number"
                 readOnly
                 value={formData.profit || 0}
+                style={{
+                  backgroundColor: darkMode ? "#444" : "#fff", // Input background
+                  color: darkMode ? "#fff" : "#000", // Input text color
+                }}
               />
             </div>
           </div>
 
           {formData.salePrice && (
             <div className="mb-3">
-              <label className="form-label">Sold Date</label>
+              <label
+                className="form-label"
+                style={{ color: darkMode ? "#fff" : "#000" }} // Label color
+              >
+                Sold Date
+              </label>
               <input
                 className="form-control"
                 name="soldDate"
                 type="date"
                 value={formData.soldDate || ""}
                 onChange={handleInputChange}
+                style={{
+                  backgroundColor: darkMode ? "#444" : "#fff", // Input background
+                  color: darkMode ? "#fff" : "#000", // Input text color
+                }}
               />
             </div>
           )}
 
           <div className="d-grid mt-4">
-            <button className="btn btn-primary btn-lg" type="submit">
+            <button
+              className="btn btn-primary btn-lg"
+              type="submit"
+              style={{
+                backgroundColor: darkMode ? "#0056b3" : "#007bff", // Button background
+                color: darkMode ? "#fff" : "#fff", // Button text color
+              }}
+            >
               Save Changes
             </button>
           </div>

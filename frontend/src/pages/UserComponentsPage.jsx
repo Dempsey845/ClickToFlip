@@ -3,7 +3,7 @@ import AddUserComponentModel from "../components/AddUserComponentModel";
 import { getUserComponents, deleteUserComponent } from "../handlers/apiHandler";
 import { useState, useEffect } from "react";
 
-function UserComponentsPage({ onUpdate }) {
+function UserComponentsPage({ onUpdate, darkMode }) {
   const [components, setComponents] = useState(null);
   const [showAddModel, setShowAddModel] = useState(false);
   const [addType, setAddType] = useState("CPU");
@@ -53,6 +53,7 @@ function UserComponentsPage({ onUpdate }) {
           }}
           onUpdate={onUpdate}
           addingCustom={true}
+          darkMode={darkMode}
         />
       )}
       <div className="container mt-4">

@@ -4,7 +4,7 @@ import Builds from "../components/Builds";
 import { getUserBuilds } from "../handlers/apiHandler";
 import { useNavigate } from "react-router-dom";
 
-function DashboardPage({ onLogout }) {
+function DashboardPage({ onLogout, darkMode }) {
   const [builds, setBuilds] = useState([]);
   const [updateCount, setUpdateCount] = useState(0);
   const navigate = useNavigate();
@@ -22,16 +22,22 @@ function DashboardPage({ onLogout }) {
     setUpdateCount((prev) => prev + 1);
   };
 
+  const cardClass = `card mb-4 p-3 ${darkMode ? "bg-dark text-light" : ""}`;
+  const specialCardClass = `card mb-4 p-4 shadow-sm ${
+    darkMode ? "bg-dark text-light" : ""
+  }`;
+
   return (
     <div className="container mt-4">
       <h1 className="text-center mb-4">Dashboard</h1>
 
       {/* Add Build Form */}
-      <div className="card mb-4 p-3">
-        <AddBuildForm onUpdate={handleUpdate} />
+      <div className={cardClass}>
+        <AddBuildForm onUpdate={handleUpdate} darkMode={darkMode} />
       </div>
 
-      <div className="card mb-4 p-4 shadow-sm">
+      {/* Edit Components Card */}
+      <div className={specialCardClass}>
         <div className="d-flex justify-content-between align-items-center">
           <h5 className="mb-0 text-primary">Edit Your Components</h5>
           <button
@@ -47,8 +53,8 @@ function DashboardPage({ onLogout }) {
       </div>
 
       {/* Builds Section */}
-      <div className="card mb-4 p-3">
-        <Builds builds={builds} onUpdate={handleUpdate} />
+      <div className={cardClass}>
+        <Builds builds={builds} onUpdate={handleUpdate} darkMode={darkMode} />
       </div>
 
       {/* Logout Button */}

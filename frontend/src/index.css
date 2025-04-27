@@ -1,0 +1,108 @@
+/* Dark mode styles */
+.dark-container {
+  background-color: #444;
+  color: #fff;
+}
+
+.dark-header {
+  background-color: #444;
+}
+
+.dark-btn {
+  border-color: #444;
+  color: #fff;
+}
+
+.dark-chart-container {
+  background-color: #444;
+}
+
+.dark-alert {
+  background-color: #444;
+  color: #fff;
+}
+
+.dark-card {
+  background-color: #333;
+  color: #fff;
+}
+
+.dark-card-body {
+  background-color: #444;
+}
+
+/* Dark mode list group border */
+.list-group-flush.bg-dark {
+  background-color: #333; /* Dark background for dark mode */
+  border-color: #444; /* Slightly darker border */
+}
+
+.list-group-flush.text-light {
+  color: #fff; /* Light text color for dark mode */
+}
+
+/* Light mode list group border */
+.list-group-flush.bg-white {
+  background-color: #fff; /* White background for light mode */
+  border-color: #ddd; /* Light border */
+}
+
+.list-group-flush.text-dark {
+  color: #000; /* Dark text color for light mode */
+}
+
+/* Dark mode list items */
+.list-group-item.bg-dark {
+  background-color: #333; /* Dark background for list items */
+  color: #fff; /* Light text for list items */
+}
+
+/* Light mode list items */
+.list-group-item.bg-white {
+  background-color: #fff; /* White background for list items */
+  color: #000; /* Dark text for list items */
+}
+
+/* Body styles for dark mode */
+body.dark-mode {
+  background-color: #222; /* Dark background for the body */
+  color: #fff; /* Light text for dark mode */
+}
+
+/* Body styles for light mode */
+body.light-mode {
+  background-color: #fff; /* White background for light mode */
+  color: #000; /* Dark text for light mode */
+}
+
+.dark-modal .modal-content {
+  background-color: #333;
+  color: #fff;
+}
+
+.dark-modal .modal-header {
+  background-color: #444;
+}
+
+.dark-modal .modal-footer {
+  background-color: #444;
+}
+
+.dark-modal .form-label {
+  color: #fff;
+}
+
+.dark-modal .form-control {
+  background-color: #444;
+  color: #fff;
+}
+
+.dark-modal .btn-secondary {
+  background-color: #555;
+  border-color: #444;
+}
+
+.dark-modal .btn-primary {
+  background-color: #0056b3;
+  border-color: #444;
+}

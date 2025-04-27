@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import BuildComponent from "./BuildComponent";
 
-function DisplayComponents({ build, onUpdate }) {
+function DisplayComponents({ build, onUpdate, darkMode }) {
   const [gpusGrouped, setGpusGrouped] = useState([]);
 
   const uniqueComponents = build.components?.filter(
@@ -57,6 +57,7 @@ function DisplayComponents({ build, onUpdate }) {
             buildId={build.id}
             onUpdate={onUpdate}
             referenceId={component.component_reference_id}
+            darkMode={darkMode}
           />
         </div>
       ))}
@@ -71,6 +72,7 @@ function DisplayComponents({ build, onUpdate }) {
               buildId={build.id}
               onUpdate={onUpdate}
               referenceId={component.component_reference_id}
+              darkMode={darkMode}
             />
           </div>
         );

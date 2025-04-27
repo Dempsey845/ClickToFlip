@@ -20,13 +20,20 @@ ChartJS.register(
   LinearScale
 );
 
-function Stats({ builds }) {
+function Stats({ builds, darkMode }) {
   if (!builds) return null;
 
   if (builds.length < 2) {
     return (
-      <div className="alert alert-info text-center mt-3" role="alert">
-        <h5 className="mb-0">Add more builds to view stats...</h5>
+      <div
+        className={`alert alert-info text-center mt-3 ${
+          darkMode ? "dark-alert" : ""
+        }`}
+        role="alert"
+      >
+        <h5 className={`mb-0 ${darkMode ? "text-light" : ""}`}>
+          Add more builds to view stats...
+        </h5>
       </div>
     );
   }
@@ -96,11 +103,13 @@ function Stats({ builds }) {
 
   return (
     <div
-      className="stats-container card mb-4 shadow-sm"
+      className={`stats-container card mb-4 shadow-sm ${
+        darkMode ? "dark-container" : ""
+      }`}
       style={{ margin: "0.25rem" }}
     >
       <div
-        className="stats-header"
+        className={`stats-header ${darkMode ? "dark-header" : ""}`}
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -109,9 +118,11 @@ function Stats({ builds }) {
           margin: "1rem",
         }}
       >
-        <h3 style={{ margin: 0 }}>Build Stats</h3>
+        <h3 style={{ margin: 0 }} className={darkMode ? "text-light" : ""}>
+          Build Stats
+        </h3>
         <button
-          className="btn btn-outline-primary"
+          className={`btn btn-outline-primary ${darkMode ? "dark-btn" : ""}`}
           onClick={() => setShowStats((prev) => !prev)}
         >
           {showStats ? (
@@ -127,24 +138,32 @@ function Stats({ builds }) {
         <>
           {/* Pie Chart for Profit and Loss */}
           <div
-            className="chart-container"
+            className={`chart-container ${
+              darkMode ? "dark-chart-container" : ""
+            }`}
             style={{ maxWidth: "400px", margin: "auto" }}
           >
-            <h4>Overall Profit vs Loss</h4>
+            <h4 className={darkMode ? "text-light" : ""}>
+              Overall Profit vs Loss
+            </h4>
             <Pie data={pieData} options={options} />
           </div>
 
           {/* Bar Chart for Build Status Breakdown */}
           <div
-            className="chart-container"
+            className={`chart-container ${
+              darkMode ? "dark-chart-container" : ""
+            }`}
             style={{ maxWidth: "400px", margin: "auto" }}
           >
-            <h4>Build Status (Sold vs In Progress)</h4>
+            <h4 className={darkMode ? "text-light" : ""}>
+              Build Status (Sold vs In Progress)
+            </h4>
             <Bar data={barData} options={options} />
           </div>
 
           {/* Display stats */}
-          <div className="stats-details">
+          <div className={`stats-details ${darkMode ? "text-light" : ""}`}>
             <p>
               <strong>Total Sold Builds:</strong> {soldBuilds.length}
             </p>

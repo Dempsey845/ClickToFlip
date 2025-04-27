@@ -21,6 +21,7 @@ const AddUserComponentModel = ({
   onUpdate,
   onDataUpdated,
   addingCustom = false,
+  darkMode = false, // Add darkMode as a prop
 }) => {
   const [name, setName] = useState(defaultName);
   const [brand, setBrand] = useState(defaultBrand);
@@ -107,24 +108,43 @@ const AddUserComponentModel = ({
   const modelPlaceholder = getModelPlaceholder(type);
 
   return (
-    <div style={styles.overlay}>
-      <div style={styles.modal}>
+    <div
+      style={{
+        ...styles.overlay,
+        backgroundColor: darkMode ? "rgba(0, 0, 0, 0.7)" : "rgba(0, 0, 0, 0.5)", // Adjust overlay for dark mode
+      }}
+    >
+      <div
+        style={{
+          ...styles.modal,
+          backgroundColor: darkMode ? "#333" : "white", // Dark or light background for modal
+          color: darkMode ? "#fff" : "#000", // Text color based on dark mode
+        }}
+      >
         {customTitle ? <h2>{customTitle}</h2> : <h2>Add New {type}</h2>}
 
-        <label>Name:</label>
+        <label style={{ color: darkMode ? "#fff" : "#000" }}>Name:</label>
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder={`Enter ${type} name`}
-          style={styles.input}
+          style={{
+            ...styles.input,
+            backgroundColor: darkMode ? "#444" : "#fff", // Input background
+            color: darkMode ? "#fff" : "#000", // Input text color
+          }}
           disabled={disabledNameInput}
         />
 
-        <label>Brand:</label>
+        <label style={{ color: darkMode ? "#fff" : "#000" }}>Brand:</label>
         <select
           value={brand}
           onChange={(e) => setBrand(e.target.value)}
-          style={styles.input}
+          style={{
+            ...styles.input,
+            backgroundColor: darkMode ? "#444" : "#fff", // Select background
+            color: darkMode ? "#fff" : "#000", // Select text color
+          }}
         >
           <option value="">Select brand</option>
           {brandOptions.map((b, i) => (
@@ -134,28 +154,40 @@ const AddUserComponentModel = ({
           ))}
         </select>
 
-        <label>Model:</label>
+        <label style={{ color: darkMode ? "#fff" : "#000" }}>Model:</label>
         <input
           value={model}
           onChange={(e) => setModel(e.target.value)}
           placeholder={modelPlaceholder}
-          style={styles.input}
+          style={{
+            ...styles.input,
+            backgroundColor: darkMode ? "#444" : "#fff", // Input background
+            color: darkMode ? "#fff" : "#000", // Input text color
+          }}
         />
 
-        <label>Specs:</label>
+        <label style={{ color: darkMode ? "#fff" : "#000" }}>Specs:</label>
         {specFields?.map((field, index) => (
           <div key={index} style={styles.specRow}>
             <input
               value={field.key}
               onChange={(e) => handleSpecChange(index, "key", e.target.value)}
               placeholder="Spec key (e.g., Cores)"
-              style={styles.specInput}
+              style={{
+                ...styles.specInput,
+                backgroundColor: darkMode ? "#444" : "#fff", // Spec input background
+                color: darkMode ? "#fff" : "#000", // Spec input text color
+              }}
             />
             <input
               value={field.value}
               onChange={(e) => handleSpecChange(index, "value", e.target.value)}
               placeholder="Value (e.g., 8)"
-              style={styles.specInput}
+              style={{
+                ...styles.specInput,
+                backgroundColor: darkMode ? "#444" : "#fff", // Spec input background
+                color: darkMode ? "#fff" : "#000", // Spec input text color
+              }}
             />
             <button
               onClick={() => handleRemoveSpecField(index)}

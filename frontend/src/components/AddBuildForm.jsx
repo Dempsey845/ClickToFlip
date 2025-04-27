@@ -3,7 +3,7 @@ import AutocompleteInput from "../components/AutocompleteInput";
 import { addBuildWithBuildPayLoad } from "../handlers/apiHandler";
 import "./AddBuildForm.css";
 
-function AddBuildForm({ onUpdate, onImageAdded }) {
+function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     buildName: "",
@@ -88,7 +88,7 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
       const data = await addBuildWithBuildPayLoad(buildPayload);
       setBuildId(data.buildId);
       onUpdate();
-      setShowModal(false); // close modal on success
+      setShowModal(false);
 
       // Reset form
       setFormData({
@@ -118,7 +118,9 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
             Build Name
           </label>
           <input
-            className="form-control"
+            className={`form-control ${
+              darkMode ? "bg-dark text-light border-secondary" : ""
+            }`}
             id="buildName"
             name="buildName"
             type="text"
@@ -133,7 +135,9 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
             Description
           </label>
           <textarea
-            className="form-control"
+            className={`form-control ${
+              darkMode ? "bg-dark text-light border-secondary" : ""
+            }`}
             id="description"
             name="description"
             rows="3"
@@ -147,7 +151,9 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
             Status
           </label>
           <select
-            className="form-select"
+            className={`form-select ${
+              darkMode ? "bg-dark text-light border-secondary" : ""
+            }`}
             id="status"
             name="status"
             value={formData.status}
@@ -165,7 +171,11 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
           <label className="form-label">
             CPU <span className="text-danger">*</span>
           </label>
-          <AutocompleteInput type="CPU" onSelect={setSelectedCPU} />
+          <AutocompleteInput
+            type="CPU"
+            onSelect={setSelectedCPU}
+            darkMode={darkMode}
+          />
           {formErrors.cpu && (
             <div className="form-text text-danger">{formErrors.cpu}</div>
           )}
@@ -178,6 +188,7 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
               <AutocompleteInput
                 type="GPU"
                 onSelect={(val) => handleGPUChange(index, val)}
+                darkMode={darkMode}
               />
             </div>
           ))}
@@ -197,6 +208,7 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
           <AutocompleteInput
             type="Motherboard"
             onSelect={setSelectedMotherboard}
+            darkMode={darkMode}
           />
           {formErrors.motherboard && (
             <div className="form-text text-danger">
@@ -207,49 +219,27 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
 
         {/* Financials */}
         <div className="row">
-          <div className="col-md-4 mb-3">
-            <label htmlFor="totalCost" className="form-label">
-              Total Cost (£)
-            </label>
-            <input
-              className="form-control"
-              id="totalCost"
-              name="totalCost"
-              type="number"
-              step="0.01"
-              value={formData.totalCost}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <label htmlFor="salePrice" className="form-label">
-              Sale Price (£)
-            </label>
-            <input
-              className="form-control"
-              id="salePrice"
-              name="salePrice"
-              type="number"
-              step="0.01"
-              value={formData.salePrice}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="col-md-4 mb-3">
-            <label htmlFor="profit" className="form-label">
-              Profit (£)
-            </label>
-            <input
-              className="form-control"
-              id="profit"
-              name="profit"
-              type="number"
-              value={formData.profit}
-              readOnly
-            />
-          </div>
+          {["totalCost", "salePrice", "profit"].map((field, idx) => (
+            <div className="col-md-4 mb-3" key={idx}>
+              <label htmlFor={field} className="form-label">
+                {field === "totalCost" && "Total Cost (£)"}
+                {field === "salePrice" && "Sale Price (£)"}
+                {field === "profit" && "Profit (£)"}
+              </label>
+              <input
+                className={`form-control ${
+                  darkMode ? "bg-dark text-light border-secondary" : ""
+                }`}
+                id={field}
+                name={field}
+                type="number"
+                step="0.01"
+                value={formData[field]}
+                readOnly={field === "profit"}
+                onChange={handleInputChange}
+              />
+            </div>
+          ))}
         </div>
 
         {formData.salePrice && (
@@ -258,7 +248,9 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
               Sold Date
             </label>
             <input
-              className="form-control"
+              className={`form-control ${
+                darkMode ? "bg-dark text-light border-secondary" : ""
+              }`}
               id="soldDate"
               name="soldDate"
               type="date"
@@ -284,7 +276,11 @@ function AddBuildForm({ onUpdate, onImageAdded }) {
 
       {showModal && (
         <div className="modal-overlay">
-          <div className="modal-content shadow-lg rounded p-4 bg-white">
+          <div
+            className={`modal-content shadow-lg rounded p-4 ${
+              darkMode ? "bg-dark text-light" : "bg-white"
+            }`}
+          >
             <div className="d-flex justify-content-between mb-3">
               <h4>Add New PC Build</h4>
               <button

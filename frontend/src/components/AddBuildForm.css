@@ -1,3 +1,4 @@
+/* Modal overlay with fade-in effect */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -10,8 +11,11 @@
   justify-content: center;
   align-items: center;
   z-index: 1050;
+  opacity: 0;
+  animation: fadeInOverlay 0.3s ease-out forwards; /* Animation for overlay */
 }
 
+/* Modal content */
 .modal-content {
   background-color: white;
   max-width: 700px;
@@ -21,4 +25,29 @@
   padding: 2rem;
   border-radius: 1rem;
   position: relative;
+  opacity: 0;
+  transform: scale(0.9); /* Start with a slight scale-down */
+  animation: fadeInContent 0.3s ease-out forwards; /* Animation for content */
+}
+
+/* Animation for the modal overlay */
+@keyframes fadeInOverlay {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Animation for the modal content */
+@keyframes fadeInContent {
+  0% {
+    opacity: 0;
+    transform: scale(0.95); /* Start with a slight scale-down */
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1); /* Scale up to normal size */
+  }
 }

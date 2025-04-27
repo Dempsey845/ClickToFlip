@@ -57,6 +57,7 @@ function BuildComponent({
   referenceId,
   userComponent = false,
   onUserComponentDelete,
+  darkMode,
 }) {
   // Component example:
   // {id: 7743, name: "djkal", specs: "socket: AM4, test: 10", "brand": "dafsa", model: "dadad"}
@@ -116,7 +117,12 @@ function BuildComponent({
 
   const displaySpecs = () => {
     const mapped = Object.entries(parsedSpecs).map(([k, v]) => (
-      <li key={k} className="list-group-item">
+      <li
+        key={k}
+        className={`list-group-item ${
+          darkMode ? "bg-dark text-light" : "bg-white text-dark"
+        }`}
+      >
         {k}: {v}
       </li>
     ));
@@ -161,7 +167,7 @@ function BuildComponent({
   if (deleted) return null;
 
   return (
-    <div className="component">
+    <div className={`component ${darkMode ? "bg-dark text-light" : ""}`}>
       {showEditModel && (
         <AddUserComponentModel
           type={editModelFields.type}
@@ -181,11 +187,12 @@ function BuildComponent({
           componentId={editModelFields.id}
           onUpdate={onUpdate}
           onDataUpdated={handleUpdatedData}
+          darkMode={darkMode}
         />
       )}
       {localComponent && (
-        <div className="card mb-3">
-          <div className="card-header">
+        <div className={`card mb-3 ${darkMode ? "bg-dark text-light" : ""}`}>
+          <div className={`card-header`}>
             <h5 className="mb-0">
               {type == "CPU" && <i className="bi bi-cpu"></i>}{" "}
               {type == "GPU" && <i className="bi bi-gpu-card"></i>}{" "}
@@ -210,14 +217,18 @@ function BuildComponent({
                   });
                   setShowEditModel(true);
                 }}
-                className="btn btn-outline-primary btn-sm ms-2"
+                className={`btn btn-outline-primary btn-sm ms-2 ${
+                  darkMode ? "dark-btn" : ""
+                }`}
                 title={`Edit ${type}`}
               >
                 <i className="bi bi-gear-fill"></i>
               </button>
               {type === "GPU" && !userComponent && (
                 <button
-                  className="btn btn-outline-danger btn-sm ms-2"
+                  className={`btn btn-outline-danger btn-sm ms-2 ${
+                    darkMode ? "dark-btn" : ""
+                  }`}
                   onClick={removeGPU}
                 >
                   <i className="bi bi-trash3"></i>
@@ -225,7 +236,9 @@ function BuildComponent({
               )}
               {userComponent && (
                 <button
-                  className="btn btn-outline-danger btn-sm ms-2"
+                  className={`btn btn-outline-danger btn-sm ms-2 ${
+                    darkMode ? "dark-btn" : ""
+                  }`}
                   onClick={() => {
                     onUserComponentDelete(localComponent.id);
                     setDeleted(true);
@@ -236,22 +249,45 @@ function BuildComponent({
               )}
             </h5>
             {useBuild && (
-              <AutocompleteInput type={type} onSelect={handleComponentChange} />
+              <AutocompleteInput
+                type={type}
+                onSelect={handleComponentChange}
+                darkMode={darkMode}
+                ƒ
+              />
             )}
             {showComponentChangeButton && (
               <button
-                className="btn btn-sm btn-outline-primary mt-2"
+                className={`btn btn-sm btn-outline-primary mt-2 ${
+                  darkMode ? "dark-btn" : ""
+                }`}
                 onClick={handleComponentChangeSubmit}
               >
                 Change {type}
               </button>
             )}
           </div>
-          <div className="card-body">
+          <div
+            className={`card-body ${
+              darkMode ? "bg-dark text-light" : "bg-white text-dark"
+            }`}
+          >
             {parsedSpecs && Object.keys(parsedSpecs).length > 0 ? (
-              <ul className="list-group list-group-flush">{displaySpecs()}</ul>
+              <ul
+                className={`list-group list-group-flush ${
+                  darkMode ? "bg-dark text-light" : "bg-white text-dark"
+                }`}
+              >
+                {displaySpecs()}
+              </ul>
             ) : (
-              <p className="text-muted">No {type} specs available.</p>
+              <p
+                className={`text-muted ${
+                  darkMode ? "text-light" : "text-dark"
+                }`}
+              >
+                No {type} specs available.
+              </p>
             )}
           </div>
         </div>
