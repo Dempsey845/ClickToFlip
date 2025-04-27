@@ -1,40 +1,40 @@
 /* Dark mode styles */
 .dark-container {
-  background-color: #444;
+  background-color: #1d1d1d;
   color: #fff;
 }
 
 .dark-header {
-  background-color: #444;
+  background-color: #1d1d1d;
 }
 
 .dark-btn {
-  border-color: #444;
+  border-color: #1d1d1d;
   color: #fff;
 }
 
 .dark-chart-container {
-  background-color: #444;
+  background-color: #1d1d1d;
 }
 
 .dark-alert {
-  background-color: #444;
+  background-color: #1d1d1d;
   color: #fff;
 }
 
 .dark-card {
-  background-color: #333;
+  background-color: #1d1d1d;
   color: #fff;
 }
 
 .dark-card-body {
-  background-color: #444;
+  background-color: #1d1d1d;
 }
 
 /* Dark mode list group border */
 .list-group-flush.bg-dark {
-  background-color: #333; /* Dark background for dark mode */
-  border-color: #444; /* Slightly darker border */
+  background-color: #1d1d1d; /* Dark background for dark mode */
+  border-color: #1d1d1d; /* Slightly darker border */
 }
 
 .list-group-flush.text-light {
@@ -53,7 +53,7 @@
 
 /* Dark mode list items */
 .list-group-item.bg-dark {
-  background-color: #333; /* Dark background for list items */
+  background-color: #1d1d1d; /* Dark background for list items */
   color: #fff; /* Light text for list items */
 }
 
@@ -76,16 +76,16 @@ body.light-mode {
 }
 
 .dark-modal .modal-content {
-  background-color: #333;
+  background-color: #1d1d1d;
   color: #fff;
 }
 
 .dark-modal .modal-header {
-  background-color: #444;
+  background-color: #1d1d1d;
 }
 
 .dark-modal .modal-footer {
-  background-color: #444;
+  background-color: #1d1d1d;
 }
 
 .dark-modal .form-label {
@@ -93,16 +93,16 @@ body.light-mode {
 }
 
 .dark-modal .form-control {
-  background-color: #444;
+  background-color: #1d1d1d;
   color: #fff;
 }
 
 .dark-modal .btn-secondary {
   background-color: #555;
-  border-color: #444;
+  border-color: #1d1d1d;
 }
 
 .dark-modal .btn-primary {
   background-color: #0056b3;
-  border-color: #444;
+  border-color: #1d1d1d;
 }

@@ -35,7 +35,7 @@ function Builds({ builds, onUpdate, darkMode }) {
           {builds.map((build, index) => (
             <div key={build.id || index} className="col-12 col-md-6 col-lg-6">
               <div
-                className={`card h-100 shadow-sm border-0 ${
+                className={`card shadow-sm border-0 ${
                   darkMode ? "dark-card" : ""
                 }`}
               >

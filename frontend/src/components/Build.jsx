@@ -16,6 +16,8 @@ function Build({ build, onUpdate, darkMode }) {
   const [localBuild, setLocalBuild] = useState(build);
   const [editing, setEditing] = useState(false);
   const [showAddGPUForm, setShowAddGPUForm] = useState(false);
+  const [showComponents, setShowComponents] = useState(false); // Toggle for components section
+  const [showDescription, setShowDescription] = useState(false); // Toggle for description visibility
 
   const handleEditClick = () => {
     setEditing(!editing);
@@ -106,94 +108,115 @@ function Build({ build, onUpdate, darkMode }) {
         {/* Main Content */}
         <div className="row g-4">
           {/* Components Section */}
-          <div className="col-md-6">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h5 className={`mb-0 ${darkMode ? "text-light" : ""}`}>
-                Components
-              </h5>
-              <button
-                className={`btn btn-sm btn-outline-primary ${
-                  darkMode ? "dark-btn" : ""
-                }`}
-                title="Add GPU"
-                onClick={() => setShowAddGPUForm(true)}
-              >
-                <i className="bi bi-plus-lg me-1"></i>
-                <i className="bi bi-gpu-card"></i>
-              </button>
-            </div>
+          <div className="col-12">
+            {/* Button to toggle components visibility */}
+            <button
+              className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
+                darkMode ? "dark-btn" : ""
+              }`}
+              onClick={() => setShowComponents((prev) => !prev)} // Toggle component visibility
+            >
+              <i class="bi bi-motherboard-fill"></i>{" "}
+              {showComponents ? "Hide Components" : "View Components"}
+            </button>
 
-            {localBuild && (
-              <DisplayComponents
-                build={localBuild}
-                onUpdate={onUpdate}
-                darkMode={darkMode}
-              />
-            )}
-          </div>
-
-          {/* Build Info Section */}
-          <div className="col-md-6">
-            <h5 className={darkMode ? "text-light" : ""}>Build Info</h5>
-            <ul className="list-unstyled">
-              <li>
-                <strong>Description:</strong>{" "}
-                {localBuild?.description.substr(0, 200) || "N/A"}
-              </li>
-              <li>
-                <strong>Status:</strong> {localBuild?.status}
-              </li>
-              <li>
-                <strong>Total Cost:</strong> £{localBuild?.total_cost}
-              </li>
-              <li>
-                <strong>Sale Price:</strong>{" "}
-                {localBuild?.sale_price
-                  ? `£${localBuild?.sale_price}`
-                  : "Not sold yet"}
-              </li>
-              <li>
-                <strong>Sold Date:</strong> {localBuild?.sold_date || "N/A"}
-              </li>
-              <li>
-                <strong>Profit:</strong>{" "}
-                {localBuild?.profit ? `£${localBuild?.profit}` : "N/A"}
-              </li>
-            </ul>
-
-            {/* Build Image */}
-            <div className="my-3 text-center">
-              {localBuild?.image_url ? (
-                <img
-                  src={`${BACKEND_URL}${localBuild.image_url}`}
-                  alt="Build image"
-                  className="img-fluid rounded border"
-                  style={{ maxHeight: "400px", objectFit: "cover" }}
+            {/* Show components in a 2x2 grid when showComponents is true */}
+            {showComponents && localBuild && (
+              <div className="row g-3">
+                <DisplayComponents
+                  build={localBuild}
+                  onUpdate={onUpdate}
+                  darkMode={darkMode}
                 />
-              ) : (
-                <div
-                  className={`d-flex align-items-center justify-content-center ${
-                    darkMode ? "bg-dark" : "bg-secondary"
-                  } text-white rounded border`}
-                  style={{ height: "400px" }}
-                >
-                  No image available
-                </div>
-              )}
-            </div>
-
-            {/* Image Upload */}
-            {localBuild && (
-              <ImageUploader
-                beforeUploaded={handleImageReplace}
-                onUploaded={handleImageUpload}
-                uploadText={
-                  localBuild.image_url ? "Replace Image" : "Add Image"
-                }
-                buildId={localBuild.id}
-              />
+              </div>
             )}
           </div>
+
+          {/* Build Info and Image Sections */}
+          {!showComponents && (
+            <div className="col-12">
+              {/* Build Info Section */}
+              <h5 className={darkMode ? "text-light" : ""}>Build Info</h5>
+              <ul className="list-unstyled">
+                <li>
+                  <strong
+                    onClick={() => {
+                      setShowDescription(!showDescription);
+                    }}
+                  >
+                    Description:
+                  </strong>{" "}
+                  {(showDescription && localBuild?.description) || "Hidden"}
+                </li>
+                <li>
+                  <strong>Status:</strong> {localBuild?.status}
+                </li>
+                <li>
+                  <strong>Total Cost:</strong> £{localBuild?.total_cost}
+                </li>
+                <li>
+                  <strong>Sale Price:</strong>{" "}
+                  {localBuild?.sale_price
+                    ? `£${localBuild?.sale_price}`
+                    : "Not sold yet"}
+                </li>
+                <li>
+                  <li>
+                    <strong>Sold Date: </strong>
+                    {localBuild?.sold_date
+                      ? new Date(localBuild.sold_date).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "long",
+                            year: "numeric",
+                          }
+                        )
+                      : "N/A"}
+                  </li>
+                </li>
+                <li>
+                  <strong>Profit:</strong>{" "}
+                  {localBuild?.profit ? `£${localBuild?.profit}` : "N/A"}
+                </li>
+              </ul>
+
+              {/* Centered Build Image */}
+              <div className="d-flex justify-content-center align-items-center my-3">
+                {localBuild?.image_url ? (
+                  <img
+                    src={`${BACKEND_URL}${localBuild.image_url}`}
+                    alt="Build image"
+                    className="img-fluid rounded border"
+                    style={{ maxHeight: "400px", objectFit: "cover" }}
+                  />
+                ) : (
+                  <div
+                    className={`d-flex align-items-center justify-content-center ${
+                      darkMode ? "bg-dark" : "bg-secondary"
+                    } text-white rounded border`}
+                    style={{ height: "400px" }}
+                  >
+                    No image available
+                  </div>
+                )}
+              </div>
+
+              {/* Image Upload */}
+              <div className="d-flex justify-content-center align-items-center">
+                {localBuild && (
+                  <ImageUploader
+                    beforeUploaded={handleImageReplace}
+                    onUploaded={handleImageUpload}
+                    uploadText={
+                      localBuild.image_url ? "Replace Image" : "Add Image"
+                    }
+                    buildId={localBuild.id}
+                  />
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Delete Build Button */}
