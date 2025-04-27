@@ -83,6 +83,18 @@ async function isAuthenticated() {
   }
 }
 
+async function getUserData() {
+  try {
+    const response = await axios.get(`${BACKEND_URL}/api/getUserData`, {
+      withCredentials: true,
+    });
+    return response.data.user;
+  } catch (err) {
+    console.error("User not authenticated.");
+    return null;
+  }
+}
+
 // Log the user out
 async function logout() {
   try {
@@ -385,6 +397,7 @@ export {
   registerUserWithFormData,
   attemptLoginWithFormData,
   isAuthenticated,
+  getUserData,
   logout,
   getCPUComponents,
   getGPUComponents,

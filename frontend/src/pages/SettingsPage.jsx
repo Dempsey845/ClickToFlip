@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Container,
   Row,
@@ -8,10 +8,21 @@ import {
   Modal,
   Form,
 } from "react-bootstrap";
+import { getUserData } from "../handlers/apiHandler";
 
 function SettingsPage({ darkMode, toggleDarkMode }) {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [userData, setUserData] = useState(getUserData());
+
+  const fetchUserData = async () => {
+    const data = await getUserData();
+    setUserData(data);
+  };
+
+  useEffect(() => {
+    fetchUserData();
+  }, []);
 
   return (
     <div
@@ -30,12 +41,12 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
                 <hr />
 
                 <div className="mb-3">
-                  <strong>Email:</strong> user@example.com
+                  <strong>Email:</strong> {userData?.email}
                 </div>
 
                 <div className="mb-3 d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>Password:</strong> ********
+                    <strong>Password</strong>
                   </div>
                   <Button
                     variant="outline-primary"
@@ -48,7 +59,7 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
 
                 <div className="mb-3 d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>Username:</strong> dempsey845
+                    <strong>Username:</strong> TODO
                   </div>
                   <Button
                     variant="outline-secondary"

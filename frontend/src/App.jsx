@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { isAuthenticated, logout } from "./handlers/apiHandler";
+import { isAuthenticated, logout, getUserData } from "./handlers/apiHandler";
 import HomePage from "./pages/HomePage";
 import SignInPage from "./pages/SignInPage";
 import SignUpPage from "./pages/SignUpPage";

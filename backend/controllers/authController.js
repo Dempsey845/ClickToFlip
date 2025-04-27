@@ -55,3 +55,9 @@ export const logout = (req, res) => {
 export const checkAuth = (req, res) => {
   res.json({ isAuthenticated: req.isAuthenticated() });
 };
+
+export const getUserData = (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ user: req.user });
+  }
+};

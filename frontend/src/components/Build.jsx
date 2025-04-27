@@ -116,7 +116,7 @@ function Build({ build, onUpdate, darkMode }) {
               }`}
               onClick={() => setShowComponents((prev) => !prev)} // Toggle component visibility
             >
-              <i class="bi bi-motherboard-fill"></i>{" "}
+              <i className="bi bi-motherboard-fill"></i>{" "}
               {showComponents ? "Hide Components" : "View Components"}
             </button>
 
@@ -161,19 +161,17 @@ function Build({ build, onUpdate, darkMode }) {
                     : "Not sold yet"}
                 </li>
                 <li>
-                  <li>
-                    <strong>Sold Date: </strong>
-                    {localBuild?.sold_date
-                      ? new Date(localBuild.sold_date).toLocaleDateString(
-                          "en-GB",
-                          {
-                            day: "2-digit",
-                            month: "long",
-                            year: "numeric",
-                          }
-                        )
-                      : "N/A"}
-                  </li>
+                  <strong>Sold Date: </strong>
+                  {localBuild?.sold_date
+                    ? new Date(localBuild.sold_date).toLocaleDateString(
+                        "en-GB",
+                        {
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        }
+                      )
+                    : "N/A"}
                 </li>
                 <li>
                   <strong>Profit:</strong>{" "}

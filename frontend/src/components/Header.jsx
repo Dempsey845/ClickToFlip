@@ -70,20 +70,20 @@ function Header({ isAuthenticated, onLogout }) {
             <div className="">
               <button
                 type="button"
-                class="btn btn-outline-secondary me-2"
+                className="btn btn-outline-secondary me-2"
                 title="Settings"
                 onClick={() => {
                   navigate("/settings");
                 }}
               >
-                <i class=" bi bi-gear-wide-connected"></i>
+                <i className=" bi bi-gear-wide-connected"></i>
               </button>
               <button
                 onClick={handleLogout}
                 className="btn btn-outline-danger"
                 title="Logout"
               >
-                <i class="bi bi-box-arrow-left"></i>
+                <i className="bi bi-box-arrow-left"></i>
               </button>
             </div>
           ) : (
