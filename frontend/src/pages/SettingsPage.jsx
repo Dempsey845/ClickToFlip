@@ -8,7 +8,8 @@ import {
   Modal,
   Form,
 } from "react-bootstrap";
-import { getUserData } from "../handlers/apiHandler";
+import { getUserData, changePassword } from "../handlers/apiHandler";
+import ChangePasswordModal from "../components/ChangePasswordModel";
 
 function SettingsPage({ darkMode, toggleDarkMode }) {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -70,7 +71,6 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
                   </Button>
                 </div>
 
-                {/* HERE is the switch version for theme toggle */}
                 <div className="mb-3 d-flex justify-content-between align-items-center">
                   <div>
                     <strong>Theme:</strong>
@@ -95,41 +95,10 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
         </Row>
 
         {/* Password Modal */}
-        <Modal
-          show={showPasswordModal}
-          onHide={() => setShowPasswordModal(false)}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Change Password</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group className="mb-3">
-                <Form.Label>New Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Enter new password"
-                />
-              </Form.Group>
-              <Form.Group>
-                <Form.Label>Confirm Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Confirm new password"
-                />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => setShowPasswordModal(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="primary">Save Changes</Button>
-          </Modal.Footer>
-        </Modal>
+        <ChangePasswordModal
+          showPasswordModal={showPasswordModal}
+          setShowPasswordModal={setShowPasswordModal}
+        />
 
         {/* Username Modal */}
         <Modal

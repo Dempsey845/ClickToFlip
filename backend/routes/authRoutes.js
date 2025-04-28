@@ -6,6 +6,7 @@ import {
   logout,
   checkAuth,
   getUserData,
+  changePassword,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -16,5 +17,7 @@ router.post("/login", login);
 router.get("/logout", logout);
 router.get("/check-auth", checkAuth);
 router.get("/getUserData", getUserData);
+
+router.patch("/changePassword", changePassword);
 
 export default router;

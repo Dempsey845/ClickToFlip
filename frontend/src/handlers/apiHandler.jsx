@@ -83,6 +83,24 @@ async function isAuthenticated() {
   }
 }
 
+async function changePassword(newPassword) {
+  try {
+    await axios.patch(
+      `${BACKEND_URL}/api/changePassword`,
+      { newPassword },
+      { withCredentials: true }
+    );
+    toast.success("Successfully changed password.");
+  } catch (err) {
+    console.error("Error changing password:", err);
+
+    const message =
+      err.response?.data?.message || "Something went wrong. Please try again.";
+
+    toast.error(message);
+  }
+}
+
 async function getUserData() {
   try {
     const response = await axios.get(`${BACKEND_URL}/api/getUserData`, {
@@ -419,4 +437,5 @@ export {
   getUserComponents,
   getUserComponentsByType,
   deleteUserComponent,
+  changePassword,
 };

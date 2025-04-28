@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function Header({ isAuthenticated, onLogout }) {
+function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -70,7 +70,23 @@ function Header({ isAuthenticated, onLogout }) {
             <div className="">
               <button
                 type="button"
-                className="btn btn-outline-secondary me-2"
+                className="btn btn-outline-warning me-2"
+                title="Toggle Darkmode"
+                onClick={() => {
+                  toggleDarkMode();
+                }}
+              >
+                {darkMode ? (
+                  <i className="bi bi-moon"></i>
+                ) : (
+                  <i className="bi bi-brightness-high"></i>
+                )}{" "}
+              </button>
+              <button
+                type="button"
+                className={`btn ${
+                  darkMode ? "btn-outline-light" : "btn-outline-primary"
+                } me-2`}
                 title="Settings"
                 onClick={() => {
                   navigate("/settings");

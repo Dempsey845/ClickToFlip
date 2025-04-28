@@ -26,6 +26,38 @@ export const register = async (req, res) => {
   }
 };
 
+export const changePassword = async (req, res) => {
+  const { newPassword } = req.body;
+  const userId = req.user.id;
+
+  if (!req.isAuthenticated())
+    return res.status(401).json({ message: "Unauthorized" });
+
+  if (!newPassword)
+    return res.status(400).json({ message: "New password is required" });
+
+  try {
+    const hashed = await bcrypt.hash(
+      newPassword,
+      parseInt(process.env.SALTS || "10", 10)
+    );
+
+    const result = await db.query(
+      "UPDATE users SET password = $1 WHERE id = $2",
+      [hashed, userId]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ message: "Password updated successfully" });
+  } catch (err) {
+    console.error("Error changing password:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const login = (req, res, next) => {
   passport.authenticate("local", (err, user, info) => {
     if (err) {
