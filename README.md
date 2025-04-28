@@ -31,7 +31,7 @@ It lets you **build**, **track**, and **manage** custom PC builds — and even *
 ## 🧰 Getting Started (Development)
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/click-to-flip.git
+   git clone https://github.com/Dempsey845/ClickToFlip.git
    ```
 2. Install dependencies:
    ```bash
