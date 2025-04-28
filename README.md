@@ -19,8 +19,7 @@ It lets you **build**, **track**, and **manage** custom PC builds — and even *
 - **Frontend:** React, Bootstrap
 - **Backend:** Node.js, Express.js
 - **Database:** PostgreSQL
-- **Authentication:** Secure session-based auth (local and Google login support)
-- **Hosting:** Vercel (frontend) + Render / Railway / etc. (backend)
+- **Authentication:** Secure session-based auth local login (Google login support coming soon)
 
 ---
 
