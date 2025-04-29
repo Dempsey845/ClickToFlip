@@ -15,11 +15,12 @@ import DashboardPage from "./pages/DashboardPage";
 import Header from "./components/Header";
 import UserComponentsPage from "./pages/UserComponentsPage";
 import SettingsPage from "./pages/SettingsPage";
+import ViewBuild from "./components/ViewBuild";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -80,6 +81,10 @@ function App() {
         />
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route
+            path="/builds/:buildId"
+            element={<ViewBuild darkMode={darkMode} />}
+          />
           <Route
             path="/dashboard"
             element={

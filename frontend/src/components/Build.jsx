@@ -8,6 +8,7 @@ import {
   deleteImageByURL,
   addGPUToBuild,
 } from "../handlers/apiHandler";
+import { Button } from "react-bootstrap";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -123,6 +124,19 @@ function Build({ build, onUpdate, darkMode }) {
             {/* Show components in a 2x2 grid when showComponents is true */}
             {showComponents && localBuild && (
               <div className="row g-3">
+                <div class="col-6">
+                  <button
+                    className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
+                      darkMode ? "dark-btn" : ""
+                    }`}
+                    onClick={() => {
+                      setShowAddGPUForm(true);
+                    }}
+                    title="Add GPU"
+                  >
+                    +<i class="bi bi-gpu-card"></i>
+                  </button>
+                </div>
                 <DisplayComponents
                   build={localBuild}
                   onUpdate={onUpdate}

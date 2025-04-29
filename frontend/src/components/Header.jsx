@@ -105,6 +105,20 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
           ) : (
             <>
               <button
+                type="button"
+                className="btn btn-outline-warning me-2"
+                title="Toggle Darkmode"
+                onClick={() => {
+                  toggleDarkMode();
+                }}
+              >
+                {darkMode ? (
+                  <i className="bi bi-moon"></i>
+                ) : (
+                  <i className="bi bi-brightness-high"></i>
+                )}{" "}
+              </button>
+              <button
                 onClick={handleLogin}
                 type="button"
                 className="btn btn-outline-primary me-2"
