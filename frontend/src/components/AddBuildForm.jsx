@@ -271,7 +271,7 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
   return (
     <>
       <button className="btn btn-success" onClick={() => setShowModal(true)}>
-        + Add New Build
+        <i class="bi bi-pc-display"></i> + Add New Build
       </button>
 
       {showModal && (

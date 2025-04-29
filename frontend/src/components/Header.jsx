@@ -58,11 +58,6 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
               Contact
             </a>
           </li>
-          <li>
-            <a href="/about" className={`nav-link px-2 ${isActive("/about")}`}>
-              About
-            </a>
-          </li>
         </ul>
 
         <div className="col-md-3 text-end">

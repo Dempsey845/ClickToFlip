@@ -82,7 +82,6 @@ function Build({ build, onUpdate, darkMode }) {
             }`}
           >
             <i className="bi bi-pencil-square fs-5"></i>
-            {editing ? "Close Edit" : "Edit Build"}
           </button>
         </div>
 
