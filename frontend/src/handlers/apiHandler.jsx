@@ -425,6 +425,20 @@ const changeUsername = async (username) => {
   }
 };
 
+const deleteAccount = async () => {
+  try {
+    await axios.delete(`${BACKEND_URL}/api/deleteAccount`, {
+      withCredentials: true,
+    });
+    toast.success("Successfully deleted account.");
+    return true;
+  } catch (err) {
+    console.error(`${err.response?.data?.error || err.message}`);
+    toast.error(`${err.response?.data?.error || err.message}`);
+    return false;
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -453,4 +467,5 @@ export {
   deleteUserComponent,
   changePassword,
   changeUsername,
+  deleteAccount,
 };

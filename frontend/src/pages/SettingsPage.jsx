@@ -11,10 +11,12 @@ import {
 import { getUserData } from "../handlers/apiHandler";
 import ChangePasswordModal from "../components/ChangePasswordModal";
 import ChangeUsernameModel from "../components/ChangeUsernameModal";
+import DeleteAccountModal from "../components/DeleteAccountModal";
 
 function SettingsPage({ darkMode, toggleDarkMode }) {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [showDeleteAccountModal, setShowDeleteAccountModal] = useState(false);
   const [userData, setUserData] = useState(getUserData());
 
   const fetchUserData = async () => {
@@ -88,7 +90,14 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
                 </div>
 
                 <div className="text-end">
-                  <Button variant="danger">Delete Account</Button>
+                  <Button
+                    variant="danger"
+                    onClick={() => {
+                      setShowDeleteAccountModal(true);
+                    }}
+                  >
+                    Delete Account
+                  </Button>
                 </div>
               </Card.Body>
             </Card>
@@ -110,6 +119,12 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
               return { ...prev, user_name: newUsername };
             });
           }}
+        />
+
+        {/* Delete Account Modal */}
+        <DeleteAccountModal
+          showDeleteAccountModal={showDeleteAccountModal}
+          setShowDeleteAccountModal={setShowDeleteAccountModal}
         />
       </Container>
     </div>

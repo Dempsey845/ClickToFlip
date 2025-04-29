@@ -8,6 +8,7 @@ import {
   getUserData,
   changePassword,
   changeUsername,
+  deleteAccount,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -21,5 +22,7 @@ router.get("/getUserData", getUserData);
 
 router.patch("/changePassword", changePassword);
 router.patch("/changeUsername", changeUsername);
+
+router.delete("/deleteAccount", deleteAccount);
 
 export default router;

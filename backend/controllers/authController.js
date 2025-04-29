@@ -113,3 +113,38 @@ export const changeUsername = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const deleteAccount = async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const userId = req.user.id;
+
+  try {
+    // Delete the user from the database
+    await db.query("DELETE FROM users WHERE id = $1", [userId]);
+
+    // Logout the user
+    req.logout((err) => {
+      if (err) {
+        console.error("Logout failed:", err);
+        return res.status(500).json({ message: "Logout failed" });
+      }
+
+      // Destroy the session
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Error destroying session:", err);
+          return res.status(500).json({ message: "Failed to destroy session" });
+        }
+
+        res.clearCookie("connect.sid");
+        res.json({ message: "Account successfully deleted and logged out" });
+      });
+    });
+  } catch (err) {
+    console.error("Error deleting account:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
