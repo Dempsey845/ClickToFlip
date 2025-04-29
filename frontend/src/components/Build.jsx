@@ -9,6 +9,7 @@ import {
   addGPUToBuild,
 } from "../handlers/apiHandler";
 import { Button } from "react-bootstrap";
+import ShareButton from "./ShareButton";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -232,7 +233,8 @@ function Build({ build, onUpdate, darkMode }) {
         </div>
 
         {/* Delete Build Button */}
-        <div className="d-flex justify-content-end mt-4">
+        <div className="d-flex justify-content-end mt-4 gap-3">
+          <ShareButton build={build} />
           <button
             onClick={() => {
               deleteBuildById(localBuild);
@@ -242,7 +244,7 @@ function Build({ build, onUpdate, darkMode }) {
             }}
             className="btn btn-danger"
           >
-            Delete Build
+            <i class="bi bi-trash3-fill"></i> Delete
           </button>
         </div>
       </div>

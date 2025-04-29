@@ -63,6 +63,7 @@ function ViewBuild({ darkMode, onUpdate }) {
                   build={build}
                   onUpdate={onUpdate}
                   darkMode={darkMode}
+                  viewOnly={true}
                 />
               </div>
             )}

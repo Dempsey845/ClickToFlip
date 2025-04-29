@@ -58,6 +58,7 @@ function BuildComponent({
   userComponent = false,
   onUserComponentDelete,
   darkMode,
+  viewOnly = false,
 }) {
   // Component example:
   // {id: 7743, name: "djkal", specs: "socket: AM4, test: 10", "brand": "dafsa", model: "dadad"}
@@ -199,32 +200,34 @@ function BuildComponent({
               {type == "Motherboard" && <i className="bi bi-motherboard"></i>}{" "}
               {localComponent.name || "N/A"}{" "}
               {localComponent.count > 1 && `(${localComponent.count})`}
-              <button
-                onClick={() => {
-                  const isCustom = localComponent.name.includes("(Custom)");
-                  setUpdate(isCustom);
-                  var compName = isCustom
-                    ? localComponent.name
-                    : `${localComponent.name} (Custom)`;
-                  setEditModelFields({
-                    type: type,
-                    fields: convertParsedToFields(parsedSpecs),
-                    name: compName,
-                    title: `Edit ${compName} Properties`,
-                    brand: localComponent.brand,
-                    model: localComponent.model,
-                    id: localComponent.id,
-                  });
-                  setShowEditModel(true);
-                }}
-                className={`btn btn-outline-primary btn-sm ms-2 ${
-                  darkMode ? "dark-btn" : ""
-                }`}
-                title={`Edit ${type}`}
-              >
-                <i className="bi bi-gear-fill"></i>
-              </button>
-              {type === "GPU" && !userComponent && (
+              {!viewOnly && (
+                <button
+                  onClick={() => {
+                    const isCustom = localComponent.name.includes("(Custom)");
+                    setUpdate(isCustom);
+                    var compName = isCustom
+                      ? localComponent.name
+                      : `${localComponent.name} (Custom)`;
+                    setEditModelFields({
+                      type: type,
+                      fields: convertParsedToFields(parsedSpecs),
+                      name: compName,
+                      title: `Edit ${compName} Properties`,
+                      brand: localComponent.brand,
+                      model: localComponent.model,
+                      id: localComponent.id,
+                    });
+                    setShowEditModel(true);
+                  }}
+                  className={`btn btn-outline-primary btn-sm ms-2 ${
+                    darkMode ? "dark-btn" : ""
+                  }`}
+                  title={`Edit ${type}`}
+                >
+                  <i className="bi bi-gear-fill"></i>
+                </button>
+              )}
+              {!viewOnly && type === "GPU" && !userComponent && (
                 <button
                   className={`btn btn-outline-danger btn-sm ms-2 ${
                     darkMode ? "dark-btn" : ""
@@ -234,7 +237,7 @@ function BuildComponent({
                   <i className="bi bi-trash3"></i>
                 </button>
               )}
-              {userComponent && (
+              {!viewOnly && userComponent && (
                 <button
                   className={`btn btn-outline-danger btn-sm ms-2 ${
                     darkMode ? "dark-btn" : ""
@@ -248,7 +251,7 @@ function BuildComponent({
                 </button>
               )}
             </h5>
-            {useBuild && (
+            {!viewOnly && useBuild && (
               <AutocompleteInput
                 type={type}
                 onSelect={handleComponentChange}
@@ -256,7 +259,7 @@ function BuildComponent({
                 ƒ
               />
             )}
-            {showComponentChangeButton && (
+            {!viewOnly && showComponentChangeButton && (
               <button
                 className={`btn btn-sm btn-outline-primary mt-2 ${
                   darkMode ? "dark-btn" : ""
