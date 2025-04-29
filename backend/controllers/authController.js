@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 import passport from "passport";
 
 export const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, username } = req.body;
   try {
     const userCheck = await db.query("SELECT * FROM users WHERE email = $1", [
       email,
@@ -16,8 +16,8 @@ export const register = async (req, res) => {
       parseInt(process.env.SALTS || "10", 10)
     );
     const result = await db.query(
-      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING *",
-      [email, hashed]
+      "INSERT INTO users (email, password, user_name) VALUES ($1, $2, $3) RETURNING *",
+      [email, hashed, username]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -91,5 +91,25 @@ export const checkAuth = (req, res) => {
 export const getUserData = (req, res) => {
   if (req.isAuthenticated()) {
     res.json({ user: req.user });
+  }
+};
+
+export const changeUsername = async (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const { username } = req.body;
+  const userId = req.user.id;
+
+  try {
+    await db.query("UPDATE users SET user_name = $1 WHERE id = $2", [
+      username,
+      userId,
+    ]);
+    return res.status(200).json({ message: "Successfully changed username" });
+  } catch (err) {
+    console.error("Error changing username:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };

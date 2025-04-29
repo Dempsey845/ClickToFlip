@@ -7,6 +7,7 @@ import {
   checkAuth,
   getUserData,
   changePassword,
+  changeUsername,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.get("/check-auth", checkAuth);
 router.get("/getUserData", getUserData);
 
 router.patch("/changePassword", changePassword);
+router.patch("/changeUsername", changeUsername);
 
 export default router;

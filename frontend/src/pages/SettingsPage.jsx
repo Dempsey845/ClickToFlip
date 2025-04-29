@@ -8,8 +8,9 @@ import {
   Modal,
   Form,
 } from "react-bootstrap";
-import { getUserData, changePassword } from "../handlers/apiHandler";
-import ChangePasswordModal from "../components/ChangePasswordModel";
+import { getUserData } from "../handlers/apiHandler";
+import ChangePasswordModal from "../components/ChangePasswordModal";
+import ChangeUsernameModel from "../components/ChangeUsernameModal";
 
 function SettingsPage({ darkMode, toggleDarkMode }) {
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -60,7 +61,7 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
 
                 <div className="mb-3 d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>Username:</strong> TODO
+                    <strong>Username:</strong> {userData?.user_name}
                   </div>
                   <Button
                     variant="outline-secondary"
@@ -101,31 +102,15 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
         />
 
         {/* Username Modal */}
-        <Modal
-          show={showUsernameModal}
-          onHide={() => setShowUsernameModal(false)}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>Edit Username</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <Form>
-              <Form.Group>
-                <Form.Label>New Username</Form.Label>
-                <Form.Control type="text" placeholder="Enter new username" />
-              </Form.Group>
-            </Form>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button
-              variant="secondary"
-              onClick={() => setShowUsernameModal(false)}
-            >
-              Cancel
-            </Button>
-            <Button variant="primary">Save Changes</Button>
-          </Modal.Footer>
-        </Modal>
+        <ChangeUsernameModel
+          showUsernameModal={showUsernameModal}
+          setShowUsernameModal={setShowUsernameModal}
+          onSave={(newUsername) => {
+            setUserData((prev) => {
+              return { ...prev, user_name: newUsername };
+            });
+          }}
+        />
       </Container>
     </div>
   );

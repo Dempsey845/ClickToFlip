@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal, Button, Form, Spinner } from "react-bootstrap";
 import { changePassword } from "../handlers/apiHandler";
+import { toast } from "react-toastify";
 
 function ChangePasswordModal({ showPasswordModal, setShowPasswordModal }) {
   const [newPassword, setNewPassword] = useState("");

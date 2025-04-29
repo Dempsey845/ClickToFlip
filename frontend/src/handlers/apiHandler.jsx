@@ -411,6 +411,20 @@ const deleteUserComponent = async (componentId) => {
   }
 };
 
+const changeUsername = async (username) => {
+  try {
+    await axios.patch(
+      `${BACKEND_URL}/api/changeUsername`,
+      { username },
+      { withCredentials: true }
+    );
+    toast.success("Successfully changed password!");
+  } catch (err) {
+    console.error(`${err.response?.data?.error || err.message}`);
+    toast.error(`${err.response?.data?.error || err.message}`);
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -438,4 +452,5 @@ export {
   getUserComponentsByType,
   deleteUserComponent,
   changePassword,
+  changeUsername,
 };

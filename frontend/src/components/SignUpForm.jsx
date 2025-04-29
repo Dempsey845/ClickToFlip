@@ -14,6 +14,7 @@ function SignUpForm({ onSignUp }) {
       onSubmit={handleRegister}
       fields={[
         { name: "email", label: "Email", type: "email" },
+        { name: "username", label: "Username", type: "username" },
         { name: "password", label: "Password", type: "password" },
       ]}
     />
