@@ -214,49 +214,53 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
               />
             </div>
 
-            <div className="col-md-4 mb-3">
-              <label
-                className="form-label"
-                style={{ color: darkMode ? "#fff" : "#000" }} // Label color
-              >
-                Sale Price (£)
-              </label>
-              <input
-                className="form-control"
-                name="salePrice"
-                type="number"
-                step="0.01"
-                value={formData.salePrice || 0}
-                onChange={handleInputChange}
-                style={{
-                  backgroundColor: darkMode ? "#444" : "#fff", // Input background
-                  color: darkMode ? "#fff" : "#000", // Input text color
-                }}
-              />
-            </div>
+            {formData.status === "sold" && (
+              <>
+                <div className="col-md-4 mb-3">
+                  <label
+                    className="form-label"
+                    style={{ color: darkMode ? "#fff" : "#000" }}
+                  >
+                    Sale Price (£)
+                  </label>
+                  <input
+                    className="form-control"
+                    name="salePrice"
+                    type="number"
+                    step="0.01"
+                    value={formData.salePrice || 0}
+                    onChange={handleInputChange}
+                    style={{
+                      backgroundColor: darkMode ? "#444" : "#fff",
+                      color: darkMode ? "#fff" : "#000",
+                    }}
+                  />
+                </div>
 
-            <div className="col-md-4 mb-3">
-              <label
-                className="form-label"
-                style={{ color: darkMode ? "#fff" : "#000" }} // Label color
-              >
-                Profit (£)
-              </label>
-              <input
-                className="form-control"
-                name="profit"
-                type="number"
-                readOnly
-                value={formData.profit || 0}
-                style={{
-                  backgroundColor: darkMode ? "#444" : "#fff", // Input background
-                  color: darkMode ? "#fff" : "#000", // Input text color
-                }}
-              />
-            </div>
+                <div className="col-md-4 mb-3">
+                  <label
+                    className="form-label"
+                    style={{ color: darkMode ? "#fff" : "#000" }}
+                  >
+                    Profit (£)
+                  </label>
+                  <input
+                    className="form-control"
+                    name="profit"
+                    type="number"
+                    readOnly
+                    value={formData.profit || 0}
+                    style={{
+                      backgroundColor: darkMode ? "#444" : "#fff",
+                      color: darkMode ? "#fff" : "#000",
+                    }}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
-          {formData.salePrice && (
+          {formData.status === "sold" && (
             <div className="mb-3">
               <label
                 className="form-label"

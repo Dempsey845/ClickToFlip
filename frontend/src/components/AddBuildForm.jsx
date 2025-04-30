@@ -219,27 +219,59 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
 
         {/* Financials */}
         <div className="row">
-          {["totalCost", "salePrice", "profit"].map((field, idx) => (
-            <div className="col-md-4 mb-3" key={idx}>
-              <label htmlFor={field} className="form-label">
-                {field === "totalCost" && "Total Cost (£)"}
-                {field === "salePrice" && "Sale Price (£)"}
-                {field === "profit" && "Profit (£)"}
-              </label>
-              <input
-                className={`form-control ${
-                  darkMode ? "bg-dark text-light border-secondary" : ""
-                }`}
-                id={field}
-                name={field}
-                type="number"
-                step="0.01"
-                value={formData[field]}
-                readOnly={field === "profit"}
-                onChange={handleInputChange}
-              />
-            </div>
-          ))}
+          <div className="col-md-4 mb-3">
+            <label htmlFor="totalCost" className="form-label">
+              Total Cost (£)
+            </label>
+            <input
+              className={`form-control ${
+                darkMode ? "bg-dark text-light border-secondary" : ""
+              }`}
+              id="totalCost"
+              name="totalCost"
+              type="number"
+              step="0.01"
+              value={formData.totalCost}
+              onChange={handleInputChange}
+            />
+          </div>
+
+          {formData.status === "sold" && (
+            <>
+              <div className="col-md-4 mb-3">
+                <label htmlFor="salePrice" className="form-label">
+                  Sale Price (£)
+                </label>
+                <input
+                  className={`form-control ${
+                    darkMode ? "bg-dark text-light border-secondary" : ""
+                  }`}
+                  id="salePrice"
+                  name="salePrice"
+                  type="number"
+                  step="0.01"
+                  value={formData.salePrice}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div className="col-md-4 mb-3">
+                <label htmlFor="profit" className="form-label">
+                  Profit (£)
+                </label>
+                <input
+                  className={`form-control ${
+                    darkMode ? "bg-dark text-light border-secondary" : ""
+                  }`}
+                  id="profit"
+                  name="profit"
+                  type="number"
+                  step="0.01"
+                  value={formData.profit}
+                  readOnly
+                />
+              </div>
+            </>
+          )}
         </div>
 
         {formData.salePrice && (
