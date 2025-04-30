@@ -13,6 +13,20 @@ import ShareButton from "./ShareButton";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
+function linkify(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.split(urlRegex).map((part, i) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+}
+
 function Build({ build, onUpdate, darkMode }) {
   const [show, setShow] = useState(true);
   const [localBuild, setLocalBuild] = useState(build);
@@ -72,13 +86,13 @@ function Build({ build, onUpdate, darkMode }) {
     >
       <div className={`card-body p-4 ${darkMode ? "dark-card-body" : ""}`}>
         {/* Build Header */}
-        <div className="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row">
+        <div className="d-flex justify-content-center align-items-center mb-4 flex-column flex-md-row">
           <h2 className={`card-title mb-0 ${darkMode ? "text-light" : ""}`}>
             {localBuild?.name}
           </h2>
           <button
             onClick={handleEditClick}
-            className={`btn btn-outline-primary d-flex align-items-center gap-2 ${
+            className={`btn btn-outline-primary d-flex align-items-center gap-2 ms-md-3 mt-2 mt-md-0 ${
               darkMode ? "dark-btn" : ""
             }`}
           >
@@ -108,39 +122,38 @@ function Build({ build, onUpdate, darkMode }) {
         )}
 
         {/* Main Content */}
-        <div className="row g-4">
+        <div className="row g-4 justify-content-center">
           {/* Components Section */}
-          <div className="col-12">
-            {/* Button to toggle components visibility (hide on medium screens and up) */}
-            <div className="d-md-none">
-              <button
-                className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
-                  darkMode ? "dark-btn" : ""
-                }`}
-                onClick={() => setShowComponents((prev) => !prev)} // Toggle component visibility
-              >
-                <i className="bi bi-motherboard-fill"></i>{" "}
-                {showComponents ? "Hide Components" : "View Components"}
-              </button>
-            </div>
+          <div className="col-12 text-center">
+            <button
+              className={`btn btn-sm btn-outline-secondary mb-2 ${
+                darkMode ? "dark-btn" : ""
+              }`}
+              onClick={() => setShowComponents((prev) => !prev)} // Toggle component visibility
+            >
+              <i className="bi bi-motherboard-fill"></i>{" "}
+              {showComponents ? "Hide Components" : "View Components"}
+            </button>
+          </div>
 
-            {/* Show components in a 2x2 grid when showComponents is true */}
-            {showComponents && localBuild && (
-              <div className="row g-3">
-                <div className="col-12 col-md-6">
-                  <button
-                    className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
-                      darkMode ? "dark-btn" : ""
-                    }`}
-                    onClick={() => {
-                      setShowAddGPUForm(true);
-                    }}
-                    title="Add GPU"
-                  >
-                    +<i className="bi bi-gpu-card"></i>
-                  </button>
-                </div>
-                <div className="col-12 col-md-6">
+          {showComponents && localBuild && (
+            <div className="col-12">
+              {/* Button placed above the components */}
+              <div className="text-center mb-3">
+                <button
+                  className={`btn btn-sm btn-outline-secondary ${
+                    darkMode ? "dark-btn" : ""
+                  }`}
+                  onClick={() => setShowAddGPUForm(true)}
+                  title="Add GPU"
+                >
+                  +<i className="bi bi-gpu-card"></i>
+                </button>
+              </div>
+
+              {/* Components Grid */}
+              <div className="row g-3 justify-content-center">
+                <div className="text-center">
                   <DisplayComponents
                     build={localBuild}
                     onUpdate={onUpdate}
@@ -148,30 +161,40 @@ function Build({ build, onUpdate, darkMode }) {
                   />
                 </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Build Info and Image Sections */}
           {!showComponents && (
-            <div className="col-12">
-              {/* Build Info Section */}
-              <h5 className={darkMode ? "text-light" : ""}>Build Info</h5>
+            <div className="col-12 text-center">
+              <h5 className={darkMode ? "text-light" : ""}>
+                <strong>Build Info</strong>
+              </h5>
               <ul className="list-unstyled">
                 <li>
                   <strong
-                    onClick={() => {
-                      setShowDescription(!showDescription);
-                    }}
+                    onClick={() => setShowDescription(!showDescription)}
                     onPointerOver={() => setDescriptionHovered(true)}
                     onPointerOut={() => setDescriptionHovered(false)}
                     style={{
-                      color: isDescriptionHovered ? "white" : "#0074d9",
+                      color: isDescriptionHovered ? "#33a0ff" : "#0074d9",
                       cursor: "pointer",
                     }}
                   >
                     Description:
-                  </strong>{" "}
-                  {(showDescription && build?.description) || "Hidden"}
+                  </strong>
+                  {showDescription ? (
+                    <p
+                      style={{
+                        whiteSpace: "pre-wrap",
+                        marginTop: "0.5rem",
+                      }}
+                    >
+                      {linkify(build?.description)}
+                    </p>
+                  ) : (
+                    " Hidden"
+                  )}
                 </li>
                 <li>
                   <strong>Status:</strong> {localBuild?.status}
@@ -205,7 +228,7 @@ function Build({ build, onUpdate, darkMode }) {
               </ul>
 
               {/* Build Image */}
-              <div className="d-flex justify-content-center align-items-center my-3">
+              <div className="d-flex justify-content-center my-3">
                 {localBuild?.image_url ? (
                   <img
                     src={`${BACKEND_URL}${localBuild.image_url}`}
@@ -229,7 +252,7 @@ function Build({ build, onUpdate, darkMode }) {
               </div>
 
               {/* Image Upload */}
-              <div className="d-flex justify-content-center align-items-center">
+              <div className="d-flex justify-content-center">
                 {localBuild && (
                   <ImageUploader
                     beforeUploaded={handleImageReplace}
@@ -246,7 +269,7 @@ function Build({ build, onUpdate, darkMode }) {
         </div>
 
         {/* Delete Build Button */}
-        <div className="d-flex justify-content-end mt-4 gap-3">
+        <div className="d-flex justify-content-center mt-4 gap-3">
           <ShareButton build={build} />
           <button
             onClick={() => {

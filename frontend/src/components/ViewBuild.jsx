@@ -5,10 +5,21 @@ import DisplayComponents from "./DisplayComponents";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-function BuildInfo({ darkMode, build }) {
-  const [isDescriptionHovered, setDescriptionHovered] = useState(false);
-  const [showDescription, setShowDescription] = useState(false); // Toggle for description visibility
+function linkify(text) {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  return text.split(urlRegex).map((part, i) => {
+    if (part.match(urlRegex)) {
+      return (
+        <a key={i} href={part} target="_blank" rel="noopener noreferrer">
+          {part}
+        </a>
+      );
+    }
+    return part;
+  });
+}
 
+function BuildInfo({ darkMode, build }) {
   return (
     <div className="container d-flex justify-content-center">
       <div className="row align-items-start w-100 flex-column flex-md-row text-center text-md-start">
@@ -49,20 +60,7 @@ function BuildInfo({ darkMode, build }) {
               Build Info
             </h5>
             */}
-            <li className="mb-2">
-              <strong
-                onClick={() => setShowDescription(!showDescription)}
-                onPointerOver={() => setDescriptionHovered(true)}
-                onPointerOut={() => setDescriptionHovered(false)}
-                style={{
-                  color: isDescriptionHovered ? "white" : "#0074d9",
-                  cursor: "pointer",
-                }}
-              >
-                Description:
-              </strong>{" "}
-              {(showDescription && build?.description) || "Hidden"}
-            </li>
+
             <li className="mb-2">
               <strong>Status:</strong> {build?.status}
             </li>
@@ -196,6 +194,20 @@ function ViewBuild({ darkMode, onUpdate }) {
           </div>
         </div>
       </div>
+      {build.description && (
+        <div>
+          <h2 style={{ textAlign: "center" }}>Description</h2>
+          <p
+            style={{
+              textAlign: "center",
+              whiteSpace: "pre-wrap",
+              marginTop: "0.5rem",
+            }}
+          >
+            {linkify(build?.description)}
+          </p>
+        </div>
+      )}
     </div>
   );
 }

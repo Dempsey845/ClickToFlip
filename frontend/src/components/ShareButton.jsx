@@ -35,7 +35,8 @@ function ShareButton({ build }) {
 
   return (
     <button className="btn btn-outline-primary" onClick={handleShare}>
-      <i class="bi bi-share-fill"></i> {copied ? "Link Copied!" : "Share Build"}
+      <i className="bi bi-share-fill"></i>{" "}
+      {copied ? "Link Copied!" : "Share Build"}
     </button>
   );
 }

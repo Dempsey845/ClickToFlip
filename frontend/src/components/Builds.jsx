@@ -1,75 +1,85 @@
+import { useState } from "react";
 import Build from "./Build";
 import Stats from "./Stats";
 
-function sortByNewest(builds) {
-  return builds.sort((a, b) => {
-    const aSold = a.status === "sold";
-    const bSold = b.status === "sold";
+// --- Sort Functions ---
+const sortFunctions = {
+  newest: (a, b) => new Date(b.sold_date) - new Date(a.sold_date),
+  oldest: (a, b) => new Date(a.sold_date) - new Date(b.sold_date),
+  saleHigh: (a, b) => b.sale_price - a.sale_price,
+  saleLow: (a, b) => a.sale_price - b.sale_price,
+  costHigh: (a, b) => b.total_cost - a.total_cost,
+  costLow: (a, b) => a.total_cost - b.total_cost,
+};
 
-    if (!aSold && bSold) return -1; // a is unsold, b is sold => a comes first
-    if (aSold && !bSold) return 1; // a is sold, b is unsold => b comes first
-
-    // Both are either sold or unsold; sort by date if sold
-    if (aSold && bSold) {
-      return new Date(b.sold_date) - new Date(a.sold_date); // recent first
-    }
-
-    return 0; // both are unsold
+// --- Filter Function (excluding sold items) ---
+function filterBuilds(builds, statusFilter) {
+  return builds.filter((build) => {
+    if (statusFilter === "all") return true;
+    if (statusFilter === "notSold") return build.status !== "sold"; // filter out sold items
+    return build.status === statusFilter;
   });
 }
 
-function sortByOldest(builds) {
-  // Show unsold builds first, then oldest builds (by sold_date)
-  return builds.sort((a, b) => {
-    const aSold = a.status === "sold";
-    const bSold = b.status === "sold";
+function Builds({ builds = [], onUpdate, darkMode }) {
+  const [sortOption, setSortOption] = useState("newest");
+  const [statusFilter, setStatusFilter] = useState("all"); // "all", "sold", "notSold"
 
-    if (!aSold && bSold) return -1; // a is unsold, b is sold → a first
-    if (aSold && !bSold) return 1; // a is sold, b is unsold → b first
+  let filtered = filterBuilds(builds, statusFilter);
 
-    // Both sold → sort by sold_date ASCENDING
-    if (aSold && bSold) {
-      return new Date(a.sold_date) - new Date(b.sold_date);
-    }
-
-    return 0; // both unsold
-  });
-}
-
-function Builds({ builds, onUpdate, darkMode }) {
-  builds = sortByNewest();
-
-  const displayBuild = (build) => {
-    return (
-      <Build
-        key={build.id}
-        build={build}
-        onUpdate={onUpdate}
-        darkMode={darkMode}
-      />
-    );
-  };
-
-  if (builds.length === 0) {
-    return (
-      <div
-        className={`alert alert-info text-center mt-3 ${
-          darkMode ? "text-light bg-dark" : ""
-        }`}
-        role="alert"
-      >
-        <h5 className="mb-0">Add a build to get started!</h5>
-      </div>
-    );
+  if (sortOption && sortFunctions[sortOption]) {
+    filtered = [...filtered].sort(sortFunctions[sortOption]);
   }
+
+  const displayBuild = (build) => (
+    <Build
+      key={build.id}
+      build={build}
+      onUpdate={onUpdate}
+      darkMode={darkMode}
+    />
+  );
 
   return (
     <div className={`container py-4 ${darkMode ? "bg-dark text-light" : ""}`}>
       <Stats builds={builds} darkMode={darkMode} />
 
-      {builds.length > 0 ? (
+      {/* Filter + Sort UI */}
+      <div className="row g-3 mb-4">
+        <div className="col-md-3">
+          <label className="form-label">Sort By</label>
+          <select
+            className="form-select"
+            value={sortOption}
+            onChange={(e) => setSortOption(e.target.value)}
+          >
+            <option value="newest">Newest Sold</option>
+            <option value="oldest">Oldest Sold</option>
+            <option value="saleHigh">Sold Price: High to Low</option>
+            <option value="saleLow">Sold Price: Low to High</option>
+            <option value="costHigh">Cost: High to Low</option>
+            <option value="costLow">Cost Price: Low to High</option>
+          </select>
+        </div>
+
+        <div className="col-md-3">
+          <label className="form-label">Status</label>
+          <select
+            className="form-select"
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="all">All</option>
+            <option value="sold">Sold</option>
+            <option value="notSold">Not Sold</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Builds Display */}
+      {filtered.length > 0 ? (
         <div className="row g-4">
-          {builds.map((build, index) => (
+          {filtered.map((build, index) => (
             <div key={build.id || index} className="col-12 col-md-6 col-lg-6">
               <div
                 className={`card shadow-sm border-0 ${
@@ -94,7 +104,7 @@ function Builds({ builds, onUpdate, darkMode }) {
           }`}
           role="alert"
         >
-          No builds yet. Start by creating your first one!
+          No builds match your filters.
         </div>
       )}
     </div>

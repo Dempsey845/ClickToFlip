@@ -9,6 +9,7 @@ import {
   BarElement,
   LinearScale,
 } from "chart.js";
+import "./Stats.css";
 
 // Register necessary chart elements
 ChartJS.register(
@@ -60,10 +61,10 @@ function Stats({ builds, darkMode }) {
 
   // Data for Pie Chart: Profit vs Loss
   const pieData = {
-    labels: ["Profit", "Loss"],
+    labels: ["Profit", "Inventory Cost"],
     datasets: [
       {
-        label: "Profit/Loss",
+        label: "Profit/Inventory Cost",
         data: [soldProfit, unSoldCost],
         backgroundColor: ["#4CAF50", "#F44336"], // Green for profit, Red for loss
         borderColor: ["#388E3C", "#D32F2F"],
@@ -74,7 +75,7 @@ function Stats({ builds, darkMode }) {
 
   // Data for Bar Chart: Build Status Breakdown
   const barData = {
-    labels: ["Sold", "In Progress"],
+    labels: ["Sold", "Unsold"],
     datasets: [
       {
         label: "Builds",
@@ -159,47 +160,111 @@ function Stats({ builds, darkMode }) {
             style={{ maxWidth: "400px", margin: "auto" }}
           >
             <h4 className={darkMode ? "text-light" : ""}>
-              Build Status (Sold vs In Progress)
+              Build Status (Sold vs Unsold)
             </h4>
             <Bar data={barData} options={options} />
           </div>
 
           {/* Display stats */}
-          <div className={`stats-details ${darkMode ? "text-light" : ""}`}>
-            <p>
-              <strong>Total Sold Builds:</strong> {soldBuilds.length}
-            </p>
-            <p>
-              <strong>Total In Progress Builds:</strong> {unSoldBuilds.length}
-            </p>
-            <p>
-              <strong>Total Profit:</strong> ${soldProfit.toFixed(2)}
-            </p>
-            <p>
-              <strong>Total Revenue:</strong> ${totalRevenue.toFixed(2)}
-            </p>
-            <p>
-              <strong>Total Cost:</strong> ${totalCost.toFixed(2)}
-            </p>
-            <p>
-              <strong>Average Profit Margin:</strong> {averageMargin}%
-            </p>
-            <p>
-              <strong>Average Revenue per Build:</strong> $
-              {(totalRevenue / soldBuilds.length || 0).toFixed(2)}
-            </p>
-            <p>
-              <strong>Average Profit per Build:</strong> $
-              {(soldProfit / soldBuilds.length || 0).toFixed(2)}
-            </p>
-            <p>
-              <strong>Inventory Value:</strong> ${unSoldCost.toFixed(2)}
-            </p>
+          <div className="row g-3 stats-details">
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Total Sold Builds:</strong>
+                <div>{soldBuilds.length}</div>
+              </div>
+            </div>
 
-            <p>
-              <strong>Total Cost for In Progress Builds:</strong> $
-              {unSoldCost.toFixed(2)}
-            </p>
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Total Unsold Builds:</strong>
+                <div>{unSoldBuilds.length}</div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Total Profit:</strong>
+                <div>${soldProfit.toFixed(2)}</div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Total Revenue:</strong>
+                <div>${totalRevenue.toFixed(2)}</div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Total Cost:</strong>
+                <div>${totalCost.toFixed(2)}</div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Avg Profit Margin:</strong>
+                <div>{averageMargin}%</div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Avg Revenue per Build:</strong>
+                <div>${(totalRevenue / soldBuilds.length || 0).toFixed(2)}</div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Avg Profit per Build:</strong>
+                <div>${(soldProfit / soldBuilds.length || 0).toFixed(2)}</div>
+              </div>
+            </div>
+
+            <div className="col-md-6 col-lg-4">
+              <div
+                className={`p-3 border rounded shadow-sm ${
+                  darkMode ? "bg-dark text-light" : "bg-light"
+                }`}
+              >
+                <strong>Inventory Value:</strong>
+                <div>${unSoldCost.toFixed(2)}</div>
+              </div>
+            </div>
           </div>
         </div>
       )}
