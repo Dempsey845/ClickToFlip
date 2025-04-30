@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getBuildById } from "../handlers/apiHandler";
+import { getBuildById, getUsernameFromId } from "../handlers/apiHandler";
 import DisplayComponents from "./DisplayComponents";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
@@ -17,6 +17,8 @@ function ViewBuild({ darkMode, onUpdate }) {
     const getBuildData = async () => {
       try {
         const data = await getBuildById(buildId);
+        const usernameResponse = await getUsernameFromId(data.user_id);
+        data.username = usernameResponse.data.user_name;
         setBuild(data);
       } catch (err) {
         setError("Failed to load build.");
@@ -37,7 +39,8 @@ function ViewBuild({ darkMode, onUpdate }) {
         {/* Build Header */}
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h2 className={`card-title mb-0 ${darkMode ? "text-light" : ""}`}>
-            {build?.name}
+            {build?.name} Created by{" "}
+            <strong style={{ color: "#0074d9" }}>{build?.username}</strong>
           </h2>
         </div>
 

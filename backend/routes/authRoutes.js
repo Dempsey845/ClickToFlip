@@ -9,6 +9,7 @@ import {
   changePassword,
   changeUsername,
   deleteAccount,
+  getUsername,
 } from "../controllers/authController.js";
 
 const router = express.Router();
@@ -19,6 +20,7 @@ router.post("/login", login);
 router.get("/logout", logout);
 router.get("/check-auth", checkAuth);
 router.get("/getUserData", getUserData);
+router.get("/username/:userId", getUsername);
 
 router.patch("/changePassword", changePassword);
 router.patch("/changeUsername", changeUsername);

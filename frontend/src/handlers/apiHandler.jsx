@@ -439,6 +439,17 @@ const deleteAccount = async () => {
   }
 };
 
+const getUsernameFromId = async (userId) => {
+  try {
+    const response = await axios.get(`${BACKEND_URL}/api/username/${userId}`);
+    return response;
+  } catch (err) {
+    console.error(`${err.response?.data?.error || err.message}`);
+    toast.error(`${err.response?.data?.error || err.message}`);
+    return "";
+  }
+};
+
 export {
   registerUserWithFormData,
   attemptLoginWithFormData,
@@ -468,4 +479,5 @@ export {
   changePassword,
   changeUsername,
   deleteAccount,
+  getUsernameFromId,
 };

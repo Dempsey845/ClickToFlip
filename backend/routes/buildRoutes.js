@@ -33,6 +33,7 @@ router.post("/", async (req, res) => {
   }
 
   const userId = req.user.id;
+  const username = req.user.user_name;
 
   const {
     name,
@@ -69,8 +70,8 @@ router.post("/", async (req, res) => {
 
     const buildResult = await client.query(
       `
-      INSERT INTO builds (name, description, status, total_cost, sale_price, sold_date, profit, user_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO builds (name, description, status, total_cost, sale_price, sold_date, profit, user_id, user_name)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING id;
     `,
       [
@@ -82,6 +83,7 @@ router.post("/", async (req, res) => {
         sold_date || null,
         profit || null,
         userId,
+        username,
       ]
     );
 
@@ -261,6 +263,7 @@ router.get("/:buildId", async (req, res) => {
   b.sold_date,
   b.profit,
   b.image_url,
+  b.user_id,
 
   -- CPU: expect one
   cpu.cpu_id,

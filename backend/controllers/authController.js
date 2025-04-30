@@ -148,3 +148,22 @@ export const deleteAccount = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const getUsername = async (req, res) => {
+  const { userId } = req.params;
+  if (!userId) {
+    return res.status(400).json({ message: "User ID Required" });
+  }
+  try {
+    const result = await db.query("SELECT user_name FROM users WHERE id = $1", [
+      userId,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ user_name: result.rows[0].user_name });
+  } catch (err) {
+    console.error("Error getting username:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
