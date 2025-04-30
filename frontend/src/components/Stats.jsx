@@ -40,21 +40,23 @@ function Stats({ builds, darkMode }) {
 
   const [showStats, setShowStats] = useState(true); // State to toggle visibility
 
+  const sumField = (items, field) =>
+    items.reduce((total, item) => total + parseFloat(item[field] || 0), 0);
+
   // Separate sold and planned builds
   const soldBuilds = builds.filter((build) => build.status === "sold");
   const unSoldBuilds = builds.filter(
     (build) => build.status !== "sold" && build.status !== "planned"
   );
 
-  // Calculate profit for pie chart
-  const soldProfit = soldBuilds.reduce(
-    (total, build) => total + parseFloat(build.profit),
-    0
-  );
-  const unSoldCost = unSoldBuilds.reduce(
-    (total, build) => total + parseFloat(build.total_cost),
-    0
-  );
+  const soldProfit = sumField(soldBuilds, "profit");
+  const totalRevenue = sumField(soldBuilds, "sale_price");
+  const totalCost = sumField(builds, "total_cost");
+  const unSoldCost = sumField(unSoldBuilds, "total_cost");
+
+  // Average profit margin across sold builds (rounded to whole %)
+  const averageMargin =
+    totalRevenue > 0 ? Math.round((soldProfit / totalRevenue) * 100) : 0;
 
   // Data for Pie Chart: Profit vs Loss
   const pieData = {
@@ -135,7 +137,7 @@ function Stats({ builds, darkMode }) {
 
       {/* Conditionally render stats */}
       {showStats && (
-        <>
+        <div className="d-flex flex-wrap justify-content-around gap-3">
           {/* Pie Chart for Profit and Loss */}
           <div
             className={`chart-container ${
@@ -144,7 +146,7 @@ function Stats({ builds, darkMode }) {
             style={{ maxWidth: "400px", margin: "auto" }}
           >
             <h4 className={darkMode ? "text-light" : ""}>
-              Overall Profit vs Loss
+              Profit vs Inventory Cost
             </h4>
             <Pie data={pieData} options={options} />
           </div>
@@ -174,11 +176,32 @@ function Stats({ builds, darkMode }) {
               <strong>Total Profit:</strong> ${soldProfit.toFixed(2)}
             </p>
             <p>
+              <strong>Total Revenue:</strong> ${totalRevenue.toFixed(2)}
+            </p>
+            <p>
+              <strong>Total Cost:</strong> ${totalCost.toFixed(2)}
+            </p>
+            <p>
+              <strong>Average Profit Margin:</strong> {averageMargin}%
+            </p>
+            <p>
+              <strong>Average Revenue per Build:</strong> $
+              {(totalRevenue / soldBuilds.length || 0).toFixed(2)}
+            </p>
+            <p>
+              <strong>Average Profit per Build:</strong> $
+              {(soldProfit / soldBuilds.length || 0).toFixed(2)}
+            </p>
+            <p>
+              <strong>Inventory Value:</strong> ${unSoldCost.toFixed(2)}
+            </p>
+
+            <p>
               <strong>Total Cost for In Progress Builds:</strong> $
               {unSoldCost.toFixed(2)}
             </p>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

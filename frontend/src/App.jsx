@@ -16,6 +16,7 @@ import Header from "./components/Header";
 import UserComponentsPage from "./pages/UserComponentsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ViewBuild from "./components/ViewBuild";
+import ContactPage from "./pages/ContactPage";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
@@ -80,7 +81,11 @@ function App() {
           toggleDarkMode={toggleDarkMode}
         />
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage darkMode={darkMode} />} />
+          <Route
+            path="/contact"
+            element={<ContactPage darkMode={darkMode} />}
+          />
           <Route
             path="/builds/:buildId"
             element={<ViewBuild darkMode={darkMode} />}

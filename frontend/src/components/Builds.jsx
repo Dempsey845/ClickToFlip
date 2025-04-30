@@ -1,7 +1,44 @@
 import Build from "./Build";
 import Stats from "./Stats";
 
+function sortByNewest(builds) {
+  return builds.sort((a, b) => {
+    const aSold = a.status === "sold";
+    const bSold = b.status === "sold";
+
+    if (!aSold && bSold) return -1; // a is unsold, b is sold => a comes first
+    if (aSold && !bSold) return 1; // a is sold, b is unsold => b comes first
+
+    // Both are either sold or unsold; sort by date if sold
+    if (aSold && bSold) {
+      return new Date(b.sold_date) - new Date(a.sold_date); // recent first
+    }
+
+    return 0; // both are unsold
+  });
+}
+
+function sortByOldest(builds) {
+  // Show unsold builds first, then oldest builds (by sold_date)
+  return builds.sort((a, b) => {
+    const aSold = a.status === "sold";
+    const bSold = b.status === "sold";
+
+    if (!aSold && bSold) return -1; // a is unsold, b is sold → a first
+    if (aSold && !bSold) return 1; // a is sold, b is unsold → b first
+
+    // Both sold → sort by sold_date ASCENDING
+    if (aSold && bSold) {
+      return new Date(a.sold_date) - new Date(b.sold_date);
+    }
+
+    return 0; // both unsold
+  });
+}
+
 function Builds({ builds, onUpdate, darkMode }) {
+  builds = sortByNewest();
+
   const displayBuild = (build) => {
     return (
       <Build

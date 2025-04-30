@@ -58,7 +58,11 @@ function UserComponentsPage({ onUpdate, darkMode }) {
       )}
       <div className="container mt-4">
         {/* Create Custom Component Card */}
-        <div className="card mb-4 shadow-sm">
+        <div
+          className={`card mb-4 shadow-sm ${
+            darkMode ? "bg-dark text-light border-light" : ""
+          }`}
+        >
           <div className="card-body text-center">
             <h5 className="card-title">Create a Custom Component</h5>
             <p className="card-text">
