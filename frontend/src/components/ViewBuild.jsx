@@ -5,9 +5,97 @@ import DisplayComponents from "./DisplayComponents";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
-function ViewBuild({ darkMode, onUpdate }) {
-  const [showComponents, setShowComponents] = useState(false); // Toggle for components section
+function BuildInfo({ darkMode, build }) {
+  const [isDescriptionHovered, setDescriptionHovered] = useState(false);
   const [showDescription, setShowDescription] = useState(false); // Toggle for description visibility
+
+  return (
+    <div className="container d-flex justify-content-center">
+      <div className="row align-items-start w-100 flex-column flex-md-row text-center text-md-start">
+        <div className="col-12 col-md-auto mb-3 mb-md-0 d-flex justify-content-center">
+          {build?.image_url ? (
+            <img
+              src={`${BACKEND_URL}${build.image_url}`}
+              alt="Build image"
+              className="img-fluid rounded border"
+              style={{
+                maxWidth: "100%", // Fully responsive
+                height: "auto", // Maintain aspect ratio
+                maxHeight: "300px", // Limit vertical size
+                objectFit: "cover",
+              }}
+            />
+          ) : (
+            <div
+              className={`d-flex align-items-center justify-content-center ${
+                darkMode ? "bg-dark" : "bg-secondary"
+              } text-white rounded border`}
+              style={{
+                height: "200px",
+                width: "100%",
+                maxWidth: "300px",
+              }}
+            >
+              No image available
+            </div>
+          )}
+        </div>
+
+        {/* Info Column */}
+        <div className="col ps-md-3">
+          <ul className="list-unstyled mb-0">
+            {/*
+            <h5 className={`mb-3 ${darkMode ? "text-light" : ""}`}>
+              Build Info
+            </h5>
+            */}
+            <li className="mb-2">
+              <strong
+                onClick={() => setShowDescription(!showDescription)}
+                onPointerOver={() => setDescriptionHovered(true)}
+                onPointerOut={() => setDescriptionHovered(false)}
+                style={{
+                  color: isDescriptionHovered ? "white" : "#0074d9",
+                  cursor: "pointer",
+                }}
+              >
+                Description:
+              </strong>{" "}
+              {(showDescription && build?.description) || "Hidden"}
+            </li>
+            <li className="mb-2">
+              <strong>Status:</strong> {build?.status}
+            </li>
+            <li className="mb-2">
+              <strong>Total Cost:</strong> £{build?.total_cost}
+            </li>
+            <li className="mb-2">
+              <strong>Sale Price:</strong>{" "}
+              {build?.sale_price ? `£${build.sale_price}` : "Not sold yet"}
+            </li>
+            <li className="mb-2">
+              <strong>Sold Date:</strong>{" "}
+              {build?.sold_date
+                ? new Date(build.sold_date).toLocaleDateString("en-GB", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                  })
+                : "N/A"}
+            </li>
+            <li>
+              <strong>Profit:</strong>{" "}
+              {build?.profit ? `£${build.profit}` : "N/A"}
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ViewBuild({ darkMode, onUpdate }) {
+  const [showComponents, setShowComponents] = useState(true); // Toggle for components section
 
   const { buildId } = useParams(); // Access the URL param
   const [build, setBuild] = useState(null);
@@ -26,14 +114,38 @@ function ViewBuild({ darkMode, onUpdate }) {
       }
     };
     getBuildData();
+
+    // Set showComponents to true on larger screens
+    if (window.innerWidth >= 768) {
+      setShowComponents(true);
+    }
   }, [buildId]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 768) {
+        setShowComponents(true); // Always show on wide screens
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // Run once on mount in case the screen was resized before
+    handleResize();
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   if (error) return <p className="text-danger">{error}</p>;
   if (!build) return <p>Loading...</p>;
 
   return (
     <div
-      className={`card mb-4 shadow-sm border-0 ${darkMode ? "dark-card" : ""}`}
+      className={`container mt-4 card mb-4 shadow-sm border-0 ${
+        darkMode ? "dark-card" : ""
+      }`}
     >
       <div className={`card-body p-4 ${darkMode ? "dark-card-body" : ""}`}>
         {/* Build Header */}
@@ -48,94 +160,40 @@ function ViewBuild({ darkMode, onUpdate }) {
         <div className="row g-4">
           {/* Components Section */}
           <div className="col-12">
-            {/* Button to toggle components visibility */}
-            <button
-              className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
-                darkMode ? "dark-btn" : ""
-              }`}
-              onClick={() => setShowComponents((prev) => !prev)} // Toggle component visibility
-            >
-              <i className="bi bi-motherboard-fill"></i>{" "}
-              {showComponents ? "Hide Components" : "View Components"}
-            </button>
+            {/* Button to toggle components visibility (hidden on md+) */}
+            <div className="d-md-none">
+              <button
+                className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
+                  darkMode ? "dark-btn" : ""
+                }`}
+                onClick={() => setShowComponents((prev) => !prev)}
+              >
+                <i className="bi bi-motherboard-fill"></i>{" "}
+                {showComponents ? "Hide Components" : "View Components"}
+              </button>
+            </div>
 
-            {/* Show components in a 2x2 grid when showComponents is true */}
-            {showComponents && (
-              <div className="row g-3">
-                <DisplayComponents
-                  build={build}
-                  onUpdate={onUpdate}
-                  darkMode={darkMode}
-                  viewOnly={true}
-                />
+            {showComponents ? (
+              <div className="row g-4 align-items-start">
+                {/* Components Section */}
+                <div className="col-12 col-md-7">
+                  <DisplayComponents
+                    build={build}
+                    onUpdate={onUpdate}
+                    darkMode={darkMode}
+                    viewOnly={true}
+                  />
+                </div>
+
+                {/* Build Info on the right */}
+                <div className="col-12 col-md-5">
+                  <BuildInfo darkMode={darkMode} build={build} />
+                </div>
               </div>
+            ) : (
+              <BuildInfo darkMode={darkMode} build={build} />
             )}
           </div>
-
-          {/* Build Info */}
-          {!showComponents && (
-            <div className="col-12">
-              {/* Build Info Section */}
-              <h5 className={darkMode ? "text-light" : ""}>Build Info</h5>
-              <ul className="list-unstyled">
-                <li>
-                  <strong
-                    onClick={() => {
-                      setShowDescription(!showDescription);
-                    }}
-                  >
-                    Description:
-                  </strong>{" "}
-                  {(showDescription && build?.description) || "Hidden"}
-                </li>
-                <li>
-                  <strong>Status:</strong> {build?.status}
-                </li>
-                <li>
-                  <strong>Total Cost:</strong> £{build?.total_cost}
-                </li>
-                <li>
-                  <strong>Sale Price:</strong>{" "}
-                  {build?.sale_price ? `£${build?.sale_price}` : "Not sold yet"}
-                </li>
-                <li>
-                  <strong>Sold Date: </strong>
-                  {build?.sold_date
-                    ? new Date(build.sold_date).toLocaleDateString("en-GB", {
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })
-                    : "N/A"}
-                </li>
-                <li>
-                  <strong>Profit:</strong>{" "}
-                  {build?.profit ? `£${build?.profit}` : "N/A"}
-                </li>
-              </ul>
-
-              {/* Centered Build Image */}
-              <div className="d-flex justify-content-center align-items-center my-3">
-                {build?.image_url ? (
-                  <img
-                    src={`${BACKEND_URL}${build.image_url}`}
-                    alt="Build image"
-                    className="img-fluid rounded border"
-                    style={{ maxHeight: "400px", objectFit: "cover" }}
-                  />
-                ) : (
-                  <div
-                    className={`d-flex align-items-center justify-content-center ${
-                      darkMode ? "bg-dark" : "bg-secondary"
-                    } text-white rounded border`}
-                    style={{ height: "400px" }}
-                  >
-                    No image available
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

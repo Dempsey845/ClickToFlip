@@ -20,6 +20,7 @@ function Build({ build, onUpdate, darkMode }) {
   const [showAddGPUForm, setShowAddGPUForm] = useState(false);
   const [showComponents, setShowComponents] = useState(false); // Toggle for components section
   const [showDescription, setShowDescription] = useState(false); // Toggle for description visibility
+  const [isDescriptionHovered, setDescriptionHovered] = useState(false);
 
   const handleEditClick = () => {
     setEditing(!editing);
@@ -71,7 +72,7 @@ function Build({ build, onUpdate, darkMode }) {
     >
       <div className={`card-body p-4 ${darkMode ? "dark-card-body" : ""}`}>
         {/* Build Header */}
-        <div className="d-flex justify-content-between align-items-center mb-4">
+        <div className="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row">
           <h2 className={`card-title mb-0 ${darkMode ? "text-light" : ""}`}>
             {localBuild?.name}
           </h2>
@@ -110,21 +111,23 @@ function Build({ build, onUpdate, darkMode }) {
         <div className="row g-4">
           {/* Components Section */}
           <div className="col-12">
-            {/* Button to toggle components visibility */}
-            <button
-              className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
-                darkMode ? "dark-btn" : ""
-              }`}
-              onClick={() => setShowComponents((prev) => !prev)} // Toggle component visibility
-            >
-              <i className="bi bi-motherboard-fill"></i>{" "}
-              {showComponents ? "Hide Components" : "View Components"}
-            </button>
+            {/* Button to toggle components visibility (hide on medium screens and up) */}
+            <div className="d-md-none">
+              <button
+                className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
+                  darkMode ? "dark-btn" : ""
+                }`}
+                onClick={() => setShowComponents((prev) => !prev)} // Toggle component visibility
+              >
+                <i className="bi bi-motherboard-fill"></i>{" "}
+                {showComponents ? "Hide Components" : "View Components"}
+              </button>
+            </div>
 
             {/* Show components in a 2x2 grid when showComponents is true */}
             {showComponents && localBuild && (
               <div className="row g-3">
-                <div class="col-6">
+                <div className="col-12 col-md-6">
                   <button
                     className={`btn btn-sm btn-outline-secondary d-block mb-2 ${
                       darkMode ? "dark-btn" : ""
@@ -134,14 +137,16 @@ function Build({ build, onUpdate, darkMode }) {
                     }}
                     title="Add GPU"
                   >
-                    +<i class="bi bi-gpu-card"></i>
+                    +<i className="bi bi-gpu-card"></i>
                   </button>
                 </div>
-                <DisplayComponents
-                  build={localBuild}
-                  onUpdate={onUpdate}
-                  darkMode={darkMode}
-                />
+                <div className="col-12 col-md-6">
+                  <DisplayComponents
+                    build={localBuild}
+                    onUpdate={onUpdate}
+                    darkMode={darkMode}
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -157,10 +162,16 @@ function Build({ build, onUpdate, darkMode }) {
                     onClick={() => {
                       setShowDescription(!showDescription);
                     }}
+                    onPointerOver={() => setDescriptionHovered(true)}
+                    onPointerOut={() => setDescriptionHovered(false)}
+                    style={{
+                      color: isDescriptionHovered ? "white" : "#0074d9",
+                      cursor: "pointer",
+                    }}
                   >
                     Description:
                   </strong>{" "}
-                  {(showDescription && localBuild?.description) || "Hidden"}
+                  {(showDescription && build?.description) || "Hidden"}
                 </li>
                 <li>
                   <strong>Status:</strong> {localBuild?.status}
@@ -193,21 +204,24 @@ function Build({ build, onUpdate, darkMode }) {
                 </li>
               </ul>
 
-              {/* Centered Build Image */}
+              {/* Build Image */}
               <div className="d-flex justify-content-center align-items-center my-3">
                 {localBuild?.image_url ? (
                   <img
                     src={`${BACKEND_URL}${localBuild.image_url}`}
                     alt="Build image"
                     className="img-fluid rounded border"
-                    style={{ maxHeight: "400px", objectFit: "cover" }}
+                    style={{
+                      maxHeight: "400px",
+                      objectFit: "cover",
+                    }}
                   />
                 ) : (
                   <div
                     className={`d-flex align-items-center justify-content-center ${
                       darkMode ? "bg-dark" : "bg-secondary"
                     } text-white rounded border`}
-                    style={{ height: "400px" }}
+                    style={{ height: "400px", width: "400px" }}
                   >
                     No image available
                   </div>
@@ -243,7 +257,7 @@ function Build({ build, onUpdate, darkMode }) {
             }}
             className="btn btn-danger"
           >
-            <i class="bi bi-trash3-fill"></i> Delete
+            <i className="bi bi-trash3-fill"></i> Delete
           </button>
         </div>
       </div>
