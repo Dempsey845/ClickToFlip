@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Build from "./Build";
 import Stats from "./Stats";
+import { duplicateBuild } from "../handlers/apiHandler";
 
 // --- Sort Functions ---
 const sortFunctions = {
@@ -31,12 +32,18 @@ function Builds({ builds = [], onUpdate, darkMode }) {
     filtered = [...filtered].sort(sortFunctions[sortOption]);
   }
 
+  const handleDuplicate = async (build) => {
+    const newBuild = await duplicateBuild(build);
+    onUpdate();
+  };
+
   const displayBuild = (build) => (
     <Build
       key={build.id}
       build={build}
       onUpdate={onUpdate}
       darkMode={darkMode}
+      onDuplicate={handleDuplicate}
     />
   );
 

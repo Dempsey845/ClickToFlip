@@ -151,6 +151,7 @@ const getMotherboardComponents = async () => {
 
 // Add build
 const addBuildWithBuildPayLoad = async (buildPayload) => {
+  console.log("Build payload: ", buildPayload);
   try {
     const response = await axios.post(
       `${BACKEND_URL}/api/builds`,
@@ -163,6 +164,52 @@ const addBuildWithBuildPayLoad = async (buildPayload) => {
   } catch (err) {
     console.error("Error submitting build", err);
     toast.error("Failed to create build.");
+  }
+};
+
+const duplicateBuild = async (build) => {
+  console.log(build);
+  const {
+    id,
+    description,
+    total_cost,
+    status,
+    sale_price,
+    sold_date,
+    profit,
+    image_url,
+  } = build;
+  const name = build.name + " (Copy)";
+  try {
+    const response = await axios.get(
+      `${BACKEND_URL}/api/builds/buildComponents/${id}`
+    );
+    const componentIds = response.data.componentIds;
+    if (!componentIds) {
+      toast.error("Error duplicating build. Please Try Again.");
+      return null;
+    } else {
+      const newBuild = await axios.post(
+        `${BACKEND_URL}/api/builds`,
+        {
+          componentIds: componentIds,
+          description: description,
+          name: name,
+          profit: profit,
+          sale_price: sale_price,
+          sold_date: sold_date,
+          status: status,
+          total_cost: total_cost,
+          imageUrl: image_url,
+        },
+        { withCredentials: true }
+      );
+      toast.success("Successfully Duplicated Build: ");
+      return newBuild;
+    }
+  } catch (err) {
+    toast.error("Error duplicating build. Please Try Again.");
+    return null;
   }
 };
 
@@ -287,7 +334,21 @@ const deleteBuildById = async (build) => {
   }
 };
 
+const doesImageExistInMultipleBuilds = async (filename) => {
+  try {
+    const res = await axios.get(
+      `${BACKEND_URL}/api/builds/doesImageExistInMultipleBuilds/${filename}`
+    );
+    return res.data.existsInMultiple;
+  } catch (err) {
+    console.error("Error checking image existence:", err);
+    return false;
+  }
+};
+
 const deleteImageByFilename = async (filename) => {
+  const exists = await doesImageExistInMultipleBuilds(filename);
+  if (exists) return;
   try {
     await axios.delete(`${BACKEND_URL}/api/builds/image/${filename}`, {
       withCredentials: true,
@@ -480,4 +541,5 @@ export {
   changeUsername,
   deleteAccount,
   getUsernameFromId,
+  duplicateBuild,
 };

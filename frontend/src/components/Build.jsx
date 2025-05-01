@@ -14,6 +14,7 @@ import ShareButton from "./ShareButton";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function linkify(text) {
+  if (!text) return;
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   return text.split(urlRegex).map((part, i) => {
     if (part.match(urlRegex)) {
@@ -27,7 +28,7 @@ function linkify(text) {
   });
 }
 
-function Build({ build, onUpdate, darkMode }) {
+function Build({ build, onUpdate, darkMode, onDuplicate }) {
   const [show, setShow] = useState(true);
   const [localBuild, setLocalBuild] = useState(build);
   const [editing, setEditing] = useState(false);
@@ -268,9 +269,16 @@ function Build({ build, onUpdate, darkMode }) {
           )}
         </div>
 
-        {/* Delete Build Button */}
         <div className="d-flex justify-content-center mt-4 gap-3">
-          <ShareButton build={build} />
+          <ShareButton build={localBuild} />
+          <button
+            className="btn btn-secondary"
+            onClick={() => {
+              onDuplicate(localBuild);
+            }}
+          >
+            <i className="bi bi-clipboard-plus-fill"></i> Duplicate
+          </button>
           <button
             onClick={() => {
               deleteBuildById(localBuild);

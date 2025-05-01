@@ -8,9 +8,29 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const router = express.Router();
 
-function deleteImageFromURL(imageURL) {
+async function doesImageExistInMultipleBuilds(imageUrl) {
   try {
-    const filename = imageURL.split("/uploads/")[1];
+    const result = await db.query("SELECT 1 FROM builds WHERE image_url = $1", [
+      imageUrl,
+    ]);
+    console.log(result.rows.length);
+    return result.rows.length > 1;
+  } catch (err) {
+    console.error("Error checking image URL:", err);
+    return false;
+  }
+}
+
+router.get("/doesImageExistInMultipleBuilds/:filename", async (req, res) => {
+  const existsInMultiple = await doesImageExistInMultipleBuilds(
+    "/uploads/" + req.params.filename
+  );
+  return res.status(200).json({ existsInMultiple: existsInMultiple });
+});
+
+function deleteImageFromURL(imageUrl) {
+  try {
+    const filename = imageUrl.split("/uploads/")[1];
     const filePath = path.join(__dirname, "..", "uploads", filename);
 
     fs.unlink(filePath, (err) => {
@@ -43,6 +63,7 @@ router.post("/", async (req, res) => {
     sold_date,
     profit,
     componentIds,
+    imageUrl,
   } = req.body;
 
   if (!name || !componentIds || componentIds.length === 0) {
@@ -69,8 +90,8 @@ router.post("/", async (req, res) => {
 
     const buildResult = await client.query(
       `
-      INSERT INTO builds (name, description, status, total_cost, sale_price, sold_date, profit, user_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      INSERT INTO builds (name, description, status, total_cost, sale_price, sold_date, profit, image_url, user_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING id;
     `,
       [
@@ -81,6 +102,7 @@ router.post("/", async (req, res) => {
         sale_price || null,
         sold_date || null,
         profit || null,
+        imageUrl || null,
         userId,
       ]
     );
@@ -96,7 +118,10 @@ router.post("/", async (req, res) => {
 
     await client.query("COMMIT");
     console.log("Transaction committed.");
-    res.status(201).json({ message: "Build created successfully", buildId });
+    res.status(201).json({
+      message: "Build created successfully",
+      buildId,
+    });
   } catch (err) {
     await client.query("ROLLBACK");
     console.error("Error creating build:", err.message);
@@ -224,6 +249,31 @@ router.get("/", async (req, res) => {
     return res
       .status(500)
       .json({ error: "Failed to query db for user builds" });
+  }
+});
+
+router.get("/buildComponents/:buildId", async (req, res) => {
+  const { buildId } = req.params;
+
+  try {
+    const result = await db.query(
+      "SELECT component_id FROM build_components WHERE build_id = $1",
+      [buildId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "No build components found" });
+    }
+
+    const componentIds = result.rows.map((row) => row.component_id);
+
+    return res.status(200).json({
+      message: "Got build components successfully",
+      componentIds,
+    });
+  } catch (err) {
+    console.error("Error fetching build components:", err);
+    return res.status(500).json({ message: "Server error" });
   }
 });
 
@@ -585,15 +635,31 @@ router.delete("/image/:filename", async (req, res) => {
   const { filename } = req.params;
   const filePath = path.join(__dirname, "..", "uploads", filename);
 
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.error("Error deleting image:", err);
-      return res.status(500).json({ error: "Failed to delete image." });
+  try {
+    const imageExistsInOtherBuilds = await doesImageExistInMultipleBuilds(
+      `/uploads/${filename}`
+    );
+
+    // If the image is used in other builds, don't delete it
+    if (imageExistsInOtherBuilds) {
+      return res.status(200).json({
+        message: "Image still in use by other builds. Not deleted.",
+      });
     }
 
-    console.log(`Deleted image: ${filename}`);
-    return res.status(200).json({ message: "Image deleted successfully." });
-  });
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        console.error("Error deleting image:", err);
+        return res.status(500).json({ error: "Failed to delete image." });
+      }
+
+      console.log(`Deleted image: ${filename}`);
+      return res.status(200).json({ message: "Image deleted successfully." });
+    });
+  } catch (err) {
+    console.error("Error checking image usage:", err);
+    return res.status(500).json({ error: "Server error." });
+  }
 });
 
 router.delete("/:buildId", async (req, res) => {
@@ -611,22 +677,38 @@ router.delete("/:buildId", async (req, res) => {
       "SELECT * FROM builds WHERE id = $1 AND user_id = $2",
       [buildId, userId]
     );
+
     const build = check.rows[0];
 
-    if (check.rows.length === 0) {
+    if (!build) {
       return res.status(403).json({ error: "Forbidden. Not your build." });
     }
+
+    const imageExistsInOtherBuilds = await doesImageExistInMultipleBuilds(
+      build.image_url
+    );
 
     // Delete the build
     await db.query("DELETE FROM builds WHERE id = $1", [buildId]);
 
-    // Delete the image
+    // Conditionally delete the image file if it's not used elsewhere
+    let imageMessage = null;
+
     if (build.image_url) {
       const imageURL = build.image_url;
-      deleteImageFromURL(imageURL);
+
+      if (!imageExistsInOtherBuilds) {
+        deleteImageFromURL(imageURL, build.id);
+        imageMessage = "Image deleted.";
+      } else {
+        imageMessage = "Image still in use by other builds. Not deleted.";
+      }
     }
 
-    return res.status(200).json({ message: "Build deleted successfully." });
+    return res.status(200).json({
+      message: "Build deleted successfully.",
+      ...(imageMessage && { image: imageMessage }),
+    });
   } catch (err) {
     console.error("Error deleting build:", err);
     return res.status(500).json({ error: "Internal server error." });

@@ -6,6 +6,7 @@ import DisplayComponents from "./DisplayComponents";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function linkify(text) {
+  if (!text) return;
   const urlRegex = /(https?:\/\/[^\s]+)/g;
   return text.split(urlRegex).map((part, i) => {
     if (part.match(urlRegex)) {
