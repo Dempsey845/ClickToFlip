@@ -11,7 +11,7 @@ function DashboardPage({ onLogout, darkMode }) {
 
   const getBuilds = async () => {
     const result = await getUserBuilds();
-    setBuilds(result);
+    result && setBuilds(result);
   };
 
   useEffect(() => {

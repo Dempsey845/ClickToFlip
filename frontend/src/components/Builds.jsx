@@ -15,9 +15,10 @@ const sortFunctions = {
 
 // --- Filter Function (excluding sold items) ---
 function filterBuilds(builds, statusFilter) {
+  if (!Array.isArray(builds)) return [];
   return builds.filter((build) => {
     if (statusFilter === "all") return true;
-    if (statusFilter === "notSold") return build.status !== "sold"; // filter out sold items
+    if (statusFilter === "notSold") return build.status !== "sold";
     return build.status === statusFilter;
   });
 }
