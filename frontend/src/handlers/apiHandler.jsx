@@ -151,7 +151,7 @@ const getMotherboardComponents = async () => {
 
 // Add build
 const addBuildWithBuildPayLoad = async (buildPayload) => {
-  console.log("Build payload: ", buildPayload);
+  //console.log("Build payload: ", buildPayload);
   try {
     const response = await axios.post(
       `${BACKEND_URL}/api/builds`,
@@ -168,7 +168,7 @@ const addBuildWithBuildPayLoad = async (buildPayload) => {
 };
 
 const duplicateBuild = async (build) => {
-  console.log(build);
+  //console.log(build);
   const {
     id,
     description,

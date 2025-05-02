@@ -22,7 +22,8 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
   });
 
   const [formErrors, setFormErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true); // Loading state for fetching build data
+  const [isSubmitting, setIsSubmitting] = useState(false); // Loading state for form submission
 
   const processBuildData = (data) => {
     return {
@@ -85,6 +86,8 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
       return;
     }
 
+    setIsSubmitting(true); // Set the submitting state to true
+
     const payload = {
       name: formData.buildName,
       description: formData.description,
@@ -101,6 +104,8 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
       if (onClose) onClose();
     } catch (err) {
       console.error("Update failed:", err);
+    } finally {
+      setIsSubmitting(false); // Reset the submitting state after the request is completed
     }
   };
 
@@ -286,12 +291,14 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
             <button
               className="btn btn-primary btn-lg"
               type="submit"
+              disabled={isSubmitting} // Disable button while submitting
               style={{
                 backgroundColor: darkMode ? "#0056b3" : "#007bff", // Button background
                 color: darkMode ? "#fff" : "#fff", // Button text color
               }}
             >
-              Save Changes
+              {isSubmitting ? "Saving..." : "Save Changes"}{" "}
+              {/* Change button text while submitting */}
             </button>
           </div>
         </form>

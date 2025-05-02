@@ -21,6 +21,7 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
   const [formErrors, setFormErrors] = useState({});
   const [selectedGPUs, setSelectedGPUs] = useState([null]);
   const [buildId, setBuildId] = useState(null);
+  const [loading, setLoading] = useState(false); // Loading state for the submit button
 
   const handleGPUChange = (index, value) => {
     const updated = [...selectedGPUs];
@@ -61,6 +62,7 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
     }
 
     setFormErrors({});
+    setLoading(true); // Set loading to true when submission starts
 
     try {
       const cpuId = selectedCPU?.id;
@@ -106,6 +108,8 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
       setSelectedGPUs([null]);
     } catch (error) {
       console.error("Error creating build:", error);
+    } finally {
+      setLoading(false); // Set loading to false once submission is complete
     }
   };
 
@@ -292,8 +296,16 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
           </div>
         )}
         <div className="d-grid mt-4">
-          <button type="submit" className="btn btn-primary btn-lg">
-            Add Build
+          <button
+            type="submit"
+            className="btn btn-primary btn-lg"
+            disabled={loading} // Disable button when loading
+          >
+            {loading ? (
+              <span>Loading...</span> // Show loading text
+            ) : (
+              "Add Build"
+            )}
           </button>
         </div>
       </form>
