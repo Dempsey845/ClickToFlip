@@ -1,16 +1,9 @@
-import SignInForm from "../components/SignInForm";
-import { useNavigate } from "react-router-dom";
+import SignIn from "../components/SignIn";
 
 function SignInPage({ onSignIn }) {
-  const navigate = useNavigate();
-  const handleSignIn = () => {
-    onSignIn();
-    navigate("/dashboard");
-  };
-
   return (
-    <div d="signInPage">
-      <SignInForm onSignIn={handleSignIn} />
+    <div className="signInPage">
+      <SignIn onSignIn={onSignIn} />
     </div>
   );
 }

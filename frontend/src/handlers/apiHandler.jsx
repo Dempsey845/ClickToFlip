@@ -182,7 +182,8 @@ const duplicateBuild = async (build) => {
   const name = build.name + " (Copy)";
   try {
     const response = await axios.get(
-      `${BACKEND_URL}/api/builds/buildComponents/${id}`
+      `${BACKEND_URL}/api/builds/buildComponents/${id}`,
+      { withCredentials: true }
     );
     const componentIds = response.data.componentIds;
     if (!componentIds) {
@@ -337,7 +338,8 @@ const deleteBuildById = async (build) => {
 const doesImageExistInMultipleBuilds = async (filename) => {
   try {
     const res = await axios.get(
-      `${BACKEND_URL}/api/builds/doesImageExistInMultipleBuilds/${filename}`
+      `${BACKEND_URL}/api/builds/doesImageExistInMultipleBuilds/${filename}`,
+      { withCredentials: true }
     );
     return res.data.existsInMultiple;
   } catch (err) {
@@ -502,7 +504,9 @@ const deleteAccount = async () => {
 
 const getUsernameFromId = async (userId) => {
   try {
-    const response = await axios.get(`${BACKEND_URL}/api/username/${userId}`);
+    const response = await axios.get(`${BACKEND_URL}/api/username/${userId}`, {
+      withCredentials: true,
+    });
     return response;
   } catch (err) {
     console.error(`${err.response?.data?.error || err.message}`);
