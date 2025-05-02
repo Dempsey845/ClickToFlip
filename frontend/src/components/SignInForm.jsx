@@ -13,7 +13,7 @@ function SignInForm({ onSignIn }) {
       // Only call onSignIn if login was successful
       if (loginSuccessful) {
         onSignIn(); // Update authentication state in the parent component
-        navigate("/dashboard"); // Redirect to the dashboard
+        // navigate("/dashboard"); // Redirect to the dashboard
       } else {
         console.log("Login failed");
       }

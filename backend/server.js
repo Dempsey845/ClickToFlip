@@ -38,6 +38,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Middlewares
+app.set("trust proxy", 1); // 🔐 Trust the first proxy
 app.use(cors(corsOptions)); // Dynamic origins
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
