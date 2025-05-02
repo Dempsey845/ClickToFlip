@@ -2,7 +2,7 @@ import CustomForm from "../components/CustomForm";
 import { attemptLoginWithFormData } from "../handlers/apiHandler";
 import { useNavigate } from "react-router-dom";
 
-function SignIn({ onSignIn }) {
+function SignInForm({ onSignIn }) {
   const navigate = useNavigate();
 
   const handleLogin = async (formData) => {
@@ -34,4 +34,4 @@ function SignIn({ onSignIn }) {
   );
 }
 
-export default SignIn;
+export default SignInForm;
