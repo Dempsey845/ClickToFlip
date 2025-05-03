@@ -22,7 +22,7 @@ function DashboardPage({ onLogout, darkMode }) {
     setUpdateCount((prev) => prev + 1);
   };
 
-  const cardClass = `card mb-4 p-3 ${darkMode ? "bg-dark text-light" : ""}`;
+  const cardClass = `card ${darkMode ? "bg-dark text-light" : ""}`;
   const specialCardClass = `card mb-4 p-4 shadow-sm ${
     darkMode ? "bg-dark text-light" : ""
   }`;

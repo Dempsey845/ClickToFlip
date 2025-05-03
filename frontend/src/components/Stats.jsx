@@ -39,7 +39,8 @@ function Stats({ builds, darkMode }) {
     );
   }
 
-  const [showStats, setShowStats] = useState(true); // State to toggle visibility
+  const [showStats, setShowStats] = useState(true); // State to toggle visibility of charts
+  const [showDisplayStats, setShowDisplayStats] = useState(true); // State to toggle visibility of display stats
 
   const sumField = (items, field) =>
     items.reduce((total, item) => total + parseFloat(item[field] || 0), 0);
@@ -109,7 +110,7 @@ function Stats({ builds, darkMode }) {
       className={`stats-container card mb-4 shadow-sm ${
         darkMode ? "dark-container" : ""
       }`}
-      style={{ margin: "0.25rem" }}
+      style={{ margin: "0.25rem", maxWidth: "100%" }}
     >
       <div
         className={`stats-header ${darkMode ? "dark-header" : ""}`}
@@ -121,7 +122,10 @@ function Stats({ builds, darkMode }) {
           margin: "1rem",
         }}
       >
-        <h3 style={{ margin: 0 }} className={darkMode ? "text-light" : ""}>
+        <h3
+          style={{ margin: 0 }}
+          className={`${darkMode ? "text-light" : ""} text-center text-sm-left`}
+        >
           Build Stats
         </h3>
         <button
@@ -138,15 +142,24 @@ function Stats({ builds, darkMode }) {
 
       {/* Conditionally render stats */}
       {showStats && (
-        <div className="d-flex flex-wrap justify-content-around gap-3">
+        <div className="d-flex flex-column flex-sm-row flex-wrap justify-content-between gap-3">
           {/* Pie Chart for Profit and Loss */}
           <div
             className={`chart-container ${
               darkMode ? "dark-chart-container" : ""
             }`}
-            style={{ maxWidth: "400px", margin: "auto" }}
+            style={{
+              flex: "1 1 100%",
+              maxWidth: "400px",
+              width: "100%",
+              margin: "auto",
+            }}
           >
-            <h4 className={darkMode ? "text-light" : ""}>
+            <h4
+              className={`${
+                darkMode ? "text-light" : ""
+              } text-center text-sm-left`}
+            >
               Profit vs Inventory Cost
             </h4>
             <Pie data={pieData} options={options} />
@@ -157,115 +170,77 @@ function Stats({ builds, darkMode }) {
             className={`chart-container ${
               darkMode ? "dark-chart-container" : ""
             }`}
-            style={{ maxWidth: "400px", margin: "auto" }}
+            style={{
+              flex: "1 1 100%",
+              maxWidth: "400px",
+              width: "100%",
+              margin: "auto",
+            }}
           >
-            <h4 className={darkMode ? "text-light" : ""}>
+            <h4
+              className={`${
+                darkMode ? "text-light" : ""
+              } text-center text-sm-left`}
+            >
               Build Status (Sold vs Unsold)
             </h4>
             <Bar data={barData} options={options} />
           </div>
 
+          {/* Toggle Button for Display Stats (Mobile View) */}
+          <button
+            className={`btn btn-outline-secondary d-block d-sm-none ${
+              darkMode ? "dark-btn" : ""
+            }`}
+            onClick={() => setShowDisplayStats((prev) => !prev)}
+          >
+            {showDisplayStats ? "Hide Stats" : "Show Stats"}
+          </button>
+
           {/* Display stats */}
-          <div className="row g-3 stats-details">
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Total Sold Builds:</strong>
-                <div>{soldBuilds.length}</div>
-              </div>
+          {showDisplayStats && (
+            <div className="row g-3 stats-details" style={{ marginTop: "0px" }}>
+              {[
+                { label: "Total Sold Builds", value: soldBuilds.length },
+                { label: "Total Unsold Builds", value: unSoldBuilds.length },
+                { label: "Total Profit", value: `$${soldProfit.toFixed(2)}` },
+                {
+                  label: "Total Revenue",
+                  value: `$${totalRevenue.toFixed(2)}`,
+                },
+                { label: "Total Cost", value: `$${totalCost.toFixed(2)}` },
+                { label: "Avg Profit Margin", value: `${averageMargin}%` },
+                {
+                  label: "Avg Revenue per Build",
+                  value: `$${(totalRevenue / soldBuilds.length || 0).toFixed(
+                    2
+                  )}`,
+                },
+                {
+                  label: "Avg Profit per Build",
+                  value: `$${(soldProfit / soldBuilds.length || 0).toFixed(2)}`,
+                },
+                {
+                  label: "Inventory Value",
+                  value: `$${unSoldCost.toFixed(2)}`,
+                },
+              ].map((stat, index) => (
+                <div className="col-12 col-sm-6 col-lg-4" key={index}>
+                  <div
+                    className={`p-3 border rounded shadow-sm ${
+                      darkMode ? "bg-dark text-light" : "bg-light"
+                    }`}
+                    style={{
+                      textAlign: "center",
+                    }}
+                  >
+                    <strong>{stat.label}:</strong>
+                    <div>{stat.value}</div>
+                  </div>
+                </div>
+              ))}
             </div>
-
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Total Unsold Builds:</strong>
-                <div>{unSoldBuilds.length}</div>
-              </div>
-            </div>
-
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Total Profit:</strong>
-                <div>${soldProfit.toFixed(2)}</div>
-              </div>
-            </div>
-
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Total Revenue:</strong>
-                <div>${totalRevenue.toFixed(2)}</div>
-              </div>
-            </div>
-
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Total Cost:</strong>
-                <div>${totalCost.toFixed(2)}</div>
-              </div>
-            </div>
-
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Avg Profit Margin:</strong>
-                <div>{averageMargin}%</div>
-              </div>
-            </div>
-
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Avg Revenue per Build:</strong>
-                <div>${(totalRevenue / soldBuilds.length || 0).toFixed(2)}</div>
-              </div>
-            </div>
-
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Avg Profit per Build:</strong>
-                <div>${(soldProfit / soldBuilds.length || 0).toFixed(2)}</div>
-              </div>
-            </div>
-
-            <div className="col-md-6 col-lg-4">
-              <div
-                className={`p-3 border rounded shadow-sm ${
-                  darkMode ? "bg-dark text-light" : "bg-light"
-                }`}
-              >
-                <strong>Inventory Value:</strong>
-                <div>${unSoldCost.toFixed(2)}</div>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       )}
     </div>
