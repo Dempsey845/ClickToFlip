@@ -38,3 +38,5 @@ sessions/
 
 # Images
 uploads/
+
+firebase-service-account.json
