@@ -17,11 +17,19 @@ import UserComponentsPage from "./pages/UserComponentsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ViewBuild from "./components/ViewBuild";
 import ContactPage from "./pages/ContactPage";
+import LoadingScreen from "./components/LoadingScreen";
 
 function App() {
   const [authenticated, setAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(true);
+
+  const [fadeIn, setFadeIn] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setFadeIn(true), 100); // slight delay for smoothness
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -64,7 +72,7 @@ function App() {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen darkMode={darkMode} />;
   }
 
   return (
