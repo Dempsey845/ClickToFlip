@@ -24,15 +24,12 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
             href="/"
             className="d-inline-flex link-body-emphasis text-decoration-none"
           >
-            <svg
-              className="bi"
-              width="40"
-              height="32"
-              role="img"
-              aria-label="Bootstrap"
-            >
-              <use xlinkHref="#bootstrap"></use>
-            </svg>
+            <img
+              src={darkMode ? "/C2F (Dark).png" : "/C2F (Light).png"}
+              alt="Logo"
+              width="auto"
+              height="70"
+            />
           </a>
         </div>
 
