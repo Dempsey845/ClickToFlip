@@ -19,7 +19,8 @@ if (isProduction) {
   upload = multer({ storage: multer.memoryStorage() });
 
   // Firebase Admin setup
-  import("firebase-admin").then((admin) => {
+  import("firebase-admin").then((adminModule) => {
+    const admin = adminModule.default; // This is important!
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 
     admin.initializeApp({
