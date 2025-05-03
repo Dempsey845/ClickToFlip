@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getBuildById, getUsernameFromId } from "../handlers/apiHandler";
 import DisplayComponents from "./DisplayComponents";
+import BuildImage from "./BuildImage";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
@@ -25,32 +26,7 @@ function BuildInfo({ darkMode, build }) {
     <div className="container d-flex justify-content-center">
       <div className="row align-items-start w-100 flex-column flex-md-row text-center text-md-start">
         <div className="col-12 col-md-auto mb-3 mb-md-0 d-flex justify-content-center">
-          {build?.image_url ? (
-            <img
-              src={`${BACKEND_URL}${build.image_url}`}
-              alt="Build image"
-              className="img-fluid rounded border"
-              style={{
-                maxWidth: "100%", // Fully responsive
-                height: "auto", // Maintain aspect ratio
-                maxHeight: "300px", // Limit vertical size
-                objectFit: "cover",
-              }}
-            />
-          ) : (
-            <div
-              className={`d-flex align-items-center justify-content-center ${
-                darkMode ? "bg-dark" : "bg-secondary"
-              } text-white rounded border`}
-              style={{
-                height: "200px",
-                width: "100%",
-                maxWidth: "300px",
-              }}
-            >
-              No image available
-            </div>
-          )}
+          <BuildImage localBuild={build} darkMode={darkMode} />
         </div>
 
         {/* Info Column */}

@@ -10,8 +10,7 @@ import {
 } from "../handlers/apiHandler";
 import { Button } from "react-bootstrap";
 import ShareButton from "./ShareButton";
-
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+import BuildImage from "./BuildImage";
 
 function linkify(text) {
   if (!text) return;
@@ -229,28 +228,7 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
               </ul>
 
               {/* Build Image */}
-              <div className="d-flex justify-content-center my-3">
-                {localBuild?.image_url ? (
-                  <img
-                    src={`${BACKEND_URL}${localBuild.image_url}`}
-                    alt="Build image"
-                    className="img-fluid rounded border"
-                    style={{
-                      maxHeight: "400px",
-                      objectFit: "cover",
-                    }}
-                  />
-                ) : (
-                  <div
-                    className={`d-flex align-items-center justify-content-center ${
-                      darkMode ? "bg-dark" : "bg-secondary"
-                    } text-white rounded border`}
-                    style={{ height: "400px", width: "400px" }}
-                  >
-                    No image available
-                  </div>
-                )}
-              </div>
+              <BuildImage localBuild={localBuild} darkMode={darkMode} />
 
               {/* Image Upload */}
               <div className="d-flex justify-content-center">
