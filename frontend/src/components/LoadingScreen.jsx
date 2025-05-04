@@ -5,19 +5,22 @@ const LoadingScreen = ({
   logoLight = "/Logo (Light).png",
   logoDark = "/Logo (Dark).png",
   message = "Loading, please wait...",
+  fullscreen = true,
+  overlay = false, // NEW PROP: makes it transparent and hover-like
+  zIndex = 1050,
 }) => {
   const [fadeIn, setFadeIn] = useState(false);
   const [typedMessage, setTypedMessage] = useState("");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
 
-  // Fade-in animation
+  // Fade-in
   useEffect(() => {
     const timer = setTimeout(() => setFadeIn(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  // Typing effect (reliable with currentIndex)
+  // Typing
   useEffect(() => {
     if (currentIndex < message.length) {
       const typingTimeout = setTimeout(() => {
@@ -28,7 +31,7 @@ const LoadingScreen = ({
     }
   }, [currentIndex, message]);
 
-  // Cursor blinking
+  // Cursor blink
   useEffect(() => {
     const cursorInterval = setInterval(() => {
       setShowCursor((prev) => !prev);
@@ -36,18 +39,27 @@ const LoadingScreen = ({
     return () => clearInterval(cursorInterval);
   }, []);
 
+  const containerStyles = {
+    position: fullscreen ? "fixed" : "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    zIndex: zIndex,
+    backgroundColor: overlay ? "rgba(0, 0, 0, 0.5)" : "transparent",
+    transition: "opacity 1s ease-in-out",
+    opacity: fadeIn ? 1 : 0,
+    pointerEvents: "none", // let clicks through if overlay is just visual
+  };
+
   return (
     <div
-      className={`d-flex justify-content-center align-items-center vh-100 ${
-        darkMode ? "bg-dark text-light" : "bg-light text-dark"
+      className={`d-flex justify-content-center align-items-center ${
+        darkMode ? "text-light" : "text-dark"
       }`}
+      style={containerStyles}
     >
-      <div
-        className={`text-center d-flex flex-column align-items-center ${
-          fadeIn ? "opacity-100" : "opacity-0"
-        }`}
-        style={{ transition: "opacity 1s ease-in-out" }}
-      >
+      <div className="text-center d-flex flex-column align-items-center">
         <img
           src={darkMode ? logoDark : logoLight}
           alt="Logo"
@@ -58,7 +70,6 @@ const LoadingScreen = ({
             filter: "drop-shadow(0 0 10px rgba(0,0,0,0.3))",
           }}
         />
-
         <div
           className={`spinner-border mb-3 ${
             darkMode ? "text-light" : "text-primary"
@@ -68,7 +79,6 @@ const LoadingScreen = ({
         >
           <span className="visually-hidden">Loading...</span>
         </div>
-
         <p
           className="fs-5 fw-light"
           style={{

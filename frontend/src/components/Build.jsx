@@ -37,6 +37,7 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
   const [showComponents, setShowComponents] = useState(false); // Toggle for components section
   const [showDescription, setShowDescription] = useState(false); // Toggle for description visibility
   const [isDescriptionHovered, setDescriptionHovered] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleEditClick = () => {
     setEditing(!editing);
@@ -245,6 +246,8 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
                     }
                     buildId={localBuild.id}
                     oldImageUrl={localBuild.image_url}
+                    loading={loading}
+                    setLoading={setLoading}
                   />
                 )}
               </div>
@@ -256,22 +259,30 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
           <ShareButton build={localBuild} />
           <button
             className="btn btn-secondary"
-            onClick={() => {
-              onDuplicate(localBuild);
+            onClick={async () => {
+              setLoading(true);
+              await onDuplicate(localBuild);
+              setLoading(false);
             }}
+            disabled={loading}
           >
-            <i className="bi bi-clipboard-plus-fill"></i> Duplicate
+            <i className="bi bi-clipboard-plus-fill"></i>{" "}
+            {loading ? "Loading..." : "Duplicate"}
           </button>
           <button
-            onClick={() => {
-              deleteBuildById(localBuild);
+            onClick={async () => {
+              setLoading(true);
+              await deleteBuildById(localBuild);
+              setLoading(false);
               setLocalBuild(null);
               onUpdate();
               setShow(false);
             }}
             className="btn btn-danger"
+            disabled={loading}
           >
-            <i className="bi bi-trash3-fill"></i> Delete
+            <i className="bi bi-trash3-fill"></i>{" "}
+            {loading ? "Loading..." : "Delete"}
           </button>
         </div>
       </div>

@@ -10,9 +10,13 @@ function ImageUploader({
   beforeUploaded,
   uploadText = "Upload Image",
   oldImageUrl,
+  loading,
+  setLoading,
 }) {
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
+
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -24,7 +28,7 @@ function ImageUploader({
       return;
     }
 
-    console.log(oldImageUrl);
+    setLoading(true);
 
     const formData = new FormData();
     formData.append("image", file);
@@ -33,7 +37,9 @@ function ImageUploader({
 
     if (beforeUploaded) beforeUploaded();
 
+    // await delay(2000); delay for debugging
     const resultUrl = await uploadImageWithFormData(formData);
+    setLoading(false);
     setImageUrl(resultUrl);
     if (onUploaded) onUploaded(resultUrl, buildId);
   };
@@ -46,8 +52,12 @@ function ImageUploader({
         className="form-control"
         onChange={handleFileChange}
       />
-      <button className="btn btn-primary" onClick={handleUpload}>
-        {uploadText}
+      <button
+        className="btn btn-primary"
+        onClick={handleUpload}
+        disabled={loading}
+      >
+        {loading ? "Loading..." : uploadText}
       </button>
     </div>
   );
