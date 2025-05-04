@@ -3,17 +3,20 @@ import fs from "fs";
 import db from "../config/db.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import admin from "firebase-admin";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const router = express.Router();
+
+const isProduction = process.env.NODE_ENV === "production";
 
 async function doesImageExistInMultipleBuilds(imageUrl) {
   try {
     const result = await db.query("SELECT 1 FROM builds WHERE image_url = $1", [
       imageUrl,
     ]);
-    console.log(result.rows.length);
+    //console.log(result.rows.length);
     return result.rows.length > 1;
   } catch (err) {
     console.error("Error checking image URL:", err);
@@ -23,25 +26,65 @@ async function doesImageExistInMultipleBuilds(imageUrl) {
 
 router.get("/doesImageExistInMultipleBuilds/:filename", async (req, res) => {
   const existsInMultiple = await doesImageExistInMultipleBuilds(
-    "/uploads/" + req.params.filename
+    isProduction ? req.params.filename : "/uploads/" + req.params.filename
   );
+
   return res.status(200).json({ existsInMultiple: existsInMultiple });
 });
 
-function deleteImageFromURL(imageUrl) {
-  try {
-    const filename = imageUrl.split("/uploads/")[1];
-    const filePath = path.join(__dirname, "..", "uploads", filename);
+export async function deleteImageFromURL(imageUrl) {
+  // Function to extract filename from Firebase URL
+  const extractFilenameFromUrl = (url) => {
+    const regex = /\/([^\/]+)\?/; // This regex captures the filename from the URL
+    const match = url.match(regex);
+    return match ? match[1] : null; // Returns the filename or null if no match
+  };
 
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error("Error deleting image:", err);
-      } else {
-        console.log(`Deleted image: ${filename}`);
+  if (isProduction) {
+    try {
+      const bucket = admin.storage().bucket();
+
+      // Extract filename from the URL using the helper function
+      const filenameEncoded = extractFilenameFromUrl(imageUrl);
+
+      if (!filenameEncoded) {
+        console.error("Could not parse Firebase filename from URL:", imageUrl);
+        return { status: 400, message: "Invalid image URL format" }; // Return a message for Firebase error
       }
-    });
-  } catch (err) {
-    console.error("Error processing image URL:", err);
+
+      const oldImageFilename = `uploads/${filenameEncoded}`;
+      console.log("Old image filename: ", oldImageFilename);
+
+      const oldImageFile = bucket.file(oldImageFilename);
+
+      // Delete the old image from Firebase Storage
+      await oldImageFile.delete();
+      console.log("Old image deleted successfully.");
+
+      return { status: 200, message: "Image deleted successfully" }; // Return a success message
+    } catch (err) {
+      console.error("Error deleting old image from Firebase:", err);
+      return { status: 500, message: "Error deleting image from Firebase" };
+    }
+  } else {
+    try {
+      const filename = imageUrl.split("/uploads/")[1];
+      const filePath = path.join(__dirname, "..", "uploads", filename);
+
+      // Delete local image file
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting local image:", err);
+          return { status: 500, message: "Error deleting local image" };
+        } else {
+          console.log(`Deleted local image: ${filename}`);
+          return { status: 200, message: "Local image deleted successfully" };
+        }
+      });
+    } catch (err) {
+      console.error("Error processing local image deletion:", err);
+      return { status: 500, message: "Error processing local image deletion" };
+    }
   }
 }
 
@@ -633,31 +676,43 @@ router.delete("/image/:filename", async (req, res) => {
   }
 
   const { filename } = req.params;
-  const filePath = path.join(__dirname, "..", "uploads", filename);
 
   try {
+    const relativePath = `/uploads/${filename}`;
     const imageExistsInOtherBuilds = await doesImageExistInMultipleBuilds(
-      `/uploads/${filename}`
+      relativePath
     );
 
-    // If the image is used in other builds, don't delete it
     if (imageExistsInOtherBuilds) {
       return res.status(200).json({
         message: "Image still in use by other builds. Not deleted.",
       });
     }
 
-    fs.unlink(filePath, (err) => {
-      if (err) {
-        console.error("Error deleting image:", err);
-        return res.status(500).json({ error: "Failed to delete image." });
-      }
+    if (isProduction) {
+      // Firebase delete
+      const bucket = admin.storage().bucket();
+      const file = bucket.file(`uploads/${filename}`);
 
-      console.log(`Deleted image: ${filename}`);
-      return res.status(200).json({ message: "Image deleted successfully." });
-    });
+      await file.delete();
+      console.log(`Deleted image from Firebase: uploads/${filename}`);
+      return res.status(200).json({ message: "Image deleted from Firebase." });
+    } else {
+      // Local filesystem delete
+      const filePath = path.join(process.cwd(), "uploads", filename);
+
+      fs.unlink(filePath, (err) => {
+        if (err) {
+          console.error("Error deleting image:", err);
+          return res.status(500).json({ error: "Failed to delete image." });
+        }
+
+        console.log(`Deleted image from local: ${filename}`);
+        return res.status(200).json({ message: "Image deleted locally." });
+      });
+    }
   } catch (err) {
-    console.error("Error checking image usage:", err);
+    console.error("Error deleting image:", err);
     return res.status(500).json({ error: "Server error." });
   }
 });

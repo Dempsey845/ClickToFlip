@@ -10,6 +10,7 @@ import admin from "firebase-admin";
 dotenv.config(); // Load .env
 
 const router = express.Router();
+
 const isProduction = process.env.NODE_ENV === "production";
 
 let upload;
@@ -19,10 +20,13 @@ if (isProduction) {
   const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
   serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, "\n");
 
-  admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
-    storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  });
+  // Only initialize Firebase if not already initialized
+  if (!admin.apps.length) {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+      storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+    });
+  }
 
   // Use memory storage for Firebase
   upload = multer({ storage: multer.memoryStorage() });
@@ -48,29 +52,24 @@ router.post("/image", upload.single("image"), async (req, res) => {
 
   try {
     if (isProduction) {
-      // Firebase Storage
       const bucket = admin.storage().bucket();
 
       // Delete the old image from Firebase Storage if provided
       if (oldImageUrl) {
         console.log("old image: ", oldImageUrl);
 
-        // Extract filename from the URL path before the query string
         const urlParts = oldImageUrl.split("/uploads/");
         const filenameWithParams = urlParts[1]?.split("?")[0];
 
         if (!filenameWithParams) {
           console.error("Failed to extract filename from URL");
-          return; // If filename extraction fails, return early
+          return res.status(400).send("Invalid old image URL format");
         }
 
         const oldImageFilename = `uploads/${filenameWithParams}`;
         console.log("old filename: ", oldImageFilename);
 
-        // Firebase reference to the file in the storage bucket
         const oldImageFile = bucket.file(oldImageFilename);
-
-        // Delete the old image from Firebase Storage
         await oldImageFile.delete();
         console.log("Old image deleted successfully.");
       }
@@ -85,15 +84,12 @@ router.post("/image", upload.single("image"), async (req, res) => {
         },
       });
 
-      stream.end(req.file.buffer);
-
       stream.on("finish", async () => {
         const [url] = await file.getSignedUrl({
           action: "read",
           expires: "03-01-2030",
         });
 
-        // Update the database with the new image URL
         const query = `UPDATE builds SET image_url = $1 WHERE id = $2`;
         const values = [url, buildId];
 
@@ -102,15 +98,16 @@ router.post("/image", upload.single("image"), async (req, res) => {
       });
 
       stream.on("error", (err) => {
-        res
-          .status(500)
-          .json({ error: "Firebase upload failed", details: err.message });
+        res.status(500).json({
+          error: "Firebase upload failed",
+          details: err.message,
+        });
       });
-    } else {
-      // Local storage (for development)
-      const imageUrl = `/uploads/${req.file.filename}`;
 
-      // Update the database with the new image URL
+      stream.end(req.file.buffer);
+    } else {
+      // Local storage
+      const imageUrl = `/uploads/${req.file.filename}`;
       const query = `UPDATE builds SET image_url = $1 WHERE id = $2`;
       const values = [imageUrl, buildId];
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+
 const isProduction = process.env.NODE_ENV === "production";
 
 function BuildImage({ localBuild, darkMode }) {
