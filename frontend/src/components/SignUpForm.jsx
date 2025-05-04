@@ -1,10 +1,19 @@
-import React from "react";
+import React, { useState } from "react";
 import CustomForm from "../components/CustomForm";
 import { registerUserWithFormData } from "../handlers/apiHandler";
 
 function SignUpForm({ onSignUp }) {
+  const [loading, setLoading] = useState(false);
+
   const handleRegister = async (formData) => {
-    await registerUserWithFormData(formData);
+    setLoading(true);
+    try {
+      await registerUserWithFormData(formData);
+    } catch (error) {
+      console.error("Sign up error:", error);
+    } finally {
+      setLoading(false);
+    }
     if (onSignUp) onSignUp();
   };
 
@@ -17,6 +26,7 @@ function SignUpForm({ onSignUp }) {
         { name: "username", label: "Username", type: "username" },
         { name: "password", label: "Password", type: "password" },
       ]}
+      disabled={loading}
     />
   );
 }

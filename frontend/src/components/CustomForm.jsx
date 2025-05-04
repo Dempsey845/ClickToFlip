@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function CustomForm({ title, fields, onSubmit }) {
+function CustomForm({ title, fields, onSubmit, disabled = false }) {
   const [formData, setFormData] = useState(() =>
     fields.reduce((acc, field) => {
       acc[field.name] = "";
@@ -39,8 +39,8 @@ function CustomForm({ title, fields, onSubmit }) {
               />
             </div>
           ))}
-          <button type="submit" className="btn btn-primary">
-            Submit
+          <button disabled={disabled} type="submit" className="btn btn-primary">
+            {disabled ? "Loading..." : "Submit"}
           </button>
         </form>
       </div>

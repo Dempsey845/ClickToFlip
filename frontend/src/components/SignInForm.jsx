@@ -1,12 +1,15 @@
+import { useState } from "react";
 import CustomForm from "../components/CustomForm";
 import { attemptLoginWithFormData } from "../handlers/apiHandler";
 import { useNavigate } from "react-router-dom";
 
 function SignInForm({ onSignIn }) {
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (formData) => {
     try {
+      setLoading(true);
       // Attempt to log in with the provided form data
       const loginSuccessful = await attemptLoginWithFormData(formData);
 
@@ -19,6 +22,8 @@ function SignInForm({ onSignIn }) {
       }
     } catch (error) {
       console.error("Login error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -30,6 +35,7 @@ function SignInForm({ onSignIn }) {
         { name: "email", label: "Email", type: "text" },
         { name: "password", label: "Password", type: "password" },
       ]}
+      disabled={loading}
     />
   );
 }
