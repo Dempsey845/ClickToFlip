@@ -9,6 +9,7 @@ function ImageUploader({
   onUploaded,
   beforeUploaded,
   uploadText = "Upload Image",
+  oldImageUrl,
 }) {
   const [file, setFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
@@ -23,9 +24,12 @@ function ImageUploader({
       return;
     }
 
+    console.log(oldImageUrl);
+
     const formData = new FormData();
     formData.append("image", file);
     formData.append("buildId", buildId);
+    if (oldImageUrl) formData.append("oldImageUrl", oldImageUrl); // The URL of the old image
 
     if (beforeUploaded) beforeUploaded();
 

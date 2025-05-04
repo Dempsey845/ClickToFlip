@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+const isProduction = process.env.NODE_ENV === "production";
 
 function BuildImage({ localBuild, darkMode }) {
   const [showModal, setShowModal] = useState(false);
@@ -14,7 +15,11 @@ function BuildImage({ localBuild, darkMode }) {
       <div className="d-flex justify-content-center my-3">
         {localBuild?.image_url ? (
           <img
-            src={`${BACKEND_URL}${localBuild.image_url}`}
+            src={
+              isProduction
+                ? localBuild.image_url
+                : `${BACKEND_URL}${localBuild.image_url}`
+            }
             alt="Build"
             className="img-fluid rounded shadow border"
             style={{
@@ -54,7 +59,11 @@ function BuildImage({ localBuild, darkMode }) {
         </Modal.Header>
         <Modal.Body className="text-center">
           <img
-            src={`${BACKEND_URL}${localBuild.image_url}`}
+            src={
+              isProduction
+                ? localBuild.image_url
+                : `${BACKEND_URL}${localBuild.image_url}`
+            }
             alt="Build Large"
             className="img-fluid rounded shadow"
             style={{ maxHeight: "80vh", objectFit: "contain" }}

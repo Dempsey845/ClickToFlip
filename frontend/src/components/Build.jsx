@@ -12,6 +12,8 @@ import { Button } from "react-bootstrap";
 import ShareButton from "./ShareButton";
 import BuildImage from "./BuildImage";
 
+const isProduction = process.env.NODE_ENV === "production";
+
 function linkify(text) {
   if (!text) return;
   const urlRegex = /(https?:\/\/[^\s]+)/g;
@@ -41,8 +43,10 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
   };
 
   const handleImageReplace = () => {
-    // Delete previous image if there is one
-    localBuild?.image_url && deleteImageByURL(localBuild.image_url);
+    if (!isProduction) {
+      // Delete previous image if there is one
+      localBuild?.image_url && deleteImageByURL(localBuild.image_url);
+    }
   };
 
   const handleImageUpload = (newImageUrl) => {
@@ -240,6 +244,7 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
                       localBuild.image_url ? "Replace Image" : "Add Image"
                     }
                     buildId={localBuild.id}
+                    oldImageUrl={localBuild.image_url}
                   />
                 )}
               </div>
