@@ -93,6 +93,7 @@ function BuildComponent({
   );
 
   const [deleted, setDeleted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setPrevComponentId(localComponent.component_id | localComponent.id);
@@ -105,15 +106,16 @@ function BuildComponent({
   };
 
   const handleComponentChangeSubmit = async () => {
-    const result = await changeComponent(
-      buildId,
-      prevComponentId,
-      newComponent
-    );
-    setParsedSpecs(parseSpecsString(newComponent.specs));
-    setLocalComponent(newComponent);
-    setShowComponentChangeButton(false);
-    onUpdate();
+    setLoading(true);
+    try {
+      await changeComponent(buildId, prevComponentId, newComponent);
+      setParsedSpecs(parseSpecsString(newComponent.specs));
+      setLocalComponent(newComponent);
+      setShowComponentChangeButton(false);
+      onUpdate();
+    } finally {
+      setLoading(false);
+    }
   };
 
   const displaySpecs = () => {
@@ -133,7 +135,12 @@ function BuildComponent({
   const handleNewUserComponent = async (data) => {
     setPrevComponentId(localComponent.component_id | localComponent.id);
     setNewComponent({ ...data, component_reference_id: referenceId });
-    if (useBuild) await changeComponent(buildId, prevComponentId, data);
+    try {
+      setLoading(true);
+      if (useBuild) await changeComponent(buildId, prevComponentId, data);
+    } finally {
+      setLoading(false);
+    }
     setParsedSpecs(parseSpecsString(data.specs));
     setLocalComponent({ ...data, component_reference_id: referenceId });
     onUpdate();
@@ -156,10 +163,20 @@ function BuildComponent({
         count: prev.count - 1,
       }));
 
-      await removeBuildComponent(localComponent.component_reference_ids[0]);
+      setLoading(true);
+      try {
+        await removeBuildComponent(localComponent.component_reference_ids[0]);
+      } finally {
+        setLoading(false);
+      }
     } else {
       setDeleted(true);
-      await removeBuildComponent(localComponent.component_reference_id);
+      setLoading(true);
+      try {
+        await removeBuildComponent(localComponent.component_reference_id);
+      } finally {
+        setLoading(false);
+      }
     }
 
     onUpdate();
@@ -202,6 +219,7 @@ function BuildComponent({
               {localComponent.count > 1 && `(${localComponent.count})`}
               {!viewOnly && (
                 <button
+                  disabled={loading}
                   onClick={() => {
                     const isCustom = localComponent.name.includes("(Custom)");
                     setUpdate(isCustom);
@@ -229,6 +247,7 @@ function BuildComponent({
               )}
               {!viewOnly && type === "GPU" && !userComponent && (
                 <button
+                  disabled={loading}
                   className={`btn btn-outline-danger btn-sm ms-2 ${
                     darkMode ? "dark-btn" : ""
                   }`}
@@ -239,6 +258,7 @@ function BuildComponent({
               )}
               {!viewOnly && userComponent && (
                 <button
+                  disabled={loading}
                   className={`btn btn-outline-danger btn-sm ms-2 ${
                     darkMode ? "dark-btn" : ""
                   }`}
@@ -261,6 +281,7 @@ function BuildComponent({
             )}
             {!viewOnly && showComponentChangeButton && (
               <button
+                disabled={loading}
                 className={`btn btn-sm btn-outline-primary mt-2 ${
                   darkMode ? "dark-btn" : ""
                 }`}

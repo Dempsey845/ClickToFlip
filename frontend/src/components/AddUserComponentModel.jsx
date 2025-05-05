@@ -21,12 +21,13 @@ const AddUserComponentModel = ({
   onUpdate,
   onDataUpdated,
   addingCustom = false,
-  darkMode = false, // Add darkMode as a prop
+  darkMode = false,
 }) => {
   const [name, setName] = useState(defaultName);
   const [brand, setBrand] = useState(defaultBrand);
   const [model, setModel] = useState(defaultModel);
   const [specFields, setSpecFields] = useState(fields);
+  const [loading, setLoading] = useState(false);
 
   const getBrandOptions = (componentType) => {
     switch (componentType) {
@@ -76,32 +77,35 @@ const AddUserComponentModel = ({
       return;
     }
 
+    setLoading(true);
+
     const specsString = specFields
       .filter((f) => f.key.trim() && f.value.trim())
       .map((f) => `${f.key.trim()}: ${f.value.trim()}`)
       .join(", ");
 
     const newComponent = { name, type, brand, model, specs: specsString };
+    if (addingCustom) newComponent.name += " (Custom)";
 
-    if (addingCustom) {
-      newComponent.name = newComponent.name + " (Custom)";
+    let data;
+
+    try {
+      data = update
+        ? await updateUserComponent(componentId, newComponent)
+        : await addUserComponent(newComponent);
+
+      setShowAddComponentModal(false);
+      onClose?.();
+
+      if (update) onDataUpdated?.(data);
+      if (onComponentAdded) onComponentAdded();
+      if (!update && onComponentAddedWithData) onComponentAddedWithData(data);
+      if (onUpdate) onUpdate();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
-
-    const data = update
-      ? await updateUserComponent(componentId, newComponent)
-      : await addUserComponent(newComponent);
-    setShowAddComponentModal(false);
-
-    if (update) onDataUpdated(data);
-
-    if (onComponentAdded) onComponentAdded(); // trigger refresh
-    if (onComponentAddedWithData && !update) onComponentAddedWithData(data);
-    if (onUpdate) onUpdate();
-  };
-
-  const handleClose = () => {
-    onClose();
-    setShowAddComponentModal(false);
   };
 
   const brandOptions = getBrandOptions(type);
@@ -109,185 +113,117 @@ const AddUserComponentModel = ({
 
   return (
     <div
-      style={{
-        ...styles.overlay,
-        backgroundColor: darkMode ? "rgba(0, 0, 0, 0.7)" : "rgba(0, 0, 0, 0.5)", // Adjust overlay for dark mode
-      }}
+      className={`modal show fade ${darkMode ? "bg-dark text-white" : ""}`}
+      style={{ display: "block" }}
+      tabIndex="-1"
     >
-      <div
-        style={{
-          ...styles.modal,
-          backgroundColor: darkMode ? "#333" : "white", // Dark or light background for modal
-          color: darkMode ? "#fff" : "#000", // Text color based on dark mode
-        }}
-      >
-        {customTitle ? <h2>{customTitle}</h2> : <h2>Add New {type}</h2>}
-
-        <label style={{ color: darkMode ? "#fff" : "#000" }}>Name:</label>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder={`Enter ${type} name`}
-          style={{
-            ...styles.input,
-            backgroundColor: darkMode ? "#444" : "#fff", // Input background
-            color: darkMode ? "#fff" : "#000", // Input text color
-          }}
-          disabled={disabledNameInput}
-        />
-
-        <label style={{ color: darkMode ? "#fff" : "#000" }}>Brand:</label>
-        <select
-          value={brand}
-          onChange={(e) => setBrand(e.target.value)}
-          style={{
-            ...styles.input,
-            backgroundColor: darkMode ? "#444" : "#fff", // Select background
-            color: darkMode ? "#fff" : "#000", // Select text color
-          }}
+      <div className="modal-dialog modal-dialog-centered">
+        <div
+          className={`modal-content ${darkMode ? "bg-dark text-white" : ""}`}
         >
-          <option value="">Select brand</option>
-          {brandOptions.map((b, i) => (
-            <option key={i} value={b}>
-              {b}
-            </option>
-          ))}
-        </select>
-
-        <label style={{ color: darkMode ? "#fff" : "#000" }}>Model:</label>
-        <input
-          value={model}
-          onChange={(e) => setModel(e.target.value)}
-          placeholder={modelPlaceholder}
-          style={{
-            ...styles.input,
-            backgroundColor: darkMode ? "#444" : "#fff", // Input background
-            color: darkMode ? "#fff" : "#000", // Input text color
-          }}
-        />
-
-        <label style={{ color: darkMode ? "#fff" : "#000" }}>Specs:</label>
-        {specFields?.map((field, index) => (
-          <div key={index} style={styles.specRow}>
-            <input
-              value={field.key}
-              onChange={(e) => handleSpecChange(index, "key", e.target.value)}
-              placeholder="Spec key (e.g., Cores)"
-              style={{
-                ...styles.specInput,
-                backgroundColor: darkMode ? "#444" : "#fff", // Spec input background
-                color: darkMode ? "#fff" : "#000", // Spec input text color
-              }}
-            />
-            <input
-              value={field.value}
-              onChange={(e) => handleSpecChange(index, "value", e.target.value)}
-              placeholder="Value (e.g., 8)"
-              style={{
-                ...styles.specInput,
-                backgroundColor: darkMode ? "#444" : "#fff", // Spec input background
-                color: darkMode ? "#fff" : "#000", // Spec input text color
-              }}
-            />
+          <div className="modal-header">
+            <h5 className="modal-title">{customTitle || `Add New ${type}`}</h5>
             <button
-              onClick={() => handleRemoveSpecField(index)}
-              style={styles.removeBtn}
+              type="button"
+              className="btn-close"
+              onClick={onClose}
+            ></button>
+          </div>
+          <div className="modal-body">
+            <div className="mb-3">
+              <label className="form-label">Name:</label>
+              <input
+                className="form-control"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder={`Enter ${type} name`}
+                disabled={disabledNameInput}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Brand:</label>
+              <select
+                className="form-select"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+              >
+                <option value="">Select brand</option>
+                {brandOptions.map((b, i) => (
+                  <option key={i} value={b}>
+                    {b}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-3">
+              <label className="form-label">Model:</label>
+              <input
+                className="form-control"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+                placeholder={modelPlaceholder}
+              />
+            </div>
+
+            <label className="form-label">Specs:</label>
+            {specFields.map((field, index) => (
+              <div className="d-flex gap-2 mb-2" key={index}>
+                <input
+                  className="form-control"
+                  value={field.key}
+                  onChange={(e) =>
+                    handleSpecChange(index, "key", e.target.value)
+                  }
+                  placeholder="Spec key (e.g., Cores)"
+                />
+                <input
+                  className="form-control"
+                  value={field.value}
+                  onChange={(e) =>
+                    handleSpecChange(index, "value", e.target.value)
+                  }
+                  placeholder="Value (e.g., 8)"
+                />
+                <button
+                  className="btn btn-danger"
+                  onClick={() => handleRemoveSpecField(index)}
+                  disabled={loading}
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            <button
+              className="btn btn-success mb-3"
+              onClick={handleAddSpecField}
+              disabled={loading}
             >
-              ✕
+              + Add Spec
             </button>
           </div>
-        ))}
-        <button onClick={handleAddSpecField} style={styles.addBtn}>
-          + Add Spec
-        </button>
-
-        <div style={styles.actions}>
-          <button onClick={handleClose} style={styles.cancelBtn}>
-            Close
-          </button>
-          {update && <button style={styles.removeBtn}>Delete</button>}
-          <button onClick={handleSave} style={styles.saveBtn}>
-            Save
-          </button>
+          <div className="modal-footer">
+            <button
+              className="btn btn-secondary"
+              onClick={onClose}
+              disabled={loading}
+            >
+              Close
+            </button>
+            {/*update && <button className="btn btn-danger">Delete</button>*/}
+            <button
+              className="btn btn-primary"
+              onClick={handleSave}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Save"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-const styles = {
-  overlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1050, // Ensure overlay is above everything else
-  },
-  modal: {
-    backgroundColor: "white",
-    padding: "20px",
-    borderRadius: "8px",
-    width: "400px",
-    boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",
-    zIndex: 1060, // Ensure modal content is above the overlay
-    position: "relative", // Make sure modal content stays relative to its overlay
-  },
-  input: {
-    width: "100%",
-    padding: "8px",
-    marginBottom: "10px",
-  },
-  specRow: {
-    display: "flex",
-    gap: "5px",
-    marginBottom: "8px",
-  },
-  specInput: {
-    flex: 1,
-    padding: "6px",
-  },
-  removeBtn: {
-    backgroundColor: "red",
-    color: "white",
-    border: "none",
-    padding: "0 8px",
-    cursor: "pointer",
-    borderRadius: "4px",
-  },
-  addBtn: {
-    marginBottom: "10px",
-    backgroundColor: "#28a745",
-    color: "white",
-    padding: "6px 10px",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
-  actions: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginTop: "20px",
-  },
-  cancelBtn: {
-    backgroundColor: "#ccc",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  saveBtn: {
-    backgroundColor: "#007bff",
-    color: "white",
-    padding: "10px 20px",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
 };
 
 export default AddUserComponentModel;

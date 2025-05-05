@@ -31,6 +31,7 @@ function UserComponentsPage({ onUpdate, darkMode }) {
         onUpdate={onUpdate}
         userComponent={true}
         onUserComponentDelete={handleDeleteUserComponent}
+        darkMode={darkMode}
       />
     );
   };
