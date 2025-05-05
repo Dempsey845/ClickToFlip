@@ -56,7 +56,10 @@ const AddUserComponentModel = ({
   };
 
   const handleAddSpecField = () => {
-    setSpecFields([...specFields, { key: "", value: "" }]);
+    setSpecFields((prevFields) => [
+      ...(prevFields || []),
+      { key: "", value: "" },
+    ]);
   };
 
   const handleRemoveSpecField = (index) => {
@@ -72,14 +75,29 @@ const AddUserComponentModel = ({
   };
 
   const handleSave = async () => {
+    // Ensure specFields is never null or undefined, default to an empty array
+    const validSpecFields = Array.isArray(specFields) ? specFields : [];
+
+    // Check if required fields are filled
     if (!name.trim() || !brand.trim() || !model.trim()) {
       alert("Please fill in all required fields: Name, Brand, and Model.");
       return;
     }
 
+    // Check for empty or null spec fields
+    const invalidSpecField = validSpecFields.some(
+      (field) => !field.key.trim() || !field.value.trim()
+    );
+
+    if (invalidSpecField) {
+      alert("Please fill in all spec fields properly.");
+      return;
+    }
+
     setLoading(true);
 
-    const specsString = specFields
+    // Generate the specs string
+    const specsString = validSpecFields
       .filter((f) => f.key.trim() && f.value.trim())
       .map((f) => `${f.key.trim()}: ${f.value.trim()}`)
       .join(", ");
@@ -103,6 +121,7 @@ const AddUserComponentModel = ({
       if (onUpdate) onUpdate();
     } catch (err) {
       console.error(err);
+      alert("An error occurred while saving the component. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -168,7 +187,7 @@ const AddUserComponentModel = ({
             </div>
 
             <label className="form-label">Specs:</label>
-            {specFields.map((field, index) => (
+            {specFields?.map((field, index) => (
               <div className="d-flex gap-2 mb-2" key={index}>
                 <input
                   className="form-control"
