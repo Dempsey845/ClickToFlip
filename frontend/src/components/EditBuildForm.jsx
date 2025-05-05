@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { updateBuild, getBuildById } from "../handlers/apiHandler";
 import "./AddBuildForm";
+import PriceBreakdown from "./PriceBreakdown";
 
 const formatDate = (dateString) => {
   const date = new Date(dateString);
@@ -10,7 +11,13 @@ const formatDate = (dateString) => {
   return `${year}-${month}-${day}`;
 };
 
-function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
+function EditBuildForm({
+  buildId,
+  build,
+  onClose,
+  onSuccess,
+  darkMode = false,
+}) {
   const [formData, setFormData] = useState({
     buildName: "",
     description: "",
@@ -25,6 +32,29 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
   const [isLoading, setIsLoading] = useState(true); // Loading state for fetching build data
   const [isSubmitting, setIsSubmitting] = useState(false); // Loading state for form submission
 
+  const [prices, setPrices] = useState(
+    build.price_breakdown || {
+      CPU: 0,
+      GPU: 0,
+      RAM: 0,
+      Motherboard: 0,
+      PSU: 0,
+      Case: 0,
+      "CPU Cooler": 0,
+      Others: 0,
+    }
+  );
+
+  const [breakTotalCost, setBreakTotalCost] = useState(0);
+
+  useEffect(() => {
+    const total = Object.values(prices).reduce(
+      (sum, val) => sum + Number(val),
+      0
+    );
+    setBreakTotalCost(total);
+  }, [prices]);
+
   const processBuildData = (data) => {
     return {
       ...data,
@@ -34,10 +64,12 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
   useEffect(() => {
     const fetchBuild = async () => {
       try {
+        /*
         const data = await getBuildById(buildId);
         if (!data) return;
+        */
 
-        const processedData = processBuildData(data);
+        const processedData = processBuildData(build);
 
         setFormData({
           buildName: processedData.name || "",
@@ -62,7 +94,7 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
   }, [buildId]);
 
   useEffect(() => {
-    const cost = parseFloat(formData.totalCost);
+    const cost = parseFloat(breakTotalCost);
     const sale = parseFloat(formData.salePrice);
     if (!isNaN(cost) && !isNaN(sale)) {
       setFormData((prev) => ({
@@ -70,7 +102,7 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
         profit: (sale - cost).toFixed(2),
       }));
     }
-  }, [formData.totalCost, formData.salePrice]);
+  }, [breakTotalCost, formData.salePrice]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -92,10 +124,20 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
       name: formData.buildName,
       description: formData.description,
       status: formData.status,
-      total_cost: formData.totalCost || null,
+      total_cost: breakTotalCost || null,
       sale_price: formData.salePrice || null,
       sold_date: formData.soldDate || null,
       profit: formData.profit || null,
+      price_breakdown: prices || {
+        CPU: 0,
+        GPU: 0,
+        RAM: 0,
+        Motherboard: 0,
+        PSU: 0,
+        Case: 0,
+        "CPU Cooler": 0,
+        Others: 0,
+      },
     };
 
     try {
@@ -174,6 +216,14 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
           </div>
 
           <div className="mb-3">
+            <PriceBreakdown
+              darkMode={darkMode}
+              prices={prices}
+              onChange={(updated) => setPrices(updated)}
+            />
+          </div>
+
+          <div className="mb-3">
             <label
               className="form-label"
               style={{ color: darkMode ? "#fff" : "#000" }} // Label color
@@ -209,13 +259,13 @@ function EditBuildForm({ buildId, onClose, onSuccess, darkMode = false }) {
                 className="form-control"
                 name="totalCost"
                 type="number"
-                step="0.01"
-                value={formData.totalCost || 0}
+                value={breakTotalCost || 0}
                 onChange={handleInputChange}
                 style={{
                   backgroundColor: darkMode ? "#444" : "#fff", // Input background
                   color: darkMode ? "#fff" : "#000", // Input text color
                 }}
+                disabled={true}
               />
             </div>
 

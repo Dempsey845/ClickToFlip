@@ -117,6 +117,7 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
         {editing && (
           <EditBuildForm
             buildId={localBuild?.id}
+            build={localBuild}
             onClose={handleEditClick}
             onSuccess={(payload) => {
               updateLocalBuild(payload);

@@ -107,6 +107,7 @@ router.post("/", async (req, res) => {
     profit,
     componentIds,
     imageUrl,
+    price_breakdown,
   } = req.body;
 
   if (!name || !componentIds || componentIds.length === 0) {
@@ -133,8 +134,8 @@ router.post("/", async (req, res) => {
 
     const buildResult = await client.query(
       `
-      INSERT INTO builds (name, description, status, total_cost, sale_price, sold_date, profit, image_url, user_id)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      INSERT INTO builds (name, description, status, total_cost, sale_price, sold_date, profit, image_url, user_id, price_breakdown)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING id;
     `,
       [
@@ -147,6 +148,7 @@ router.post("/", async (req, res) => {
         profit || null,
         imageUrl || null,
         userId,
+        price_breakdown || null,
       ]
     );
 
@@ -194,6 +196,7 @@ router.get("/", async (req, res) => {
       b.sold_date,
       b.profit,
       b.image_url,
+      b.price_breakdown,
   
       -- CPU: expect one
       cpu.cpu_id,
@@ -473,6 +476,7 @@ router.patch("/:buildId", async (req, res) => {
     sold_date,
     profit,
     image_url,
+    price_breakdown,
   } = req.body;
 
   if (!buildId) {
@@ -526,6 +530,10 @@ router.patch("/:buildId", async (req, res) => {
     if (image_url !== undefined) {
       fields.push(`image_url = $${index++}`);
       values.push(image_url);
+    }
+    if (price_breakdown !== undefined) {
+      fields.push(`price_breakdown = $${index++}`);
+      values.push(price_breakdown);
     }
 
     if (fields.length === 0) {
