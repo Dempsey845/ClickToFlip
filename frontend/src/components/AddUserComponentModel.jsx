@@ -145,7 +145,10 @@ const AddUserComponentModel = ({
             <button
               type="button"
               className="btn-close"
-              onClick={onClose}
+              onClick={() => {
+                onClose();
+                setShowAddComponentModal(false);
+              }}
             ></button>
           </div>
           <div className="modal-body">
@@ -225,7 +228,10 @@ const AddUserComponentModel = ({
           <div className="modal-footer">
             <button
               className="btn btn-secondary"
-              onClick={onClose}
+              onClick={() => {
+                onClose();
+                setShowAddComponentModal(false);
+              }}
               disabled={loading}
             >
               Close
