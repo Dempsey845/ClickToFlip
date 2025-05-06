@@ -9,6 +9,7 @@ import authRoutes from "./routes/authRoutes.js";
 import componentRoutes from "./routes/componentRoutes.js";
 import buildRoutes from "./routes/buildRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
+import contactRoutes from "./routes/contactRoutes.js";
 import path from "path";
 import fs from "fs";
 import multer from "multer";
@@ -54,6 +55,7 @@ app.use("/api", authRoutes);
 app.use("/api/components", componentRoutes);
 app.use("/api/builds", buildRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api", contactRoutes);
 
 // Health check or default route
 app.get("/", (req, res) => {

@@ -1,6 +1,35 @@
-import React from "react";
+import React, { useState } from "react";
+import { contact } from "../handlers/apiHandler";
+
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
 
 function ContactPage({ darkMode }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      await contact(formData);
+      setFormData({ name: "", email: "", message: "" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div
       className={`min-vh-100 ${
@@ -17,7 +46,7 @@ function ContactPage({ darkMode }) {
 
       {/* Contact Form */}
       <div className="container mb-5" style={{ maxWidth: "600px" }}>
-        <form>
+        <form id="contactForm" onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="name" className="form-label">
               <i className="bi bi-person-fill me-2"></i>Name
@@ -29,6 +58,9 @@ function ContactPage({ darkMode }) {
               }`}
               id="name"
               placeholder="Your name"
+              value={formData.name}
+              onChange={handleChange}
+              required
             />
           </div>
           <div className="mb-3">
@@ -42,6 +74,9 @@ function ContactPage({ darkMode }) {
               }`}
               id="email"
               placeholder="name@example.com"
+              value={formData.email}
+              onChange={handleChange}
+              required
             />
           </div>
           <div className="mb-3">
@@ -55,10 +90,17 @@ function ContactPage({ darkMode }) {
               id="message"
               rows="4"
               placeholder="Type your message here..."
+              value={formData.message}
+              onChange={handleChange}
+              required
             ></textarea>
           </div>
-          <button type="submit" className="btn btn-primary w-100">
-            Send Message
+          <button
+            type="submit"
+            className="btn btn-primary w-100"
+            disabled={isLoading}
+          >
+            {isLoading ? "Sending..." : "Send Message"}
           </button>
         </form>
       </div>

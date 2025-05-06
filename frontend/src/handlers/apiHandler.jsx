@@ -20,6 +20,18 @@ const handleError = (err) => {
   }
 };
 
+async function contact(formData) {
+  try {
+    await axios.post(`${BACKEND_URL}/api/contact`, formData, {
+      withCredentials: true,
+    });
+    toast.success("Contact successful!");
+  } catch (err) {
+    console.error(`${err.response?.data?.error || err.message}`);
+    toast.error(`${err.response?.data?.error || err.message}`);
+  }
+}
+
 // Register user with form data
 async function registerUserWithFormData(formData) {
   try {
@@ -516,6 +528,7 @@ const getUsernameFromId = async (userId) => {
 };
 
 export {
+  contact,
   registerUserWithFormData,
   attemptLoginWithFormData,
   isAuthenticated,
