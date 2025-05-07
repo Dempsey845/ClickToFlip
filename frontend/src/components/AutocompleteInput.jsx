@@ -189,6 +189,7 @@ const AutocompleteInput = ({ type, onSelect, darkMode }) => {
           onClose={() => setSearchTerm("")}
           onUpdate={handleUpdate}
           darkMode={darkMode}
+          addingCustom={true}
         />
       )}
     </div>

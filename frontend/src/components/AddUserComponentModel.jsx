@@ -189,41 +189,57 @@ const AddUserComponentModel = ({
               />
             </div>
 
-            <label className="form-label">Specs:</label>
-            {specFields?.map((field, index) => (
-              <div className="d-flex gap-2 mb-2" key={index}>
-                <input
-                  className="form-control"
-                  value={field.key}
-                  onChange={(e) =>
-                    handleSpecChange(index, "key", e.target.value)
-                  }
-                  placeholder="Spec key (e.g., Cores)"
-                />
-                <input
-                  className="form-control"
-                  value={field.value}
-                  onChange={(e) =>
-                    handleSpecChange(index, "value", e.target.value)
-                  }
-                  placeholder="Value (e.g., 8)"
-                />
+            <div className="mb-4">
+              <label className="form-label fw-bold fs-5 mb-3 d-block">
+                Specs:
+              </label>
+
+              {specFields?.map((field, index) => (
+                <div
+                  className="d-flex gap-2 align-items-center mb-2"
+                  key={index}
+                >
+                  <input
+                    className="form-control"
+                    style={{ maxWidth: "200px" }}
+                    value={field.key}
+                    onChange={(e) =>
+                      handleSpecChange(index, "key", e.target.value)
+                    }
+                    placeholder="Spec key (e.g., Cores)"
+                  />
+                  <input
+                    className="form-control"
+                    style={{ maxWidth: "200px" }}
+                    value={field.value}
+                    onChange={(e) =>
+                      handleSpecChange(index, "value", e.target.value)
+                    }
+                    placeholder="Value (e.g., 8)"
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger px-3 py-1"
+                    onClick={() => handleRemoveSpecField(index)}
+                    disabled={loading}
+                    title="Remove Spec"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+
+              <div className="mt-3">
                 <button
-                  className="btn btn-danger"
-                  onClick={() => handleRemoveSpecField(index)}
+                  type="button"
+                  className="btn btn-outline-success"
+                  onClick={handleAddSpecField}
                   disabled={loading}
                 >
-                  ✕
+                  + Add Spec
                 </button>
               </div>
-            ))}
-            <button
-              className="btn btn-success mb-3"
-              onClick={handleAddSpecField}
-              disabled={loading}
-            >
-              + Add Spec
-            </button>
+            </div>
           </div>
           <div className="modal-footer">
             <button
