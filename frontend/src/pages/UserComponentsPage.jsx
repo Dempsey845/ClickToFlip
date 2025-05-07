@@ -2,16 +2,24 @@ import BuildComponent from "../components/BuildComponent";
 import AddUserComponentModel from "../components/AddUserComponentModel";
 import { getUserComponents, deleteUserComponent } from "../handlers/apiHandler";
 import { useState, useEffect } from "react";
+import LoadingScreen from "../components/LoadingScreen";
+
+// const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function UserComponentsPage({ onUpdate, darkMode }) {
   const [components, setComponents] = useState(null);
   const [showAddModel, setShowAddModel] = useState(false);
   const [addType, setAddType] = useState("CPU");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchComponents = async () => {
-      const comps = await getUserComponents();
-      setComponents(comps);
+      try {
+        const comps = await getUserComponents();
+        setComponents(comps);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchComponents();
@@ -112,6 +120,9 @@ function UserComponentsPage({ onUpdate, darkMode }) {
           ))}
         </div>
       </div>
+      {loading && (
+        <LoadingScreen fullscreen={false} overlay={true} darkMode={darkMode} />
+      )}
     </div>
   );
 }

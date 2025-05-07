@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { contact } from "../handlers/apiHandler";
 
-const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-
 function ContactPage({ darkMode }) {
   const [formData, setFormData] = useState({
     name: "",
