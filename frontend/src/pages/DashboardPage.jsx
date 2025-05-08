@@ -56,13 +56,6 @@ function DashboardPage({ onLogout, darkMode }) {
       <div className={cardClass}>
         <Builds builds={builds} onUpdate={handleUpdate} darkMode={darkMode} />
       </div>
-
-      {/* Logout Button */}
-      <div className="text-center mt-4">
-        <button onClick={onLogout} className="btn btn-danger">
-          Logout
-        </button>
-      </div>
     </div>
   );
 }

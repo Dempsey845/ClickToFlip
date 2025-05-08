@@ -1,15 +1,22 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [loading, setLoading] = useState(false);
+
   const handleLogin = () => navigate("/signin");
   const handleSignup = () => navigate("/signup");
   const handleLogout = () => {
-    onLogout();
-    navigate("/signin");
+    setLoading(true);
+    try {
+      onLogout();
+      navigate("/signin");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // A helper function to determine if the current link is active
@@ -128,6 +135,9 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
           )}
         </div>
       </header>
+      {loading && (
+        <LoadingScreen fullscreen={false} overlay={true} darkMode={darkMode} />
+      )}
     </div>
   );
 }
