@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import CustomForm from "../components/CustomForm";
 import { registerUserWithFormData } from "../handlers/apiHandler";
+import { useNavigate } from "react-router-dom";
 
 function SignUpForm({ onSignUp }) {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegister = async (formData) => {
     setLoading(true);
@@ -13,6 +15,7 @@ function SignUpForm({ onSignUp }) {
       console.error("Sign up error:", error);
     } finally {
       setLoading(false);
+      navigate("/signin");
     }
     if (onSignUp) onSignUp();
   };

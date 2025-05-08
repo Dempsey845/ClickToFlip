@@ -13,7 +13,7 @@ const AutocompleteInput = ({ type, onSelect, darkMode }) => {
   const [userComponents, setUserComponents] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredComponents, setFilteredComponents] = useState([]);
-  const [selectedComponent, setSelectedComponent] = useState(null);
+  const [_selectedComponent, setSelectedComponent] = useState(null);
   const [showAddComponentModal, setShowAddComponentModal] = useState(false);
   const [updates, setUpdates] = useState([]);
 

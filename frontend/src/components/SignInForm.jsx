@@ -24,6 +24,7 @@ function SignInForm({ onSignIn }) {
       console.error("Login error:", error);
     } finally {
       setLoading(false);
+      navigate("/dashboard");
     }
   };
 
