@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import LoadingScreen from "./LoadingScreen";
 
 function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
   const navigate = useNavigate();
@@ -9,10 +10,10 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
 
   const handleLogin = () => navigate("/signin");
   const handleSignup = () => navigate("/signup");
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setLoading(true);
     try {
-      onLogout();
+      await onLogout();
       navigate("/signin");
     } finally {
       setLoading(false);
