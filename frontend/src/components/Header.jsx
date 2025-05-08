@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import LoadingScreen from "./LoadingScreen";
 
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -13,6 +15,7 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
   const handleLogout = async () => {
     setLoading(true);
     try {
+      await delay(3000);
       await onLogout();
       navigate("/signin");
     } finally {
@@ -75,6 +78,7 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
                 onClick={() => {
                   toggleDarkMode();
                 }}
+                disabled={loading}
               >
                 {darkMode ? (
                   <i className="bi bi-moon"></i>
@@ -91,6 +95,7 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
                 onClick={() => {
                   navigate("/settings");
                 }}
+                disabled={loading}
               >
                 <i className=" bi bi-gear-wide-connected"></i>
               </button>
@@ -98,6 +103,7 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
                 onClick={handleLogout}
                 className="btn btn-outline-danger"
                 title="Logout"
+                disabled={loading}
               >
                 <i className="bi bi-box-arrow-left"></i>
               </button>
@@ -137,7 +143,7 @@ function Header({ isAuthenticated, onLogout, darkMode, toggleDarkMode }) {
         </div>
       </header>
       {loading && (
-        <LoadingScreen fullscreen={false} overlay={true} darkMode={darkMode} />
+        <LoadingScreen fullscreen={true} overlay={true} darkMode={darkMode} />
       )}
     </div>
   );
