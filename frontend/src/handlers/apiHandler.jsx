@@ -190,6 +190,7 @@ const duplicateBuild = async (build) => {
     sold_date,
     profit,
     image_url,
+    price_breakdown,
   } = build;
   const name = build.name + " (Copy)";
   try {
@@ -214,6 +215,7 @@ const duplicateBuild = async (build) => {
           status: status,
           total_cost: total_cost,
           imageUrl: image_url,
+          price_breakdown: price_breakdown,
         },
         { withCredentials: true }
       );
