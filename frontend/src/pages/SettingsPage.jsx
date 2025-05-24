@@ -13,6 +13,7 @@ import ChangePasswordModal from "../components/ChangePasswordModal";
 import ChangeUsernameModel from "../components/ChangeUsernameModal";
 import DeleteAccountModal from "../components/DeleteAccountModal";
 import LoadingScreen from "../components/LoadingScreen";
+import CurrencySelector from "../components/CurrencySelector";
 
 //const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -81,6 +82,8 @@ function SettingsPage({ darkMode, toggleDarkMode }) {
                       Edit Username
                     </Button>
                   </div>
+
+                  {!loading && <CurrencySelector userId={userData.id} />}
 
                   <div className="mb-3 d-flex justify-content-between align-items-center">
                     <div>

@@ -167,3 +167,51 @@ export const getUsername = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+export const changeCurrency = async (req, res) => {
+  const { userId, currency } = req.body;
+
+  if (!currency) {
+    return res.status(400).json({ error: "Currency is required" });
+  }
+
+  try {
+    const query = `UPDATE users SET currency = $1 WHERE id = $2 RETURNING currency`;
+    const values = [currency, userId];
+
+    const result = await db.query(query, values);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({
+      message: "Currency updated successfully",
+      currency: result.rows[0].currency,
+    });
+  } catch (err) {
+    console.error("Currency update failed:", err.message);
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: err.message });
+  }
+};
+
+export const getCurrency = async (req, res) => {
+  const { userId } = req.params;
+  if (!userId) {
+    return res.status(400).json({ message: "User ID Required" });
+  }
+  try {
+    const result = await db.query("SELECT currency FROM users WHERE id = $1", [
+      userId,
+    ]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ currency: result.rows[0].currency });
+  } catch (err) {
+    console.error("Error getting currency", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};

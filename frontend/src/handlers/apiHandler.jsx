@@ -529,6 +529,39 @@ const getUsernameFromId = async (userId) => {
   }
 };
 
+export const updateUserCurrency = async (userId, currency) => {
+  try {
+    const response = await axios.patch(
+      `${BACKEND_URL}/api/changeCurrency`,
+      { userId, currency },
+      { withCredentials: true }
+    );
+
+    toast.success("Currency updated");
+    return response.data;
+  } catch (error) {
+    toast.error(
+      "Failed to update currency:",
+      error.response?.data || error.message
+    );
+    throw error;
+  }
+};
+
+export const getUserCurrency = async (userId) => {
+  try {
+    const response = await axios.get(`${BACKEND_URL}/api/currency/${userId}`, {
+      withCredentials: true,
+    });
+    return response.data.currency;
+  } catch (error) {
+    toast.error(
+      "Failed to get user currency: ",
+      error.response?.data || error.message
+    );
+  }
+};
+
 export {
   contact,
   registerUserWithFormData,
