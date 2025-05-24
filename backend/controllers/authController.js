@@ -198,10 +198,12 @@ export const changeCurrency = async (req, res) => {
 };
 
 export const getCurrency = async (req, res) => {
-  const { userId } = req.params;
-  if (!userId) {
-    return res.status(400).json({ message: "User ID Required" });
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: "Unauthorized" });
   }
+
+  const userId = req.user.id;
+
   try {
     const result = await db.query("SELECT currency FROM users WHERE id = $1", [
       userId,

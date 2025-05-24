@@ -8,14 +8,12 @@ const currencies = [
 ];
 
 function CurrencySelector({ userId }) {
-  if (!userId) return <div>Loading...</div>;
-
   const [currency, setCurrency] = useState();
 
   useEffect(() => {
     const loadUserCurrency = async () => {
       try {
-        const c = await getUserCurrency(userId);
+        const c = await getUserCurrency();
         setCurrency(c);
       } catch (err) {
         console.error("Failed to fetch currency:", err);

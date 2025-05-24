@@ -1,6 +1,9 @@
-import React from "react";
-
-const PriceBreakdown = ({ darkMode = false, prices = {}, onChange }) => {
+const PriceBreakdown = ({
+  darkMode = false,
+  prices = {},
+  onChange,
+  currency,
+}) => {
   const components = [
     "CPU",
     "GPU",
@@ -30,7 +33,7 @@ const PriceBreakdown = ({ darkMode = false, prices = {}, onChange }) => {
           <div className="col-12 d-flex align-items-center" key={label}>
             <label className="me-auto">{label}</label>
             <div className="input-group" style={{ maxWidth: "150px" }}>
-              <span className="input-group-text">£</span>
+              <span className="input-group-text">{currency}</span>
               <input
                 type="number"
                 className="form-control"

@@ -4,7 +4,7 @@ import { addBuildWithBuildPayLoad } from "../handlers/apiHandler";
 import "./AddBuildForm.css";
 import PriceBreakdown from "./PriceBreakdown";
 
-function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
+function AddBuildForm({ onUpdate, onImageAdded, darkMode, currency }) {
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     buildName: "",
@@ -197,6 +197,7 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
             darkMode={darkMode}
             prices={prices}
             onChange={(updated) => setPrices(updated)}
+            currency={currency}
           />
         </div>
 
@@ -275,7 +276,7 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
         <div className="row">
           <div className="col-md-4 mb-3">
             <label htmlFor="totalCost" className="form-label">
-              Total Cost (£)
+              Total Cost ({currency})
             </label>
             <input
               className={`form-control ${
@@ -294,7 +295,7 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
             <>
               <div className="col-md-4 mb-3">
                 <label htmlFor="salePrice" className="form-label">
-                  Sale Price (£)
+                  Sale Price ({currency})
                 </label>
                 <input
                   className={`form-control ${
@@ -310,7 +311,7 @@ function AddBuildForm({ onUpdate, onImageAdded, darkMode }) {
               </div>
               <div className="col-md-4 mb-3">
                 <label htmlFor="profit" className="form-label">
-                  Profit (£)
+                  Profit ({currency})
                 </label>
                 <input
                   className={`form-control ${

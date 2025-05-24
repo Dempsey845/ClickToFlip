@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { updateBuild, getBuildById } from "../handlers/apiHandler";
+import { updateBuild } from "../handlers/apiHandler";
 import "./AddBuildForm";
 import PriceBreakdown from "./PriceBreakdown";
 
@@ -17,6 +17,7 @@ function EditBuildForm({
   onClose,
   onSuccess,
   darkMode = false,
+  currency,
 }) {
   const [formData, setFormData] = useState({
     buildName: "",
@@ -220,6 +221,7 @@ function EditBuildForm({
               darkMode={darkMode}
               prices={prices}
               onChange={(updated) => setPrices(updated)}
+              currency={currency}
             />
           </div>
 
@@ -253,7 +255,7 @@ function EditBuildForm({
                 className="form-label"
                 style={{ color: darkMode ? "#fff" : "#000" }} // Label color
               >
-                Total Cost (£)
+                Total Cost ({currency})
               </label>
               <input
                 className="form-control"
@@ -276,7 +278,7 @@ function EditBuildForm({
                     className="form-label"
                     style={{ color: darkMode ? "#fff" : "#000" }}
                   >
-                    Sale Price (£)
+                    Sale Price ({currency})
                   </label>
                   <input
                     className="form-control"
@@ -297,7 +299,7 @@ function EditBuildForm({
                     className="form-label"
                     style={{ color: darkMode ? "#fff" : "#000" }}
                   >
-                    Profit (£)
+                    Profit ({currency})
                   </label>
                   <input
                     className="form-control"

@@ -23,7 +23,7 @@ function filterBuilds(builds, statusFilter) {
   });
 }
 
-function Builds({ builds = [], onUpdate, darkMode }) {
+function Builds({ builds = [], onUpdate, darkMode, currency }) {
   const [sortOption, setSortOption] = useState("newest");
   const [statusFilter, setStatusFilter] = useState("all"); // "all", "sold", "notSold"
 
@@ -45,12 +45,13 @@ function Builds({ builds = [], onUpdate, darkMode }) {
       onUpdate={onUpdate}
       darkMode={darkMode}
       onDuplicate={handleDuplicate}
+      currency={currency}
     />
   );
 
   return (
     <div className={`container py-4 ${darkMode ? "bg-dark text-light" : ""}`}>
-      <Stats builds={builds} darkMode={darkMode} />
+      <Stats builds={builds} darkMode={darkMode} currency={currency} />
 
       {/* Filter + Sort UI */}
       <div className="row g-3 mb-4">

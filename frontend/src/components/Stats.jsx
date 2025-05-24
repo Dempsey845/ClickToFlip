@@ -21,7 +21,7 @@ ChartJS.register(
   LinearScale
 );
 
-function Stats({ builds, darkMode }) {
+function Stats({ builds, darkMode, currency }) {
   if (!builds) return null;
 
   if (builds.length < 2) {
@@ -203,26 +203,34 @@ function Stats({ builds, darkMode }) {
               {[
                 { label: "Total Sold Builds", value: soldBuilds.length },
                 { label: "Total Unsold Builds", value: unSoldBuilds.length },
-                { label: "Total Profit", value: `$${soldProfit.toFixed(2)}` },
+                {
+                  label: "Total Profit",
+                  value: `${currency}${soldProfit.toFixed(2)}`,
+                },
                 {
                   label: "Total Revenue",
-                  value: `$${totalRevenue.toFixed(2)}`,
+                  value: `${currency}${totalRevenue.toFixed(2)}`,
                 },
-                { label: "Total Cost", value: `$${totalCost.toFixed(2)}` },
+                {
+                  label: "Total Cost",
+                  value: `${currency}${totalCost.toFixed(2)}`,
+                },
                 { label: "Avg Profit Margin", value: `${averageMargin}%` },
                 {
                   label: "Avg Revenue per Build",
-                  value: `$${(totalRevenue / soldBuilds.length || 0).toFixed(
-                    2
-                  )}`,
+                  value: `${currency}${(
+                    totalRevenue / soldBuilds.length || 0
+                  ).toFixed(2)}`,
                 },
                 {
                   label: "Avg Profit per Build",
-                  value: `$${(soldProfit / soldBuilds.length || 0).toFixed(2)}`,
+                  value: `${currency}${(
+                    soldProfit / soldBuilds.length || 0
+                  ).toFixed(2)}`,
                 },
                 {
                   label: "Inventory Value",
-                  value: `$${unSoldCost.toFixed(2)}`,
+                  value: `${currency}${unSoldCost.toFixed(2)}`,
                 },
               ].map((stat, index) => (
                 <div className="col-12 col-sm-6 col-lg-4" key={index}>

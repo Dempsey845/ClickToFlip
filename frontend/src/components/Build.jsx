@@ -29,7 +29,7 @@ function linkify(text) {
   });
 }
 
-function Build({ build, onUpdate, darkMode, onDuplicate }) {
+function Build({ build, onUpdate, darkMode, onDuplicate, currency }) {
   const [show, setShow] = useState(true);
   const [localBuild, setLocalBuild] = useState(build);
   const [editing, setEditing] = useState(false);
@@ -124,6 +124,7 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
               onUpdate();
             }}
             darkMode={darkMode}
+            currency={currency}
           />
         )}
 
@@ -206,12 +207,13 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
                   <strong>Status:</strong> {localBuild?.status}
                 </li>
                 <li>
-                  <strong>Total Cost:</strong> £{localBuild?.total_cost}
+                  <strong>Total Cost:</strong> {currency}
+                  {localBuild?.total_cost}
                 </li>
                 <li>
                   <strong>Sale Price:</strong>{" "}
                   {localBuild?.sale_price
-                    ? `£${localBuild?.sale_price}`
+                    ? `${currency}${localBuild?.sale_price}`
                     : "Not sold yet"}
                 </li>
                 <li>
@@ -229,7 +231,9 @@ function Build({ build, onUpdate, darkMode, onDuplicate }) {
                 </li>
                 <li>
                   <strong>Profit:</strong>{" "}
-                  {localBuild?.profit ? `£${localBuild?.profit}` : "N/A"}
+                  {localBuild?.profit
+                    ? `${currency}${localBuild?.profit}`
+                    : "N/A"}
                 </li>
               </ul>
 
